@@ -50,6 +50,7 @@ const Overview = () => {
 
   useEffect(() => {
     const container = scrollRef.current;
+    console.log(container)
     if (container) {
       container.addEventListener('scroll', handleScroll);
     }
@@ -58,7 +59,7 @@ const Overview = () => {
         container.removeEventListener('scroll', handleScroll);
       }
     };
-  }, [scrollRef.current]);
+  }, [joined, scrollRef.current]);
 
   useEffect(() => {
     checkJoined()
@@ -107,7 +108,6 @@ const Overview = () => {
           <div className='flex justify-center'>
             <div className='flex flex-col items-center'>
               <div className='p-2 border rounded-lg my-20'>
-                {/* <QrCodeIcon className='h-7 w-7'></QrCodeIcon> */}
                 <ArrowPathIcon className='h-7 w-7'></ArrowPathIcon>
               </div>
               <div className='mb-10 mt-20'>
@@ -141,7 +141,7 @@ const Overview = () => {
               </div>
             </div>
           </div>
-          <QRCodeModal isOpenQR={isOpenQR} setIsOpenQR={setIsOpenQR} qrCodeUrl={`http://localhost:5050/groups/${groupId}`}></QRCodeModal>
+          <QRCodeModal isOpenQR={isOpenQR} setIsOpenQR={setIsOpenQR} qrCodeUrl={`${API_BASE_URL}/${groupId}`}></QRCodeModal>
         </div>
       </div>
       :
