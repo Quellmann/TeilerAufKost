@@ -38,13 +38,13 @@ const Overview = () => {
       if (scrollRef.current.scrollTop === 0) {
         debounce(() => toast.promise(fetchData(), { loading: "Refreshing", success: "Updated", error: "Error, something went wrong" }), 500, debounceUpdateRef)
       }
-      debounce(() => startRef.current.scrollIntoView({ behavior: "smooth" }), 20, debounceScrollRef)
+      debounce(() => startRef.current.scrollIntoView({ behavior: "smooth" }), 200, debounceScrollRef)
     }
     if (scrollRef.current.scrollTop + startRef.current.clientHeight > scrollRef.current.scrollHeight - 338) {
       if (scrollRef.current.scrollTop + scrollRef.current.clientHeight == scrollRef.current.scrollHeight) {
         setIsOpenQR(true);
       }
-      debounce(() => startRef.current.scrollIntoView({ behavior: "smooth" }), 20, debounceScrollRef)
+      debounce(() => startRef.current.scrollIntoView({ behavior: "smooth" }), 200, debounceScrollRef)
     }
   };
 
