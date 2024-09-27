@@ -3,7 +3,7 @@ import React, { useEffect, useState, useRef } from 'react'
 import { useParams, useOutletContext, useNavigate } from 'react-router-dom';
 import QRCodeModal from '../components/QRCodeModal';
 import SaldoCalc from '../components/SaldoCalc';
-import { API_BASE_URL, BASE_URL } from "../config";
+import { API_BASE_URL, APP_URL } from "../config";
 import JoinGroup from './JoinGroup';
 import toast from 'react-hot-toast';
 
@@ -36,15 +36,15 @@ const Overview = () => {
   const handleScroll = () => {
     if (scrollRef.current.scrollTop < 338) {
       if (scrollRef.current.scrollTop === 0) {
-        debounce(() => toast.promise(fetchData(), { loading: "Refreshing", success: "Updated", error: "Error, something went wrong" }), 500, debounceUpdateRef)
+        debounce(() => toast.promise(fetchData(), { loading: "Refreshing", success: "Updated", error: "Error, something went wrong" }), 5000, debounceUpdateRef)
       }
-      debounce(() => startRef.current.scrollIntoView({ behavior: "smooth" }), 200, debounceScrollRef)
+      debounce(() => startRef.current.scrollIntoView({ behavior: "smooth" }), 100, debounceScrollRef)
     }
     if (scrollRef.current.scrollTop + startRef.current.clientHeight > scrollRef.current.scrollHeight - 338) {
       if (scrollRef.current.scrollTop + scrollRef.current.clientHeight == scrollRef.current.scrollHeight) {
         setIsOpenQR(true);
       }
-      debounce(() => startRef.current.scrollIntoView({ behavior: "smooth" }), 200, debounceScrollRef)
+      debounce(() => startRef.current.scrollIntoView({ behavior: "smooth" }), 100, debounceScrollRef)
     }
   };
 
@@ -61,6 +61,7 @@ const Overview = () => {
   }, [joined, scrollRef.current]);
 
   useEffect(() => {
+    console.log(API_BASE_URL, APP_URL)
     checkJoined()
     groupId && fetchData()
     if (joined) {
@@ -140,7 +141,7 @@ const Overview = () => {
               </div>
             </div>
           </div>
-          <QRCodeModal isOpenQR={isOpenQR} setIsOpenQR={setIsOpenQR} qrCodeUrl={`${BASE_URL}/${groupId}`}></QRCodeModal>
+          <QRCodeModal isOpenQR={isOpenQR} setIsOpenQR={setIsOpenQR} qrCodeUrl={`${APP_URL}/${groupId}`}></QRCodeModal>
         </div>
       </div>
       :
