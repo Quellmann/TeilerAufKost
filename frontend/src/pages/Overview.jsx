@@ -23,7 +23,7 @@ const Overview = () => {
 
   const checkJoined = () => {
     const subscribedGroups = JSON.parse(localStorage.getItem('groupSubscription'))
-    if (subscribedGroups.includes(groupId)) {
+    if (subscribedGroups && subscribedGroups.includes(groupId)) {
       setJoined(true)
     }
   }
@@ -32,10 +32,6 @@ const Overview = () => {
     clearTimeout(ref.current)
     ref.current = setTimeout(() => { func() }, time, ref)
   }
-  // const debounce = (func, time) => {
-  //   clearTimeout(debounceRef.current)
-  //   debounceRef.current = setTimeout(func, time)
-  // }
 
   const handleScroll = () => {
     if (scrollRef.current.scrollTop < 338) {
