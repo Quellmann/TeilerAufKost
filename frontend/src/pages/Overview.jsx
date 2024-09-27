@@ -3,7 +3,7 @@ import React, { useEffect, useState, useRef } from 'react'
 import { useParams, useOutletContext, useNavigate } from 'react-router-dom';
 import QRCodeModal from '../components/QRCodeModal';
 import SaldoCalc from '../components/SaldoCalc';
-import { API_BASE_URL } from "../config";
+import { API_BASE_URL, BASE_URL } from "../config";
 import JoinGroup from './JoinGroup';
 import toast from 'react-hot-toast';
 
@@ -50,7 +50,6 @@ const Overview = () => {
 
   useEffect(() => {
     const container = scrollRef.current;
-    console.log(container)
     if (container) {
       container.addEventListener('scroll', handleScroll);
     }
@@ -141,7 +140,7 @@ const Overview = () => {
               </div>
             </div>
           </div>
-          <QRCodeModal isOpenQR={isOpenQR} setIsOpenQR={setIsOpenQR} qrCodeUrl={`${API_BASE_URL}/${groupId}`}></QRCodeModal>
+          <QRCodeModal isOpenQR={isOpenQR} setIsOpenQR={setIsOpenQR} qrCodeUrl={`${BASE_URL}/${groupId}`}></QRCodeModal>
         </div>
       </div>
       :
