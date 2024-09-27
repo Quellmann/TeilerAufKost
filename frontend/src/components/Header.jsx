@@ -1,6 +1,6 @@
 import React, { useRef, useEffect, useState } from 'react'
 import { Bars3Icon } from "@heroicons/react/24/solid"
-import Sidebar from './sidebar'
+import Sidebar from './Sidebar'
 
 const Header = ({ refresh }) => {
   const [isOpen, setIsOpen] = useState(false);
