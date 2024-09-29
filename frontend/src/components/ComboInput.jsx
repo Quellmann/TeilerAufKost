@@ -21,19 +21,26 @@ export default function ComboInput({ data, form, setForm, formfield, type }) {
         return form[formfield]
     }
 
+    useEffect(() => {
+        console.log(form)
+
+        return
+    }, [form])
+
     return (
-        <Listbox value={form[formfield]} onChange={setSelectedPeople} {...(type == "multiple" && { multiple: true })}>
+
+        < Listbox value={[]} onChange={setSelectedPeople} {...(type == "multiple" && { multiple: true })}>
             <ListboxButton
                 className={clsx(
                     'relative block w-full rounded-lg border bg-slate-100 py-1.5 pr-8 pl-3 text-left text-sm/6 text-black min-h-10',
                     'focus:outline-none data-[focus]:outline-2 data-[focus]:-outline-offset-2 data-[focus]:outline-black/25')}>
-                {handleDisplayedPeople()}
+                {/* {handleDisplayedPeople()} */}
                 <ChevronDownIcon
                     className="group pointer-events-none absolute top-2.5 right-2.5 size-4 fill-black/60"
                     aria-hidden="true"
                 />
             </ListboxButton>
-            <ListboxOptions anchor="bottom"
+            {/* <ListboxOptions anchor="bottom"
                 transition
                 className={clsx(
                     'w-[var(--button-width)] rounded-xl border border-slate-200 bg-slate-100 p-1 mt-1 [--anchor-gap:var(--spacing-1)] focus:outline-none',
@@ -49,9 +56,11 @@ export default function ComboInput({ data, form, setForm, formfield, type }) {
                         <ListboxOption key={index} value={person} className="group flex cursor-default items-center gap-2 rounded-lg py-1.5 px-3 select-none data-[focus]:bg-black/10">
                             <CheckIcon className="invisible size-4 fill-black group-data-[selected]:visible" />
                             <div className="text-sm/6 text-black">{person}</div>
+                            <div className="text-sm/6 text-black">{ }€</div>
+                            <div className="text-sm/6 text-black">{ }%</div>
                         </ListboxOption>
                     ))}
-            </ListboxOptions>
+            </ListboxOptions> */}
         </Listbox >
     )
 }
