@@ -22,9 +22,9 @@ const JoinGroup = ({ groupName, groupId, setJoined, refresh }) => {
         <div className='flex-1 h-full overflow-auto scroll-smooth'>
             <div className='h-full 2xl:w-[40%] xl:w-[50%] lg:w-[60%] md:w-[70%] sm:w-[80%] w-[90%] mx-auto justify-center flex'>
                 <div className='flex flex-col items-center text-xl mt-40'>
-                    <div>Du bist der Gruppe</div>
+                    <div>Möchtest du der Gruppe</div>
                     <div className='text-3xl'>{groupName}</div>
-                    <div className='mb-10'>noch nicht beigetreten</div>
+                    <div className='mb-10'>beitreten?</div>
                     <button onClick={() => saveGroupSubscription()} className='py-2 px-10 bg-slate-200 rounded-lg hover:bg-green-500 transition-colors'>Beitreten</button>
                 </div>
                 <div className='absolute flex bottom-24 left-1/2 -translate-x-1/2 justify-center'>

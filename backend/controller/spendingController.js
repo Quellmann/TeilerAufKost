@@ -30,6 +30,8 @@ export async function newSpending(req, res) {
             amount: req.body.amount,
             from: req.body.from,
             to: req.body.to,
+            individualValueHistory: req.body.individualValueHistory,
+            isBalancingTransaction: req.body.isBalancingTransaction,
         })
         const spending = await newSpending.save();
         res.status(200).json(spending);

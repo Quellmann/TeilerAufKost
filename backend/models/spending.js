@@ -7,6 +7,8 @@ const SpendingSchema = new Schema(
         amount: { type: Number, required: true },
         from: { type: String, required: true },
         to: { type: Array, required: true },
+        individualValueHistory: { type: Array, required: false },
+        isBalancingTransaction: { type: Boolean, required: false, default: false }
     },
     { timestamps: true }
 );
