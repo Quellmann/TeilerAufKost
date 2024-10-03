@@ -18,7 +18,7 @@ const NewSpending = () => {
   const navigate = useNavigate();
   const [form, setForm] = useState({
     title: "",
-    amount: 0,
+    amount: "",
     from: "",
     to: [{ name: "", amount: 0 }],
     individualValueHistory: [],
@@ -49,9 +49,8 @@ const NewSpending = () => {
 
   const individualValueHandler = (input, value, person) => {
     const convertedValue = +(input === "percent"
-      ? (form.amount * value) / 100
+      ? ((form.amount * value) / 100).toFixed(2)
       : value);
-    console.log(convertedValue);
 
     setForm((prev) => ({
       ...prev,
@@ -93,14 +92,19 @@ const NewSpending = () => {
         ),
       }));
     } else {
-      const newSplit = (remainingAmount / uneditedCount).toFixed(2);
+      let newSplit = parseFloat((remainingAmount / uneditedCount).toFixed(2));
+      const notSplittable =
+        form.amount - editedTotal - newSplit * uneditedCount;
+      if (notSplittable > 0.001) {
+        newSplit += 0.01;
+      }
 
       setForm((prev) => ({
         ...prev,
         to: prev.to.map((member) =>
           form.individualValueHistory.includes(member.name)
             ? member
-            : { ...member, amount: parseFloat(newSplit) }
+            : { ...member, amount: parseFloat(newSplit.toFixed(2)) }
         ),
       }));
     }
@@ -124,7 +128,13 @@ const NewSpending = () => {
   }, [form.to.length, form.amount]);
 
   const handleAmountInput = (e) => {
-    setForm((prevState) => ({ ...prevState, amount: +e.target.value }));
+    let value = e.target.value;
+
+    if (value.includes(".")) {
+      const parts = value.split(".");
+      value = parts[0] + "." + parts[1].slice(0, 2);
+    }
+    setForm((prevState) => ({ ...prevState, amount: value }));
   };
 
   const submitForm = async () => {
@@ -182,10 +192,12 @@ const NewSpending = () => {
         <div className="text-lg pl-3 mt-3">
           <Input
             onChange={(e) => handleAmountInput(e)}
+            value={form.amount}
             placeholder="Betrag"
             className="border w-full rounded-lg py-2 text-center"
             name="spending_amount"
             type="number"
+            step="0.01"
             min="0"
           />
         </div>
@@ -289,6 +301,7 @@ const NewSpending = () => {
                                 className="border w-16 rounded-lg text-right"
                                 name={"amount" + person}
                                 type="number"
+                                step="0.01"
                                 min="0"
                               />
                               <div>€</div>
@@ -315,6 +328,7 @@ const NewSpending = () => {
                                 className="border w-16 rounded-lg text-right"
                                 name={"percent" + person}
                                 type="number"
+                                step="0.01"
                                 min="0"
                               />
                               <div>%</div>
