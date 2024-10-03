@@ -52,19 +52,6 @@ const Spendings = () => {
   }
 
   useEffect(() => {
-    // async function fetchData() {
-    //     const response = await fetch(`${API_BASE_URL}/${groupId}/spendings`);
-    //     if (!response.ok) {
-    //         const message = `An error has occurred: ${response.statusText}`;
-    //         console.error(message);
-    //         return;
-    //     }
-    //     const data = await response.json();
-    //     if (!data) {
-    //         console.warn(`Data not found`);
-    //     }
-    //     setSpendings(data)
-    // }
     groupId && fetchData();
     return;
   }, [groupId]);
@@ -99,7 +86,7 @@ const Spendings = () => {
               .map((spending, index) => (
                 <Disclosure as="div" key={spending._id} className="">
                   <DisclosureButton className="group p-3 grid grid-cols-5 w-full">
-                    <div className="col-span-2 justify-self-start truncate text-xl">
+                    <div className="col-span-2 justify-self-start truncate text-xl ">
                       {spending.title}
                     </div>
                     <div className="justify-self-start text-xl">
@@ -140,7 +127,7 @@ const Spendings = () => {
                       <div className="text-lg border-b">Betrag:</div>
                       {spending.to.map((person, index) => (
                         <div className="text-left" key={index}>
-                          {person.amount.toFixed(2)}€
+                          {person.amount}€
                         </div>
                       ))}
                     </div>

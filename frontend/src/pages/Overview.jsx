@@ -3,11 +3,10 @@ import { Tab, TabGroup, TabList, TabPanel, TabPanels } from "@headlessui/react";
 import React, { useEffect, useState, useRef } from "react";
 import { useParams, useOutletContext, useNavigate } from "react-router-dom";
 import QRCodeModal from "../components/QRCodeModal";
-import SaldoCalc from "../components/SaldoCalc";
 import { API_BASE_URL } from "../config";
 import JoinGroup from "./JoinGroup";
 import toast from "react-hot-toast";
-import BalancingCalc from "../components/BalancingCalc";
+import Balancing from "../components/Balancing";
 import Summary from "../components/Summary";
 
 class Person {
@@ -20,15 +19,17 @@ class Person {
     this.expenditures = spendings.map((item) => {
       return item.from === name ? item.amount : 0;
     });
-    this.balance =
-      this.liabilities.reduce((a, b) => a + b, 0) +
-      this.expenditures.reduce((a, b) => a + b, 0);
+    this.balance = () => {
+      return (
+        this.liabilities.reduce((a, b) => a + b, 0) +
+        this.expenditures.reduce((a, b) => a + b, 0)
+      );
+    };
   }
 }
 
 const Overview = () => {
   const [data, setData] = useState([]);
-  const [spendingData, setSpendingData] = useState([]);
   const [personData, setPersonData] = useState([]);
   const [isOpenQR, setIsOpenQR] = useState(false);
   const [joined, setJoined] = useState(false);
@@ -79,7 +80,6 @@ const Overview = () => {
       }
 
       setData(data);
-      setSpendingData(spending_data);
       setPersonData(
         data.groupMember.map((member) => new Person(member, spending_data))
       );
@@ -114,28 +114,29 @@ const Overview = () => {
                   <div>
                     {personData
                       .find((person) => person.name === member)
-                      .balance.toFixed(2)}{" "}
+                      .balance()
+                      .toFixed(2)}{" "}
                     €
                   </div>
                 </div>
               </div>
             ))}
           </div>
-          <TabGroup className="my-10 pt-5 border-t">
-            <TabList className="flex justify-around mb-5">
-              <Tab className="data-[selected]:bg-slate-300 px-3 py-1 rounded-full border hover:bg-slate-100">
+          <TabGroup defaultIndex={1} className="my-10 pt-5 border-t">
+            <TabList className="flex pb-5 overflow-auto gap-5 snap-x">
+              <Tab className="data-[selected]:bg-slate-300 px-3 py-1 rounded-full border w-1/3 hover:bg-slate-100 snap-center">
                 Ausgleichszahlungen
               </Tab>
-              <Tab className="data-[selected]:bg-slate-300 px-3 py-1 rounded-full border hover:bg-slate-100">
+              <Tab className="data-[selected]:bg-slate-300 px-3 py-1 rounded-full border w-1/3 hover:bg-slate-100 snap-center">
                 Zusammenfassung
               </Tab>
-              <Tab className="data-[selected]:bg-slate-300 px-3 py-1 rounded-full border hover:bg-slate-100">
+              <Tab className="data-[selected]:bg-slate-300 px-3 py-1 rounded-full border w-1/3 hover:bg-slate-100 snap-center">
                 Graph
               </Tab>
             </TabList>
             <TabPanels>
-              <TabPanel className="">
-                <BalancingCalc spendings={spendingData}></BalancingCalc>
+              <TabPanel>
+                <Balancing personData={personData}></Balancing>
               </TabPanel>
               <TabPanel>
                 <Summary personData={personData}></Summary>

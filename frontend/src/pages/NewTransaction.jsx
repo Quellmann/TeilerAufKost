@@ -7,7 +7,7 @@ import {
   ListboxOptions,
 } from "@headlessui/react";
 import { CheckIcon, ChevronDownIcon } from "@heroicons/react/20/solid";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, useLocation } from "react-router-dom";
 import { API_BASE_URL } from "../config";
 import toast from "react-hot-toast";
 import clsx from "clsx";
@@ -16,9 +16,15 @@ const NewTransaction = () => {
   const [data, setData] = useState([]);
   const { groupId } = useParams();
   const navigate = useNavigate();
+  const location = useLocation();
+  const queryParams = new URLSearchParams(location.search);
+  const disabledForms =
+    queryParams.has("amount") &&
+    queryParams.has("from") &&
+    queryParams.has("to");
   const [form, setForm] = useState({
     title: "Zahlung",
-    amount: 0,
+    amount: "",
     from: "",
     to: [{ name: "", amount: 0 }],
     isBalancingTransaction: true,
@@ -47,10 +53,27 @@ const NewTransaction = () => {
   };
 
   useEffect(() => {
-    setForm((prev) => ({
-      ...prev,
-      to: [{ name: form.to.at(0).name, amount: form.amount }],
-    }));
+    const amount = queryParams.get("amount");
+    const from = queryParams.get("from");
+    const to = queryParams.get("to");
+    if (disabledForms) {
+      setForm({
+        title: "Ausgleichzahlung",
+        amount: +amount,
+        from: from,
+        to: [{ name: to, amount: +amount }],
+        isBalancingTransaction: true,
+      });
+    }
+  }, [location]);
+
+  useEffect(() => {
+    if (!disabledForms) {
+      setForm((prev) => ({
+        ...prev,
+        to: [{ name: form.to.at(0).name, amount: form.amount }],
+      }));
+    }
   }, [form.amount]);
 
   useEffect(() => {
@@ -75,7 +98,7 @@ const NewTransaction = () => {
   return (
     <div className="flex-1 overflow-y-auto mt-16 mb-16 2xl:w-[40%] xl:w-[50%] lg:w-[60%] md:w-[70%] sm:w-[80%] w-[90%] mx-auto">
       <form className="mt-10 flex flex-col" autoComplete="off">
-        <div className="text-3xl mb-8 pl-3">Neue Zahlung hinzufügen</div>
+        <div className="text-3xl mb-8 pl-3">Neue {form.title} hinzufügen</div>
         <div className="text-lg pl-3 mt-3">
           <Input
             onChange={(e) =>
@@ -84,6 +107,8 @@ const NewTransaction = () => {
                 amount: parseFloat(e.target.value),
               }))
             }
+            value={form.amount}
+            disabled={disabledForms}
             placeholder="Betrag"
             className="border w-full rounded-lg py-2 text-center"
             name="spending_amount"
@@ -99,6 +124,7 @@ const NewTransaction = () => {
               onChange={(value) =>
                 setForm((prev) => ({ ...prev, from: value }))
               }
+              disabled={disabledForms}
             >
               <ListboxButton
                 className={clsx(
@@ -145,6 +171,7 @@ const NewTransaction = () => {
                   to: [{ name: value, amount: form.amount }],
                 }))
               }
+              disabled={disabledForms}
             >
               <ListboxButton
                 className={clsx(
