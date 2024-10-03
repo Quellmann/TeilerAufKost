@@ -5,9 +5,12 @@ import { useParams, useOutletContext, useNavigate } from "react-router-dom";
 import QRCodeModal from "../components/QRCodeModal";
 import { API_BASE_URL } from "../config";
 import JoinGroup from "./JoinGroup";
+import useEmblaCarousel from "embla-carousel-react";
 import toast from "react-hot-toast";
 import Balancing from "../components/Balancing";
 import Summary from "../components/Summary";
+import Statistics from "../components/Statistics";
+import Carousel from "../components/Carousel";
 
 class Person {
   constructor(name, spendings) {
@@ -35,6 +38,7 @@ const Overview = () => {
   const [joined, setJoined] = useState(false);
   const refresh = useOutletContext();
   const navigate = useNavigate();
+  const [emblaRef] = useEmblaCarousel();
 
   const { groupId } = useParams();
 
@@ -99,14 +103,14 @@ const Overview = () => {
             <div className="flex">
               <div
                 onClick={() => setIsOpenQR(true)}
-                className="p-2 border rounded-lg mr-2 cursor-pointer"
+                className="p-2 border rounded-lg cursor-pointer"
               >
                 <QrCodeIcon className="h-7 w-7"></QrCodeIcon>
               </div>
             </div>
           </div>
           <div className="text-lg p-3">Saldo</div>
-          <div className="flex flex-col divide-y rounded-lg border mr-2 text-xl">
+          <div className="flex flex-col divide-y rounded-lg border text-xl">
             {data.groupMember?.map((member, index) => (
               <div key={index} className="flex justify-between p-3">
                 <div className="">{member}</div>
@@ -122,16 +126,16 @@ const Overview = () => {
               </div>
             ))}
           </div>
-          <TabGroup defaultIndex={1} className="my-10 pt-5 border-t">
-            <TabList className="flex pb-5 overflow-auto gap-5 snap-x">
-              <Tab className="data-[selected]:bg-slate-300 px-3 py-1 rounded-full border w-1/3 hover:bg-slate-100 snap-center">
+          {/* <TabGroup defaultIndex={1} className="my-10 pt-5 border-t">
+            <TabList className="flex pb-5 overflow-x-auto gap-5 snap-x scroll-smooth">
+              <Tab className="data-[selected]:bg-slate-300 px-3 py-1 rounded-full border w-1/3 hover:bg-slate-100 snap-center min-w-[70%] sm:min-w-[33%]">
                 Ausgleichszahlungen
               </Tab>
-              <Tab className="data-[selected]:bg-slate-300 px-3 py-1 rounded-full border w-1/3 hover:bg-slate-100 snap-center">
+              <Tab className="data-[selected]:bg-slate-300 px-3 py-1 rounded-full border w-1/3 hover:bg-slate-100 snap-center min-w-[70%] sm:min-w-[33%]">
                 Zusammenfassung
               </Tab>
-              <Tab className="data-[selected]:bg-slate-300 px-3 py-1 rounded-full border w-1/3 hover:bg-slate-100 snap-center">
-                Graph
+              <Tab className="data-[selected]:bg-slate-300 px-3 py-1 rounded-full border w-1/3 hover:bg-slate-100 snap-center min-w-[70%] sm:min-w-[33%]">
+                Statistik
               </Tab>
             </TabList>
             <TabPanels>
@@ -141,9 +145,12 @@ const Overview = () => {
               <TabPanel>
                 <Summary personData={personData}></Summary>
               </TabPanel>
-              <TabPanel>Tab3</TabPanel>
+              <TabPanel>
+                <Statistics personData={personData}></Statistics>
+              </TabPanel>
             </TabPanels>
-          </TabGroup>
+          </TabGroup> */}
+          <Carousel personData={personData}></Carousel>
         </div>
       </div>
       <QRCodeModal

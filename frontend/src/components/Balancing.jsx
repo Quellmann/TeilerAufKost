@@ -1,15 +1,14 @@
+import { ArrowRightIcon, BanknotesIcon } from "@heroicons/react/24/outline";
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
 
 const Balancing = ({ personData }) => {
-  const [localCopy, setLocalCopy] = useState(personData);
-
   const balancingCalculation = () => {
-    let senders = localCopy
+    let senders = personData
       .filter((person) => person.balance() < 0)
       .sort((a, b) => b.balance() - a.balance())
       .map((entry) => ({ ...entry, balance: entry.balance() }));
-    let receivers = localCopy
+    let receivers = personData
       .filter((person) => person.balance() > 0)
       .sort((a, b) => a.balance() - b.balance())
       .map((entry) => ({ ...entry, balance: entry.balance() }));
@@ -52,23 +51,39 @@ const Balancing = ({ personData }) => {
   };
 
   return (
-    <div className="border rounded-lg divide-y">
-      {balancingCalculation().map((balancing, index) => (
-        <Link
-          to={`newTransaction?${new URLSearchParams({
-            amount: balancing.amount.toFixed(2),
-            from: balancing.from,
-            to: balancing.to,
-          })}`}
-          key={index}
-          className="grid grid-cols-4 justify-between p-2 hover:bg-slate-200"
-        >
-          <div>Von: {balancing.from}</div>
-          <div>An: {balancing.to}</div>
-          <div>{balancing.amount.toFixed(2)} €</div>
-          <div>bezahlen</div>
-        </Link>
-      ))}
+    <div className="border rounded-lg overflow-auto">
+      <table className="min-w-full table-auto">
+        <thead>
+          <tr className="border-b">
+            <th className="text-left p-2 w-1/4">Von</th>
+            <th className="text-left p-2 w-1/4">An</th>
+            <th className="text-left p-2 w-1/6">Betrag</th>
+            <th className="text-center p-2 w-2/6">Ausgleichen</th>
+          </tr>
+        </thead>
+        <tbody className="divide-y">
+          {balancingCalculation().map((balancing, personIndex) => (
+            <tr key={personIndex}>
+              <td className="p-2">{balancing.from}</td>
+              <td className="p-2">{balancing.to}</td>
+              <td className="p-2">{balancing.amount} €</td>
+              <td className="p-2">
+                <Link
+                  to={`newTransaction?${new URLSearchParams({
+                    amount: balancing.amount.toFixed(2),
+                    from: balancing.from,
+                    to: balancing.to,
+                  })}`}
+                  className="flex justify-center border rounded-lg px-2 py-1 hover:bg-green-400"
+                >
+                  <BanknotesIcon className="w-7"></BanknotesIcon>
+                  <ArrowRightIcon className="w-7"></ArrowRightIcon>
+                </Link>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
     </div>
   );
 };

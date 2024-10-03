@@ -58,7 +58,7 @@ const NewTransaction = () => {
     const to = queryParams.get("to");
     if (disabledForms) {
       setForm({
-        title: "Ausgleichzahlung",
+        title: "Ausgleichszahlung",
         amount: +amount,
         from: from,
         to: [{ name: to, amount: +amount }],

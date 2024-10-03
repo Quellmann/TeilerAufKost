@@ -85,20 +85,31 @@ const Spendings = () => {
               )
               .map((spending, index) => (
                 <Disclosure as="div" key={spending._id} className="">
-                  <DisclosureButton className="group p-3 grid grid-cols-5 w-full">
-                    <div className="col-span-2 justify-self-start truncate text-xl ">
-                      {spending.title}
+                  <DisclosureButton className="group p-3 w-full flex items-center">
+                    <div className="flex sm:grid sm:grid-cols-5 w-full gap-2 sm:gap-0 items-center">
+                      <div className="w-2/3 sm:col-span-2 justify-self-start text-xl text-left overflow-hidden text-ellipsis whitespace-nowrap">
+                        {spending.title}
+                        <div className="sm:hidden justify-self-start text-base sm:text-xl">
+                          {new Date(spending.createdAt).toLocaleDateString(
+                            "de-DE",
+                            { timeZone: "Europe/Berlin" }
+                          )}
+                        </div>
+                      </div>
+                      <div className="justify-self-start text-xl">
+                        {spending.amount}€
+                      </div>
+                      <div className="hidden sm:block justify-self-start text-base sm:text-xl">
+                        {new Date(spending.createdAt).toLocaleDateString(
+                          "de-DE",
+                          { timeZone: "Europe/Berlin" }
+                        )}
+                      </div>
+                      <ChevronDownIcon className="size-5 justify-self-end hidden sm:block group-data-[open]:rotate-180" />
                     </div>
-                    <div className="justify-self-start text-xl">
-                      {spending.amount}€
+                    <div className="">
+                      <ChevronDownIcon className="size-5 justify-self-end sm:hidden group-data-[open]:rotate-180" />
                     </div>
-                    <div className="justify-self-start text-xl">
-                      {new Date(spending.createdAt).toLocaleDateString(
-                        "de-DE",
-                        { timeZone: "Europe/Berlin" }
-                      )}
-                    </div>
-                    <ChevronDownIcon className="size-5 group-data-[open]:rotate-180 justify-self-end" />
                   </DisclosureButton>
                   <DisclosurePanel
                     transition
@@ -120,7 +131,9 @@ const Spendings = () => {
                     <div className="justify-self-start w-full">
                       <div className="text-lg border-b">An:</div>
                       {spending.to.map((person, index) => (
-                        <div key={index}>{person.name}</div>
+                        <div key={index} className="truncate">
+                          {person.name}
+                        </div>
                       ))}
                     </div>
                     <div className="justify-self-start w-full">

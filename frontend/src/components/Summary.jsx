@@ -11,9 +11,9 @@ const Summary = ({ personData }) => {
             <th className="text-left p-2 w-1/3">Verbraucht</th>
           </tr>
         </thead>
-        <tbody>
+        <tbody className="divide-y">
           {personData.map((person, personIndex) => (
-            <tr key={personIndex} className="border-b">
+            <tr key={personIndex}>
               <td className="p-2">{person.name}</td>
               <td className="p-2">
                 {person.expenditures.map((expenditure, index) => (
