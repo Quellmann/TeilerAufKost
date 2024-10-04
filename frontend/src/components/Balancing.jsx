@@ -58,7 +58,7 @@ const Balancing = ({ personData }) => {
             <th className="text-left p-2 w-1/4">Von</th>
             <th className="text-left p-2 w-1/4">An</th>
             <th className="text-left p-2 w-1/6">Betrag</th>
-            <th className="text-center p-2 w-2/6">Ausgleichen</th>
+            <th className="text-center p-2 w-2/6">Begleichen</th>
           </tr>
         </thead>
         <tbody className="divide-y">
@@ -76,8 +76,8 @@ const Balancing = ({ personData }) => {
                   })}`}
                   className="flex justify-center border rounded-lg px-2 py-1 hover:bg-green-400"
                 >
-                  <BanknotesIcon className="w-7"></BanknotesIcon>
-                  <ArrowRightIcon className="w-7"></ArrowRightIcon>
+                  <BanknotesIcon className="w-6"></BanknotesIcon>
+                  <ArrowRightIcon className="w-6"></ArrowRightIcon>
                 </Link>
               </td>
             </tr>

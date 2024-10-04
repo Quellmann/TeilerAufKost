@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useLocation } from "react-router-dom";
 import { Input } from "@headlessui/react";
 import { MagnifyingGlassIcon } from "@heroicons/react/24/outline";
 import {
@@ -14,7 +14,10 @@ const Spendings = () => {
   const [search, setSearch] = useState("");
   const [data, setData] = useState([]);
   const [spendings, setSpendings] = useState([]);
+  const [focusedSpending, setFocusedSpending] = useState(null);
   const { groupId } = useParams();
+  const location = useLocation();
+  const queryParams = new URLSearchParams(location.search);
 
   async function fetchData() {
     try {
@@ -52,6 +55,12 @@ const Spendings = () => {
   }
 
   useEffect(() => {
+    if (queryParams.has("focus")) {
+      setFocusedSpending(queryParams.get("focus"));
+    }
+  }, [spendings]);
+
+  useEffect(() => {
     groupId && fetchData();
     return;
   }, [groupId]);
@@ -84,8 +93,15 @@ const Spendings = () => {
                   : spending
               )
               .map((spending, index) => (
-                <Disclosure as="div" key={spending._id} className="">
-                  <DisclosureButton className="group p-3 w-full flex items-center">
+                <Disclosure
+                  as="div"
+                  key={index}
+                  defaultOpen={index == focusedSpending}
+                >
+                  <DisclosureButton
+                    className="group p-3 w-full flex items-center"
+                    open={true}
+                  >
                     <div className="flex sm:grid sm:grid-cols-5 w-full gap-2 sm:gap-0 items-center">
                       <div className="w-2/3 sm:col-span-2 justify-self-start text-xl text-left overflow-hidden text-ellipsis whitespace-nowrap">
                         {spending.title}

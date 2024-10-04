@@ -1,15 +1,10 @@
 import { QrCodeIcon } from "@heroicons/react/24/outline";
-import { Tab, TabGroup, TabList, TabPanel, TabPanels } from "@headlessui/react";
 import React, { useEffect, useState, useRef } from "react";
 import { useParams, useOutletContext, useNavigate } from "react-router-dom";
 import QRCodeModal from "../components/QRCodeModal";
 import { API_BASE_URL } from "../config";
 import JoinGroup from "./JoinGroup";
-import useEmblaCarousel from "embla-carousel-react";
 import toast from "react-hot-toast";
-import Balancing from "../components/Balancing";
-import Summary from "../components/Summary";
-import Statistics from "../components/Statistics";
 import Carousel from "../components/Carousel";
 
 class Person {
@@ -34,11 +29,11 @@ class Person {
 const Overview = () => {
   const [data, setData] = useState([]);
   const [personData, setPersonData] = useState([]);
+  const [spendings, setSpendings] = useState([]);
   const [isOpenQR, setIsOpenQR] = useState(false);
   const [joined, setJoined] = useState(false);
   const refresh = useOutletContext();
   const navigate = useNavigate();
-  const [emblaRef] = useEmblaCarousel();
 
   const { groupId } = useParams();
 
@@ -84,6 +79,7 @@ const Overview = () => {
       }
 
       setData(data);
+      setSpendings(spending_data);
       setPersonData(
         data.groupMember.map((member) => new Person(member, spending_data))
       );
@@ -126,31 +122,7 @@ const Overview = () => {
               </div>
             ))}
           </div>
-          {/* <TabGroup defaultIndex={1} className="my-10 pt-5 border-t">
-            <TabList className="flex pb-5 overflow-x-auto gap-5 snap-x scroll-smooth">
-              <Tab className="data-[selected]:bg-slate-300 px-3 py-1 rounded-full border w-1/3 hover:bg-slate-100 snap-center min-w-[70%] sm:min-w-[33%]">
-                Ausgleichszahlungen
-              </Tab>
-              <Tab className="data-[selected]:bg-slate-300 px-3 py-1 rounded-full border w-1/3 hover:bg-slate-100 snap-center min-w-[70%] sm:min-w-[33%]">
-                Zusammenfassung
-              </Tab>
-              <Tab className="data-[selected]:bg-slate-300 px-3 py-1 rounded-full border w-1/3 hover:bg-slate-100 snap-center min-w-[70%] sm:min-w-[33%]">
-                Statistik
-              </Tab>
-            </TabList>
-            <TabPanels>
-              <TabPanel>
-                <Balancing personData={personData}></Balancing>
-              </TabPanel>
-              <TabPanel>
-                <Summary personData={personData}></Summary>
-              </TabPanel>
-              <TabPanel>
-                <Statistics personData={personData}></Statistics>
-              </TabPanel>
-            </TabPanels>
-          </TabGroup> */}
-          <Carousel personData={personData}></Carousel>
+          <Carousel personData={personData} spendings={spendings}></Carousel>
         </div>
       </div>
       <QRCodeModal

@@ -1,6 +1,9 @@
 import React from "react";
+import { Link, useLocation } from "react-router-dom";
 
 const Summary = ({ personData }) => {
+  const location = useLocation();
+
   return (
     <div className="border rounded-lg overflow-auto">
       <table className="min-w-full table-fixed">
@@ -17,15 +20,33 @@ const Summary = ({ personData }) => {
               <td className="p-2">{person.name}</td>
               <td className="p-2">
                 {person.expenditures.map((expenditure, index) => (
-                  <div key={index} className="text-green-500 text-sm">
-                    {expenditure === 0 ? "" : expenditure.toFixed(2)}
+                  <div key={index}>
+                    <Link
+                      to={`${location.pathname}/spendings?${new URLSearchParams(
+                        {
+                          focus: index,
+                        }
+                      )}`}
+                      className="text-green-500 text-sm"
+                    >
+                      {expenditure === 0 ? "" : expenditure.toFixed(2)}
+                    </Link>
                   </div>
                 ))}
               </td>
               <td className="p-2">
                 {person.liabilities.map((liability, index) => (
-                  <div key={index} className="text-red-500 text-sm">
-                    {liability === 0 ? "" : liability.toFixed(2)}
+                  <div key={index}>
+                    <Link
+                      to={`${location.pathname}/spendings?${new URLSearchParams(
+                        {
+                          focus: index,
+                        }
+                      )}`}
+                      className="text-red-500 text-sm"
+                    >
+                      {liability === 0 ? "" : liability.toFixed(2)}
+                    </Link>
                   </div>
                 ))}
               </td>
