@@ -4,7 +4,6 @@ import { useParams, useOutletContext, useNavigate } from "react-router-dom";
 import QRCodeModal from "../components/QRCodeModal";
 import { API_BASE_URL } from "../config";
 import JoinGroup from "./JoinGroup";
-import toast from "react-hot-toast";
 import Carousel from "../components/Carousel";
 
 class Person {

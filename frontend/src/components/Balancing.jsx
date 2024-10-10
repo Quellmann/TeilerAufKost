@@ -66,7 +66,7 @@ const Balancing = ({ personData }) => {
             <tr key={personIndex}>
               <td className="p-2">{balancing.from}</td>
               <td className="p-2">{balancing.to}</td>
-              <td className="p-2">{balancing.amount} €</td>
+              <td className="p-2">{balancing.amount.toFixed(2)} €</td>
               <td className="p-2">
                 <Link
                   to={`newTransaction?${new URLSearchParams({
