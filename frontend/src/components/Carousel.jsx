@@ -3,7 +3,9 @@ import useEmblaCarousel from "embla-carousel-react";
 import Statistics from "./Statistics";
 import Balancing from "./Balancing";
 import Summary from "./Summary";
+import Spendings from "../pages/Spendings";
 import { ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/24/outline";
+import Options from "./Options";
 
 const Carousel = ({ personData, spendings }) => {
   const [emblaRef, emblaApi] = useEmblaCarousel();
@@ -29,7 +31,7 @@ const Carousel = ({ personData, spendings }) => {
 
   useEffect(() => {
     if (emblaApi) {
-      emblaApi.scrollTo(1);
+      emblaApi.scrollTo(2);
     }
   }, [emblaApi]);
 
@@ -49,11 +51,21 @@ const Carousel = ({ personData, spendings }) => {
           <Summary personData={personData}></Summary>
         </div>
         <div className="flex-none w-full min-w-0">
+          <div className="flex justify-center text-xl mb-5">
+            Ausgaben-Historie
+          </div>
+          <Spendings spendings={spendings}></Spendings>
+        </div>
+        <div className="flex-none w-full min-w-0">
           <div className="flex justify-center text-xl mb-5">Statistik</div>
           <Statistics
             personData={personData}
             spendings={spendings}
           ></Statistics>
+        </div>
+        <div className="flex-none w-full min-w-0">
+          <div className="flex justify-center text-xl mb-5">Optionen</div>
+          <Options></Options>
         </div>
       </div>
       <button
@@ -69,7 +81,7 @@ const Carousel = ({ personData, spendings }) => {
         <ChevronRightIcon className="w-6 translate-x-0.5"></ChevronRightIcon>
       </button>
       <div className="absolute top-2 flex space-x-2 w-full justify-center">
-        {[0, 1, 2].map((index) => (
+        {[0, 1, 2, 3, 4].map((index) => (
           <div
             key={index}
             className={`w-2 h-2 rounded-full transition-all duration-300 ${

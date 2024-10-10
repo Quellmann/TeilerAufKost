@@ -5,6 +5,7 @@ import QRCodeModal from "../components/QRCodeModal";
 import { API_BASE_URL } from "../config";
 import JoinGroup from "./JoinGroup";
 import Carousel from "../components/Carousel";
+import GridLoader from "react-spinners/GridLoader";
 
 class Person {
   constructor(name, spendings) {
@@ -26,6 +27,7 @@ class Person {
 }
 
 const Overview = () => {
+  const [isLoading, setIsLoading] = useState(true);
   const [data, setData] = useState([]);
   const [personData, setPersonData] = useState([]);
   const [spendings, setSpendings] = useState([]);
@@ -82,6 +84,7 @@ const Overview = () => {
       setPersonData(
         data.groupMember.map((member) => new Person(member, spending_data))
       );
+      setIsLoading(false);
       return Promise.resolve();
     } catch (error) {
       console.error("Fetch data error:", error);
@@ -90,38 +93,63 @@ const Overview = () => {
   }
 
   return joined ? (
-    <div className="h-full overflow-auto">
-      <div className="flex flex-col 2xl:w-[40%] xl:w-[50%] lg:w-[60%] md:w-[70%] sm:w-[80%] w-[90%] mx-auto">
+    <div className={"relative h-full overflow-auto"}>
+      <div
+        className={`justify-center h-full items-center ${
+          isLoading ? "flex" : "hidden"
+        }`}
+      >
+        <GridLoader
+          loading={isLoading}
+          size={100}
+          speedMultiplier={0.5}
+          color="rgba(229 231 235)"
+        ></GridLoader>
+      </div>
+      <div
+        className={`flex flex-col 2xl:w-[40%] xl:w-[50%] lg:w-[60%] md:w-[70%] sm:w-[80%] w-[90%] mx-auto transition-opacity duration-500 ease-in-out ${
+          isLoading ? "opacity-0" : "opacity-100"
+        }`}
+      >
         <div className="flex flex-col grow">
-          <div className="flex items-center justify-between">
-            <div className="text-3xl py-8 pl-3 truncate">{data.groupName}</div>
-            <div className="flex">
-              <div
-                onClick={() => setIsOpenQR(true)}
-                className="p-2 border rounded-lg cursor-pointer"
-              >
-                <QrCodeIcon className="h-7 w-7"></QrCodeIcon>
-              </div>
-            </div>
-          </div>
-          <div className="text-lg p-3">Saldo</div>
-          <div className="flex flex-col divide-y rounded-lg border text-xl">
-            {data.groupMember?.map((member, index) => (
-              <div key={index} className="flex justify-between p-3">
-                <div className="">{member}</div>
-                <div className="">
-                  <div>
-                    {personData
-                      .find((person) => person.name === member)
-                      .balance()
-                      .toFixed(2)}{" "}
-                    €
+          {!isLoading && (
+            <>
+              <div className="flex items-center justify-between">
+                <div className="text-3xl py-8 pl-3 truncate">
+                  {data.groupName}
+                </div>
+                <div className="flex">
+                  <div
+                    onClick={() => setIsOpenQR(true)}
+                    className="p-2 border rounded-lg cursor-pointer"
+                  >
+                    <QrCodeIcon className="h-7 w-7"></QrCodeIcon>
                   </div>
                 </div>
               </div>
-            ))}
-          </div>
-          <Carousel personData={personData} spendings={spendings}></Carousel>
+              <div className="text-lg p-3">Saldo</div>
+              <div className="flex flex-col divide-y rounded-lg border text-xl">
+                {data.groupMember?.map((member, index) => (
+                  <div key={index} className="flex justify-between p-3">
+                    <div className="">{member}</div>
+                    <div className="">
+                      <div>
+                        {personData
+                          .find((person) => person.name === member)
+                          .balance()
+                          .toFixed(2)}{" "}
+                        €
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+              <Carousel
+                personData={personData}
+                spendings={spendings}
+              ></Carousel>
+            </>
+          )}
         </div>
       </div>
       <QRCodeModal
