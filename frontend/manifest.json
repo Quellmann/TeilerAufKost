@@ -1,0 +1,12 @@
+{
+    "name": "TeilerAufKost",
+    "short_name": "TAK",
+    "display": "standalone",
+    "icons": [
+        {
+            "src": "/logo.jpg",
+            "sizes": "192x192",
+            "type": "image/jpg"
+        }
+    ]
+}
