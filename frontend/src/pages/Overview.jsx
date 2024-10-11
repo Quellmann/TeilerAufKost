@@ -7,6 +7,7 @@ import JoinGroup from "./JoinGroup";
 import Carousel from "../components/Carousel";
 import GridLoader from "react-spinners/GridLoader";
 import AddPage from "../components/AddPage";
+import NewExpanditure from "../components/NewExpanditure";
 
 class Person {
   constructor(name, spendings) {
@@ -35,6 +36,7 @@ const Overview = () => {
   const [isOpenQR, setIsOpenQR] = useState(false);
   const [joined, setJoined] = useState(false);
   const [refresh, emblaRef, emblaApi] = useOutletContext();
+  const [addType, setAddType] = useState("");
   const navigate = useNavigate();
 
   const { groupId } = useParams();
@@ -154,7 +156,16 @@ const Overview = () => {
                   ></Carousel>
                 </div>
                 <div className="flex-none w-full min-w-0">
-                  <AddPage emblaApi={emblaApi}></AddPage>
+                  <AddPage
+                    emblaApi={emblaApi}
+                    setAddType={setAddType}
+                  ></AddPage>
+                </div>
+                <div className="flex-none w-full min-w-0">
+                  <NewExpanditure
+                    addType={addType}
+                    emblaApi={emblaApi}
+                  ></NewExpanditure>
                 </div>
               </div>
             </div>

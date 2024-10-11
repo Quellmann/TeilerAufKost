@@ -9,16 +9,19 @@ import {
 } from "@heroicons/react/24/outline";
 import { Link, useParams } from "react-router-dom";
 
-const AddPage = ({ emblaApi }) => {
-  const { groupId } = useParams();
-  const overviewButton = useCallback(() => {
+const AddPage = ({ emblaApi, setAddType }) => {
+  const backButton = useCallback(() => {
     if (emblaApi) emblaApi.scrollPrev();
   }, [emblaApi]);
+  const forwardButton = useCallback(() => {
+    if (emblaApi) emblaApi.scrollNext();
+  }, [emblaApi]);
+
   return (
     <div className="">
       <div>
         <button
-          onClick={() => overviewButton()}
+          onClick={() => backButton()}
           className="flex items-center p-1 border rounded-lg"
         >
           <ArrowUturnLeftIcon className="size-6"></ArrowUturnLeftIcon>
@@ -26,36 +29,45 @@ const AddPage = ({ emblaApi }) => {
         </button>
       </div>
       <div className="divide-y flex flex-col border rounded-lg mt-10">
-        <Link
-          to={groupId + "/newSpending"}
-          className="flex items-center px-6 py-2 space-x-4 hover:bg-slate-300 cursor-pointer"
+        <button
+          onClick={() => {
+            setAddType("spending");
+            forwardButton();
+          }}
+          className="flex items-center px-6 py-2 space-x-4 hover:bg-slate-300 cursor-pointer text-left"
         >
           <ShoppingBagIcon className="size-6"></ShoppingBagIcon>
           <div className="flex flex-col">
             Neue Ausgabe
             <div className="font-thin text-sm">Jemand hat etwas eingekauft</div>
           </div>
-        </Link>
-        <Link
-          to={groupId + "/newTransaction"}
-          className="flex items-center px-6 py-2 space-x-4 hover:bg-slate-300 cursor-pointer"
+        </button>
+        <button
+          onClick={() => {
+            setAddType("transaction");
+            forwardButton();
+          }}
+          className="flex items-center px-6 py-2 space-x-4 hover:bg-slate-300 cursor-pointer text-left"
         >
           <PaperAirplaneIcon className="size-6"></PaperAirplaneIcon>
           <div className="flex flex-col">
             Neue Zahlung
             <div className="font-thin text-sm">Jemand hat Geld erhalten</div>
           </div>
-        </Link>
-        <Link
-          to={groupId + "/newPerson"}
-          className="flex items-center px-6 py-2 space-x-4 hover:bg-slate-300 cursor-pointer"
+        </button>
+        <button
+          onClick={() => {
+            setAddType("person");
+            forwardButton();
+          }}
+          className="flex items-center px-6 py-2 space-x-4 hover:bg-slate-300 cursor-pointer text-left"
         >
           <UserPlusIcon className="size-6"></UserPlusIcon>
           <div className="flex flex-col">
             Neue Person
             <div className="font-thin text-sm">Jemanden hinzufügen</div>
           </div>
-        </Link>
+        </button>
       </div>
     </div>
   );

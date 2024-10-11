@@ -12,7 +12,7 @@ import { API_BASE_URL } from "../config";
 import toast from "react-hot-toast";
 import clsx from "clsx";
 
-const NewSpending = () => {
+const NewSpending = ({ emblaApi }) => {
   const [data, setData] = useState([]);
   const { groupId } = useParams();
   const navigate = useNavigate();
@@ -139,6 +139,7 @@ const NewSpending = () => {
 
   const submitForm = async () => {
     if (formValidation()) {
+      emblaApi.scrollTo(0);
       const response = await fetch(`${API_BASE_URL}/${groupId}/newSpending`, {
         method: "POST",
         headers: {
@@ -175,9 +176,9 @@ const NewSpending = () => {
   }, [groupId]);
 
   return (
-    <div className="flex-1 overflow-y-auto mt-16 mb-16 2xl:w-[40%] xl:w-[50%] lg:w-[60%] md:w-[70%] sm:w-[80%] w-[90%] mx-auto">
-      <form className="mt-10 flex flex-col" autoComplete="off">
-        <div className="text-xl mb-8 pl-3">Neue Ausgabe hinzufügen</div>
+    <div className="">
+      <form className="flex flex-col" autoComplete="off">
+        <div className="text-3xl mb-8 pl-3">Neue Ausgabe hinzufügen</div>
         <div className="text-lg pl-3">
           <Input
             onChange={(e) =>
@@ -268,7 +269,7 @@ const NewSpending = () => {
                 anchor="bottom"
                 transition
                 className={clsx(
-                  "w-[var(--button-width)] rounded-xl border border-slate-200 bg-slate-100 p-1 mt-1 [--anchor-gap:var(--spacing-1)] focus:outline-none",
+                  "w-full md:w-[var(--button-width)] rounded-xl border border-slate-200 bg-slate-100 p-1 m-1 [--anchor-gap:var(--spacing-1)] focus:outline-none",
                   "transition duration-100 ease-in data-[leave]:data-[closed]:opacity-0"
                 )}
               >
@@ -343,7 +344,7 @@ const NewSpending = () => {
           </div>
         </div>
       </form>
-      <div className="absolute flex bottom-24 left-1/2 -translate-x-1/2 justify-center">
+      <div className="flex justify-center mt-20">
         <button
           onClick={submitForm}
           className="rounded-lg bg-slate-200 hover:bg-green-400 transition-colors py-2 px-20 "
