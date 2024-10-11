@@ -6,6 +6,7 @@ import { API_BASE_URL } from "../config";
 import JoinGroup from "./JoinGroup";
 import Carousel from "../components/Carousel";
 import GridLoader from "react-spinners/GridLoader";
+import AddPage from "../components/AddPage";
 
 class Person {
   constructor(name, spendings) {
@@ -33,7 +34,7 @@ const Overview = () => {
   const [spendings, setSpendings] = useState([]);
   const [isOpenQR, setIsOpenQR] = useState(false);
   const [joined, setJoined] = useState(false);
-  const refresh = useOutletContext();
+  const [refresh, emblaRef, emblaApi] = useOutletContext();
   const navigate = useNavigate();
 
   const { groupId } = useParams();
@@ -113,42 +114,50 @@ const Overview = () => {
       >
         <div className="flex flex-col grow">
           {!isLoading && (
-            <>
-              <div className="flex items-center justify-between">
-                <div className="text-3xl py-8 pl-3 truncate">
-                  {data.groupName}
-                </div>
-                <div className="flex">
-                  <div
-                    onClick={() => setIsOpenQR(true)}
-                    className="p-2 border rounded-lg cursor-pointer"
-                  >
-                    <QrCodeIcon className="h-7 w-7"></QrCodeIcon>
-                  </div>
-                </div>
-              </div>
-              <div className="text-lg p-3">Saldo</div>
-              <div className="flex flex-col divide-y rounded-lg border text-xl">
-                {data.groupMember?.map((member, index) => (
-                  <div key={index} className="flex justify-between p-3">
-                    <div className="">{member}</div>
-                    <div className="">
-                      <div>
-                        {personData
-                          .find((person) => person.name === member)
-                          .balance()
-                          .toFixed(2)}{" "}
-                        €
+            <div className="overflow-hidden my-5 pt-5 relative" ref={emblaRef}>
+              <div className="flex gap-5">
+                {/* outer carousel */}
+                <div className="flex-none w-full min-w-0">
+                  <div className="flex items-center justify-between">
+                    <div className="text-3xl py-8 pl-3 truncate">
+                      {data.groupName}
+                    </div>
+                    <div className="flex">
+                      <div
+                        onClick={() => setIsOpenQR(true)}
+                        className="p-2 border rounded-lg cursor-pointer"
+                      >
+                        <QrCodeIcon className="h-7 w-7"></QrCodeIcon>
                       </div>
                     </div>
                   </div>
-                ))}
+                  <div className="text-lg p-3">Saldo</div>
+                  <div className="flex flex-col divide-y rounded-lg border text-xl">
+                    {data.groupMember?.map((member, index) => (
+                      <div key={index} className="flex justify-between p-3">
+                        <div className="">{member}</div>
+                        <div className="">
+                          <div>
+                            {personData
+                              .find((person) => person.name === member)
+                              .balance()
+                              .toFixed(2)}{" "}
+                            €
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                  <Carousel
+                    personData={personData}
+                    spendings={spendings}
+                  ></Carousel>
+                </div>
+                <div className="flex-none w-full min-w-0">
+                  <AddPage emblaApi={emblaApi}></AddPage>
+                </div>
               </div>
-              <Carousel
-                personData={personData}
-                spendings={spendings}
-              ></Carousel>
-            </>
+            </div>
           )}
         </div>
       </div>

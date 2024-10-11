@@ -68,7 +68,23 @@ const Statistics = ({ personData, spendings }) => {
         xAxis={lineXAxis}
         series={lineSeries}
         height={400}
+        margin={{
+          top: 40,
+          bottom: 20,
+          left: 30,
+          right: 0,
+        }}
         className="w-full"
+        grid={{ vertical: true, horizontal: true }}
+        slotProps={{
+          legend: {
+            direction: "row",
+            itemMarkWidth: 20,
+            itemMarkHeight: 2,
+            markGap: 5,
+            itemGap: 10,
+          },
+        }}
       />
     )
   );
