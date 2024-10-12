@@ -5,26 +5,6 @@ const Statistics = ({ personData, spendings }) => {
   const [lineXAxis, setLineXAxis] = useState({ data: [] });
   const [lineSeries, setLineSeries] = useState([]);
 
-  // Function to format spending data for each person
-  const formatSpendingData = () => {
-    const formattedData = spendings.map((spending) => {
-      const date = new Date(spending.createdAt).toLocaleDateString("de-DE", {
-        timeZone: "Europe/Berlin",
-      });
-      const dataset = personData.reduce(
-        (acc, person) => {
-          acc[person.name] =
-            parseFloat(person.liabilities) + parseFloat(person.expenditures); // Add amount for each person
-          return acc;
-        },
-        { date }
-      ); // Add date to each entry
-      return dataset;
-    });
-
-    return formattedData;
-  };
-
   const convertLineData = () => {
     setLineXAxis([
       {

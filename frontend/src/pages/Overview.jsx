@@ -116,7 +116,7 @@ const Overview = () => {
       >
         <div className="flex flex-col grow">
           {!isLoading && (
-            <div className="overflow-hidden my-5 pt-5 relative" ref={emblaRef}>
+            <div className="overflow-hidden my-5 relative" ref={emblaRef}>
               <div className="flex gap-5">
                 {/* outer carousel */}
                 <div className="flex-none w-full min-w-0">

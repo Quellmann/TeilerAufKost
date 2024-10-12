@@ -6,7 +6,6 @@ import { PlusIcon } from "@heroicons/react/24/outline";
 
 const Header = ({ refresh, emblaApi }) => {
   const [isOpen, setIsOpen] = useState(false);
-  const [isOpenAdd, setIsOpenAdd] = useState(false);
   const sidebarRef = useRef(null);
   const burgerRef = useRef(null);
 
@@ -26,7 +25,7 @@ const Header = ({ refresh, emblaApi }) => {
   };
 
   const addPageButton = useCallback(() => {
-    if (emblaApi) emblaApi.scrollNext();
+    if (emblaApi) emblaApi.scrollTo(1);
   }, [emblaApi]);
 
   useEffect(() => {
@@ -45,10 +44,10 @@ const Header = ({ refresh, emblaApi }) => {
   }, [isOpen]);
 
   return (
-    <div className="bg-gray-200">
+    <div className="bg-gray-200 flex justify-between items-center">
       <button
         ref={burgerRef}
-        className="absolute m-2 p-2 top-4 left-0 hover:bg-slate-300 rounded-lg"
+        className="m-2 p-2 hover:bg-slate-300 rounded-lg"
         onClick={toggleSidebar}
       >
         <Bars3Icon className="size-8"></Bars3Icon>
@@ -62,7 +61,7 @@ const Header = ({ refresh, emblaApi }) => {
         </div>
         <div className="text-2xl font-thin">TeilerAufKost</div>
       </Link>
-      <div className="absolute m-2 p2 top-4 right-0">
+      <div className="m-2 p2">
         <button
           className="hover:bg-slate-300 p-2 rounded-lg items-center text-sm/6 font-semibold focus:outline-none"
           onClick={() => addPageButton()}

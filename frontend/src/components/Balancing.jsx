@@ -55,10 +55,10 @@ const Balancing = ({ personData }) => {
       <table className="min-w-full table-auto">
         <thead>
           <tr className="border-b">
-            <th className="text-left p-2 w-1/4">Von</th>
-            <th className="text-left p-2 w-1/4">An</th>
-            <th className="text-left p-2 w-1/6">Betrag</th>
-            <th className="text-center p-2 w-2/6">Begleichen</th>
+            <th className="text-left p-2">Von</th>
+            <th className="text-left p-2">An</th>
+            <th className="text-left p-2">Betrag</th>
+            <th className="text-center p-2">Begleichen</th>
           </tr>
         </thead>
         <tbody className="divide-y">
@@ -67,14 +67,14 @@ const Balancing = ({ personData }) => {
               <td className="p-2">{balancing.from}</td>
               <td className="p-2">{balancing.to}</td>
               <td className="p-2">{balancing.amount.toFixed(2)} €</td>
-              <td className="p-2">
+              <td className="p-1">
                 <Link
                   to={`newTransaction?${new URLSearchParams({
                     amount: balancing.amount.toFixed(2),
                     from: balancing.from,
                     to: balancing.to,
                   })}`}
-                  className="flex justify-center border rounded-lg px-2 py-1 hover:bg-green-400"
+                  className="flex justify-center border rounded-lg px-1 py-1 hover:bg-green-400"
                 >
                   <BanknotesIcon className="w-6"></BanknotesIcon>
                   <ArrowRightIcon className="w-6"></ArrowRightIcon>

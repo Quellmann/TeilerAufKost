@@ -18,17 +18,17 @@ const AddPage = ({ emblaApi, setAddType }) => {
   }, [emblaApi]);
 
   return (
-    <div className="">
+    <div className="m-1">
       <div>
         <button
           onClick={() => backButton()}
           className="flex items-center p-1 border rounded-lg"
         >
           <ArrowUturnLeftIcon className="size-6"></ArrowUturnLeftIcon>
-          Zurück
+          <div className="ml-3">Zurück</div>
         </button>
       </div>
-      <div className="divide-y flex flex-col border rounded-lg mt-10">
+      <div className="divide-y flex flex-col border rounded-lg mt-10 overflow-hidden">
         <button
           onClick={() => {
             setAddType("spending");
@@ -39,7 +39,9 @@ const AddPage = ({ emblaApi, setAddType }) => {
           <ShoppingBagIcon className="size-6"></ShoppingBagIcon>
           <div className="flex flex-col">
             Neue Ausgabe
-            <div className="font-thin text-sm">Jemand hat etwas eingekauft</div>
+            <div className="font-thin text-sm">
+              Jemand hat etwas für die Gruppe eingekauft
+            </div>
           </div>
         </button>
         <button
@@ -52,7 +54,9 @@ const AddPage = ({ emblaApi, setAddType }) => {
           <PaperAirplaneIcon className="size-6"></PaperAirplaneIcon>
           <div className="flex flex-col">
             Neue Zahlung
-            <div className="font-thin text-sm">Jemand hat Geld erhalten</div>
+            <div className="font-thin text-sm">
+              Jemand hat einem Gruppenmitglied Geld gegeben
+            </div>
           </div>
         </button>
         <button
