@@ -1,13 +1,16 @@
 import { QrCodeIcon } from "@heroicons/react/24/outline";
-import React, { useEffect, useState, useRef } from "react";
-import { useParams, useOutletContext, useNavigate } from "react-router-dom";
+import React, { useEffect, useState } from "react";
+import {
+  useNavigate,
+  useOutletContext,
+  useSearchParams,
+} from "react-router-dom";
 import QRCodeModal from "../components/QRCodeModal";
 import { API_BASE_URL } from "../config";
 import JoinGroup from "./JoinGroup";
 import Carousel from "../components/Carousel";
 import GridLoader from "react-spinners/GridLoader";
-import AddPage from "../components/AddPage";
-import NewExpanditure from "../components/NewExpanditure";
+import LandingPage from "./LandingPage";
 
 class Person {
   constructor(name, spendings) {
@@ -35,26 +38,36 @@ const Overview = () => {
   const [spendings, setSpendings] = useState([]);
   const [isOpenQR, setIsOpenQR] = useState(false);
   const [joined, setJoined] = useState(false);
-  const [refresh, emblaRef, emblaApi] = useOutletContext();
-  const [addType, setAddType] = useState("");
+  const [groupId, setGroupId] = useState("");
   const navigate = useNavigate();
 
-  const { groupId } = useParams();
+  const [searchParams] = useSearchParams();
+  const [setSidebarGroups, refresh] = useOutletContext();
 
   const checkJoined = () => {
     const subscribedGroups = JSON.parse(
       localStorage.getItem("groupSubscription")
     );
-    if (subscribedGroups && subscribedGroups.includes(groupId)) {
+    const isAlreadySubscribed = subscribedGroups.some(
+      (group) => group.id === groupId
+    );
+    if (subscribedGroups && isAlreadySubscribed) {
       setJoined(true);
+      return true;
     }
+    return false;
   };
 
   useEffect(() => {
-    checkJoined();
-    groupId && fetchData();
+    setGroupId(searchParams.get("groupId"));
     return;
-  }, [joined, groupId, refresh.current]);
+  }, [searchParams]);
+
+  useEffect(() => {
+    groupId && fetchData();
+    checkJoined();
+    return;
+  }, [groupId, refresh]);
 
   async function fetchData() {
     try {
@@ -95,97 +108,75 @@ const Overview = () => {
     }
   }
 
-  return joined ? (
-    <div className={"relative h-full overflow-auto"}>
-      <div
-        className={`justify-center h-full items-center ${
-          isLoading ? "flex" : "hidden"
-        }`}
-      >
-        <GridLoader
-          loading={isLoading}
-          size={100}
-          speedMultiplier={0.5}
-          color="rgba(229 231 235)"
-        ></GridLoader>
-      </div>
-      <div
-        className={`flex flex-col 2xl:w-[40%] xl:w-[50%] lg:w-[60%] md:w-[70%] sm:w-[80%] w-[90%] mx-auto transition-opacity duration-500 ease-in-out ${
-          isLoading ? "opacity-0" : "opacity-100"
-        }`}
-      >
-        <div className="flex flex-col grow">
-          {!isLoading && (
-            <div className="overflow-hidden my-5 relative" ref={emblaRef}>
-              <div className="flex gap-5">
-                {/* outer carousel */}
-                <div className="flex-none w-full min-w-0">
-                  <div className="flex items-center justify-between">
-                    <div className="text-3xl py-8 pl-3 truncate">
-                      {data.groupName}
-                    </div>
-                    <div className="flex">
-                      <div
-                        onClick={() => setIsOpenQR(true)}
-                        className="p-2 border rounded-lg cursor-pointer"
-                      >
-                        <QrCodeIcon className="h-7 w-7"></QrCodeIcon>
-                      </div>
-                    </div>
-                  </div>
-                  <div className="text-lg p-3">Saldo</div>
-                  <div className="flex flex-col divide-y rounded-lg border text-xl">
-                    {data.groupMember?.map((member, index) => (
-                      <div key={index} className="flex justify-between p-3">
-                        <div className="">{member}</div>
-                        <div className="">
-                          <div>
-                            {personData
-                              .find((person) => person.name === member)
-                              .balance()
-                              .toFixed(2)}{" "}
-                            €
-                          </div>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                  <Carousel
-                    personData={personData}
-                    spendings={spendings}
-                  ></Carousel>
-                </div>
-                <div className="flex-none w-full min-w-0">
-                  <AddPage
-                    emblaApi={emblaApi}
-                    setAddType={setAddType}
-                  ></AddPage>
-                </div>
-                <div className="flex-none w-full min-w-0">
-                  <NewExpanditure
-                    addType={addType}
-                    emblaApi={emblaApi}
-                  ></NewExpanditure>
+  const renderOverview = () => {
+    if (!groupId) {
+      return <LandingPage></LandingPage>;
+    } else if (isLoading) {
+      return (
+        <div className="flex justify-center h-full items-center">
+          <GridLoader
+            loading={isLoading}
+            size={100}
+            speedMultiplier={0.5}
+            color="rgba(229 231 235)"
+          ></GridLoader>
+        </div>
+      );
+    } else if (!joined) {
+      return (
+        <JoinGroup
+          groupName={data.groupName}
+          groupId={groupId}
+          setJoined={setJoined}
+        ></JoinGroup>
+      );
+    } else {
+      return (
+        <>
+          <div>
+            <div className="flex items-center justify-between">
+              <div className="text-3xl py-8 pl-3 truncate">
+                {data.groupName}
+              </div>
+              <div className="flex">
+                <div
+                  onClick={() => setIsOpenQR(true)}
+                  className="p-2 border rounded-lg cursor-pointer"
+                >
+                  <QrCodeIcon className="h-7 w-7"></QrCodeIcon>
                 </div>
               </div>
             </div>
-          )}
-        </div>
-      </div>
-      <QRCodeModal
-        isOpenQR={isOpenQR}
-        setIsOpenQR={setIsOpenQR}
-        qrCodeUrl={window.location.href}
-      ></QRCodeModal>
-    </div>
-  ) : (
-    <JoinGroup
-      groupName={data.groupName}
-      groupId={groupId}
-      setJoined={setJoined}
-      refresh={refresh}
-    ></JoinGroup>
-  );
+            <div className="text-lg p-3">Saldo</div>
+            <div className="flex flex-col divide-y rounded-lg border text-xl">
+              {data.groupMember?.map((member, index) => (
+                <div key={index} className="flex justify-between p-3">
+                  <div className="">{member}</div>
+                  <div className="">
+                    <div>
+                      {personData
+                        .find((person) => person.name === member)
+                        .balance()
+                        .toFixed(2)}{" "}
+                      €
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+            <Carousel personData={personData} spendings={spendings}></Carousel>
+          </div>
+          <QRCodeModal
+            isOpenQR={isOpenQR}
+            setIsOpenQR={setIsOpenQR}
+            qrCodeUrl={window.location.href}
+          ></QRCodeModal>
+        </>
+      );
+    }
+  };
+
+  return renderOverview();
 };
 
 export default Overview;

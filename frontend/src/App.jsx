@@ -1,11 +1,13 @@
-import Layout from './pages/Layout'
+import Layout from "./pages/Layout";
+import MainPage from "./pages/MainPage";
 
 function App() {
   return (
     <>
-      <Layout></Layout>
+      <MainPage></MainPage>
+      {/* <Layout></Layout> */}
     </>
-  )
+  );
 }
 
-export default App
+export default App;

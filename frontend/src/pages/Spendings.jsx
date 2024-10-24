@@ -7,7 +7,7 @@ import {
   DisclosureButton,
   DisclosurePanel,
 } from "@headlessui/react";
-import { ChevronDownIcon } from "@heroicons/react/20/solid";
+import { ChevronDownIcon, PencilIcon } from "@heroicons/react/24/outline";
 import { API_BASE_URL } from "../config";
 
 const Spendings = ({ spendings }) => {
@@ -83,35 +83,46 @@ const Spendings = ({ spendings }) => {
                 </DisclosureButton>
                 <DisclosurePanel
                   transition
-                  className="mt-2 p-3 text-sm grid grid-cols-5 origin-top transition duration-200 ease-out data-[closed]:-translate-y-6 data-[closed]:opacity-0"
+                  className="mt-2 p-3  origin-top transition duration-200 ease-out data-[closed]:-translate-y-6 data-[closed]:opacity-0"
                 >
-                  <div className="col-span-3">
-                    <div className="text-lg border-b">Von:</div>
-                    <div className="flex flex-col gap-14">
-                      <div>{spending.from}</div>
-                      <div className="text-xs text-black/50">
-                        Erstellt am:{" "}
-                        {new Date(spending.updatedAt).toLocaleString("de-DE", {
-                          timeZone: "Europe/Berlin",
-                        })}
+                  <div className="text-sm grid grid-cols-5">
+                    <div className="col-span-3">
+                      <div className="text-lg border-b">Von:</div>
+                      <div className="flex flex-col gap-14">
+                        <div>{spending.from}</div>
+                        <div className="text-xs text-black/50">
+                          Erstellt am:{" "}
+                          {new Date(spending.updatedAt).toLocaleString(
+                            "de-DE",
+                            {
+                              timeZone: "Europe/Berlin",
+                            }
+                          )}
+                        </div>
                       </div>
                     </div>
+                    <div className="justify-self-start w-full">
+                      <div className="text-lg border-b">An:</div>
+                      {spending.to.map((person, index) => (
+                        <div key={index} className="truncate">
+                          {person.name}
+                        </div>
+                      ))}
+                    </div>
+                    <div className="justify-self-start w-full">
+                      <div className="text-lg border-b">Betrag:</div>
+                      {spending.to.map((person, index) => (
+                        <div className="text-left" key={index}>
+                          {person.amount}€
+                        </div>
+                      ))}
+                    </div>
                   </div>
-                  <div className="justify-self-start w-full">
-                    <div className="text-lg border-b">An:</div>
-                    {spending.to.map((person, index) => (
-                      <div key={index} className="truncate">
-                        {person.name}
-                      </div>
-                    ))}
-                  </div>
-                  <div className="justify-self-start w-full">
-                    <div className="text-lg border-b">Betrag:</div>
-                    {spending.to.map((person, index) => (
-                      <div className="text-left" key={index}>
-                        {person.amount}€
-                      </div>
-                    ))}
+                  <div className="flex justify- mt-5 ">
+                    <button className="flex items-center border px-5 py-2 rounded-lg">
+                      <PencilIcon className="size-6"></PencilIcon>
+                      <div>Bearbeiten</div>
+                    </button>
                   </div>
                 </DisclosurePanel>
               </Disclosure>

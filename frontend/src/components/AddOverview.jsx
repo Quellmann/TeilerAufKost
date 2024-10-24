@@ -1,5 +1,4 @@
 import React from "react";
-import Overview from "../pages/Overview";
 import { useCallback } from "react";
 import {
   ArrowUturnLeftIcon,
@@ -7,15 +6,25 @@ import {
   ShoppingBagIcon,
   UserPlusIcon,
 } from "@heroicons/react/24/outline";
-import { Link, useParams } from "react-router-dom";
+import { useSearchParams, useNavigate } from "react-router-dom";
 
-const AddPage = ({ emblaApi, setAddType }) => {
+const AddOverview = ({ emblaApi }) => {
+  const [searchParams, setSearchParams] = useSearchParams();
+  const navigate = useNavigate();
+
   const backButton = useCallback(() => {
     if (emblaApi) emblaApi.scrollPrev();
   }, [emblaApi]);
+
   const forwardButton = useCallback(() => {
     if (emblaApi) emblaApi.scrollNext();
   }, [emblaApi]);
+
+  const setType = (type) => {
+    const newParams = new URLSearchParams(searchParams);
+    newParams.set("type", type);
+    setSearchParams(newParams);
+  };
 
   return (
     <div className="m-1">
@@ -31,10 +40,10 @@ const AddPage = ({ emblaApi, setAddType }) => {
       <div className="divide-y flex flex-col border rounded-lg mt-10 overflow-hidden">
         <button
           onClick={() => {
-            setAddType("spending");
+            setType("spending");
             forwardButton();
           }}
-          className="flex items-center px-6 py-2 space-x-4 hover:bg-slate-300 cursor-pointer text-left"
+          className="flex items-center px-3 py-2 space-x-4 hover:bg-slate-300 cursor-pointer text-left"
         >
           <ShoppingBagIcon className="size-6"></ShoppingBagIcon>
           <div className="flex flex-col">
@@ -46,10 +55,10 @@ const AddPage = ({ emblaApi, setAddType }) => {
         </button>
         <button
           onClick={() => {
-            setAddType("transaction");
+            setType("transaction");
             forwardButton();
           }}
-          className="flex items-center px-6 py-2 space-x-4 hover:bg-slate-300 cursor-pointer text-left"
+          className="flex items-center px-3 py-2 space-x-4 hover:bg-slate-300 cursor-pointer text-left"
         >
           <PaperAirplaneIcon className="size-6"></PaperAirplaneIcon>
           <div className="flex flex-col">
@@ -61,10 +70,10 @@ const AddPage = ({ emblaApi, setAddType }) => {
         </button>
         <button
           onClick={() => {
-            setAddType("person");
+            setType("person");
             forwardButton();
           }}
-          className="flex items-center px-6 py-2 space-x-4 hover:bg-slate-300 cursor-pointer text-left"
+          className="flex items-center px-3 py-2 space-x-4 hover:bg-slate-300 cursor-pointer text-left"
         >
           <UserPlusIcon className="size-6"></UserPlusIcon>
           <div className="flex flex-col">
@@ -77,4 +86,4 @@ const AddPage = ({ emblaApi, setAddType }) => {
   );
 };
 
-export default AddPage;
+export default AddOverview;

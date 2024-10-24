@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Input } from "@headlessui/react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { UserPlusIcon, XMarkIcon } from "@heroicons/react/24/outline";
 import { API_BASE_URL } from "../config";
 import toast from "react-hot-toast";
@@ -9,9 +9,10 @@ const NewPerson = ({ emblaApi }) => {
   const [memberInput, setMemberInput] = useState("");
   const [groupMember, setGroupMember] = useState([]);
   const [data, setData] = useState([]);
-  const { groupId } = useParams();
   const inputRef = useRef(null);
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const groupId = searchParams.get("groupId");
 
   // Function to handle adding a member
   const handleAddMember = () => {
@@ -73,8 +74,8 @@ const NewPerson = ({ emblaApi }) => {
   }, []);
 
   return (
-    <div className="">
-      <form className="flex flex-col" autoComplete="off">
+    <form className="flex flex-col grow" autoComplete="off">
+      <div className="flex flex-col grow">
         <div className="text-3xl mb-8 pl-3">Neue Person hinzufügen</div>
         <div className="text-lg mt-10 relative">
           <Input
@@ -94,7 +95,7 @@ const NewPerson = ({ emblaApi }) => {
             <UserPlusIcon className="size-6" />
           </div>
         </div>
-        <div className="grid grid-cols-1 my-5 border rounded-lg divide-y mx-auto">
+        <div className="grid grid-cols-1 my-5 border rounded-lg divide-y">
           {data.groupMember?.map((member, index) => (
             <div key={index} className="py-1 grid grid-cols-3">
               <div className="pl-2 ">{index + 1 + "."}</div>
@@ -103,7 +104,9 @@ const NewPerson = ({ emblaApi }) => {
           ))}
           {groupMember.map((member, index) => (
             <div key={index} className="py-1 grid grid-cols-3">
-              <div className="pl-2 ">{index + 1 + "."}</div>
+              <div className="pl-2 ">
+                {data.groupMember.length + index + 1 + "."}
+              </div>
               <div className="w-28">{member}</div>
               <div
                 className="justify-self-end mr-2 cursor-pointer hover:bg-slate-200 rounded-full"
@@ -118,16 +121,19 @@ const NewPerson = ({ emblaApi }) => {
             </div>
           ))}
         </div>
-      </form>
-      <div className="flex justify-center">
+      </div>
+      <div className="flex justify-center mb-10">
         <button
-          onClick={submitForm}
+          onClick={(e) => {
+            e.preventDefault();
+            submitForm;
+          }}
           className="rounded-lg bg-slate-200 hover:bg-green-400 transition-colors py-2 px-20"
         >
           Speichern
         </button>
       </div>
-    </div>
+    </form>
   );
 };
 

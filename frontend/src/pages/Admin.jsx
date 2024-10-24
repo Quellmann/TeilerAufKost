@@ -38,8 +38,8 @@ const Admin = () => {
 
   return (
     <div className="h-full overflow-auto">
-      <div className="flex flex-col 2xl:w-[40%] xl:w-[50%] lg:w-[60%] md:w-[70%] sm:w-[80%] w-[90%] mx-auto">
-        <div className="border rounded-lg overflow-auto">
+      <div className="flex flex-col">
+        <div className="overflow-auto">
           <table className="min-w-full">
             <thead>
               <tr className="text-left">
@@ -55,7 +55,7 @@ const Admin = () => {
                   <td>{elmt.groupName}</td>
                   <td>{elmt.groupMember.length}</td>
                   <td>
-                    <Link to={`/${elmt._id}`}>Link</Link>
+                    <Link to={`/?groupId=${elmt._id}`}>Link</Link>
                   </td>
                 </tr>
               ))}

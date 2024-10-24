@@ -7,14 +7,15 @@ import {
   ListboxOptions,
 } from "@headlessui/react";
 import { CheckIcon, ChevronDownIcon } from "@heroicons/react/20/solid";
-import { useParams, useNavigate } from "react-router-dom";
+import { useSearchParams, useNavigate } from "react-router-dom";
 import { API_BASE_URL } from "../config";
 import toast from "react-hot-toast";
 import clsx from "clsx";
 
-const NewSpending = ({ emblaApi }) => {
+const NewSpending = ({ emblaApi, setRefresh }) => {
   const [data, setData] = useState([]);
-  const { groupId } = useParams();
+  const [searchParams] = useSearchParams();
+  const groupId = searchParams.get("groupId");
   const navigate = useNavigate();
   const [form, setForm] = useState({
     title: "",
@@ -139,7 +140,7 @@ const NewSpending = ({ emblaApi }) => {
 
   const submitForm = async () => {
     if (formValidation()) {
-      emblaApi.scrollTo(0);
+      emblaApi.scrollTo(1);
       const response = await fetch(`${API_BASE_URL}/${groupId}/newSpending`, {
         method: "POST",
         headers: {
@@ -148,7 +149,7 @@ const NewSpending = ({ emblaApi }) => {
         body: JSON.stringify(form),
       });
       const group = await response.json();
-      navigate("/" + group.groupId);
+      setRefresh(new Date());
     }
   };
 
@@ -176,8 +177,8 @@ const NewSpending = ({ emblaApi }) => {
   }, [groupId]);
 
   return (
-    <div className="">
-      <form className="flex flex-col" autoComplete="off">
+    <form className="flex flex-col justify-between grow" autoComplete="off">
+      <div className="flex flex-col grow">
         <div className="text-3xl mb-8 pl-3">Neue Ausgabe hinzufügen</div>
         <div className="text-lg pl-3">
           <Input
@@ -343,16 +344,19 @@ const NewSpending = ({ emblaApi }) => {
             </Listbox>
           </div>
         </div>
-      </form>
-      <div className="flex justify-center mt-20">
+      </div>
+      <div className="flex justify-center mb-10">
         <button
-          onClick={submitForm}
+          onClick={(e) => {
+            e.preventDefault();
+            submitForm();
+          }}
           className="rounded-lg bg-slate-200 hover:bg-green-400 transition-colors py-2 px-20 "
         >
           Speichern
         </button>
       </div>
-    </div>
+    </form>
   );
 };
 

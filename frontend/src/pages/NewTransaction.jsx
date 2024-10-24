@@ -7,14 +7,15 @@ import {
   ListboxOptions,
 } from "@headlessui/react";
 import { CheckIcon, ChevronDownIcon } from "@heroicons/react/20/solid";
-import { useParams, useNavigate, useLocation } from "react-router-dom";
+import { useSearchParams, useNavigate, useLocation } from "react-router-dom";
 import { API_BASE_URL } from "../config";
 import toast from "react-hot-toast";
 import clsx from "clsx";
 
-const NewTransaction = ({ emblaApi }) => {
+const NewTransaction = ({ emblaApi, setRefresh }) => {
   const [data, setData] = useState([]);
-  const { groupId } = useParams();
+  const [searchParams] = useSearchParams();
+  const groupId = searchParams.get("groupId");
   const navigate = useNavigate();
   const location = useLocation();
   const queryParams = new URLSearchParams(location.search);
@@ -40,7 +41,7 @@ const NewTransaction = ({ emblaApi }) => {
 
   const submitForm = async () => {
     if (formValidation()) {
-      emblaApi.scrollTo(0);
+      emblaApi.scrollTo(1);
       const response = await fetch(`${API_BASE_URL}/${groupId}/newSpending`, {
         method: "POST",
         headers: {
@@ -49,7 +50,7 @@ const NewTransaction = ({ emblaApi }) => {
         body: JSON.stringify(form),
       });
       const group = await response.json();
-      navigate("/" + group.groupId);
+      setRefresh(new Date());
     }
   };
 
@@ -97,8 +98,8 @@ const NewTransaction = ({ emblaApi }) => {
   }, [groupId]);
 
   return (
-    <div className="">
-      <form className="flex flex-col" autoComplete="off">
+    <form className="flex flex-col grow" autoComplete="off">
+      <div className="flex flex-col grow">
         <div className="text-3xl mb-8 pl-3">Neue {form.title} hinzufügen</div>
         <div className="text-lg pl-3 mt-3">
           <Input
@@ -210,16 +211,19 @@ const NewTransaction = ({ emblaApi }) => {
             </Listbox>
           </div>
         </div>
-      </form>
-      <div className="flex justify-center mt-20">
+      </div>
+      <div className="flex justify-center mb-10">
         <button
-          onClick={submitForm}
+          onClick={(e) => {
+            e.preventDefault();
+            submitForm();
+          }}
           className="rounded-lg bg-slate-200 hover:bg-green-400 transition-colors py-2 px-20 "
         >
           Speichern
         </button>
       </div>
-    </div>
+    </form>
   );
 };
 

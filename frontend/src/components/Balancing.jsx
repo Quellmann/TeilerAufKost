@@ -1,8 +1,12 @@
 import { ArrowRightIcon, BanknotesIcon } from "@heroicons/react/24/outline";
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useOutletContext, useSearchParams } from "react-router-dom";
 
 const Balancing = ({ personData }) => {
+  const [searchParams] = useSearchParams();
+  const groupId = searchParams.get("groupId");
+  const [setSidebarGroups, refresh, emblaApi] = useOutletContext();
+
   const balancingCalculation = () => {
     let senders = personData
       .filter((person) => person.balance() < 0)
@@ -69,12 +73,14 @@ const Balancing = ({ personData }) => {
               <td className="p-2">{balancing.amount.toFixed(2)} €</td>
               <td className="p-1">
                 <Link
-                  to={`newTransaction?${new URLSearchParams({
+                  to={`/?groupId=${groupId}&${new URLSearchParams({
+                    type: "transaction",
                     amount: balancing.amount.toFixed(2),
                     from: balancing.from,
                     to: balancing.to,
                   })}`}
                   className="flex justify-center border rounded-lg px-1 py-1 hover:bg-green-400"
+                  onClick={() => emblaApi.scrollTo(3)}
                 >
                   <BanknotesIcon className="w-6"></BanknotesIcon>
                   <ArrowRightIcon className="w-6"></ArrowRightIcon>
