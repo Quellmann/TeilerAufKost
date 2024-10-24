@@ -16,6 +16,7 @@ const JoinGroup = ({ groupName, groupId, setJoined }) => {
     // If there are no subscriptions yet, save the first group
     if (!subscribedGroups) {
       localStorage.setItem("groupSubscription", JSON.stringify([newGroup]));
+      setSidebarGroups([newGroup]);
       setJoined(true);
     } else {
       // Check if the group is already subscribed by matching groupId

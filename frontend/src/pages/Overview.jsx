@@ -48,12 +48,14 @@ const Overview = () => {
     const subscribedGroups = JSON.parse(
       localStorage.getItem("groupSubscription")
     );
-    const isAlreadySubscribed = subscribedGroups.some(
-      (group) => group.id === groupId
-    );
-    if (subscribedGroups && isAlreadySubscribed) {
-      setJoined(true);
-      return true;
+    if (subscribedGroups) {
+      const isAlreadySubscribed = subscribedGroups.some(
+        (group) => group.id === groupId
+      );
+      if (subscribedGroups && isAlreadySubscribed) {
+        setJoined(true);
+        return true;
+      }
     }
     return false;
   };
