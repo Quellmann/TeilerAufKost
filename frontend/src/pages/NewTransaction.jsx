@@ -100,8 +100,8 @@ const NewTransaction = ({ emblaApi, setRefresh }) => {
   return (
     <form className="flex flex-col grow" autoComplete="off">
       <div className="flex flex-col grow">
-        <div className="text-3xl mb-8 pl-3">Neue {form.title} hinzufügen</div>
-        <div className="text-lg pl-3 mt-3">
+        <div className="text-3xl mb-8">Neue {form.title} hinzufügen</div>
+        <div className="text-lg mt-3">
           <Input
             onChange={(e) =>
               setForm((prevState) => ({
@@ -118,7 +118,7 @@ const NewTransaction = ({ emblaApi, setRefresh }) => {
             min="0"
           />
         </div>
-        <div className="text-lg pl-3 mt-3">
+        <div className="text-lg mt-3">
           <div className="grid grid-cols-2">
             <span>Von</span>
             <Listbox
@@ -130,7 +130,7 @@ const NewTransaction = ({ emblaApi, setRefresh }) => {
             >
               <ListboxButton
                 className={clsx(
-                  "relative block w-full rounded-lg border bg-slate-100 py-1.5 pr-8 pl-3 text-left text-sm/6 text-black min-h-10",
+                  "relative block w-full rounded-lg border bg-slate-100 py-1.5 pr-8 text-left text-sm/6 text-black min-h-10",
                   "focus:outline-none data-[focus]:outline-2 data-[focus]:-outline-offset-2 data-[focus]:outline-black/25"
                 )}
               >
@@ -177,7 +177,7 @@ const NewTransaction = ({ emblaApi, setRefresh }) => {
             >
               <ListboxButton
                 className={clsx(
-                  "relative block w-full rounded-lg border bg-slate-100 py-1.5 pr-8 pl-3 text-left text-sm/6 text-black min-h-10",
+                  "relative block w-full rounded-lg border bg-slate-100 py-1.5 pr-8 text-left text-sm/6 text-black min-h-10",
                   "focus:outline-none data-[focus]:outline-2 data-[focus]:-outline-offset-2 data-[focus]:outline-black/25"
                 )}
               >

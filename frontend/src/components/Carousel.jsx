@@ -48,7 +48,7 @@ const Carousel = ({ personData, spendings }) => {
           <div className="flex justify-center text-xl mb-5">
             Zusammenfassung
           </div>
-          <Summary personData={personData}></Summary>
+          <Summary personData={personData} emblaApi={emblaApi}></Summary>
         </div>
         <div className="flex-none w-full min-w-0">
           <div className="flex justify-center text-xl mb-5">
@@ -58,10 +58,10 @@ const Carousel = ({ personData, spendings }) => {
         </div>
         <div className="flex-none w-full min-w-0">
           <div className="flex justify-center text-xl mb-5">Statistik</div>
-          <Statistics
+          {/* <Statistics
             personData={personData}
             spendings={spendings}
-          ></Statistics>
+          ></Statistics> */}
         </div>
         <div className="flex-none w-full min-w-0">
           <div className="flex justify-center text-xl mb-5">Optionen</div>

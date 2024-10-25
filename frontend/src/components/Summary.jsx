@@ -1,8 +1,14 @@
 import React from "react";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useSearchParams } from "react-router-dom";
 
-const Summary = ({ personData }) => {
+const Summary = ({ personData, emblaApi }) => {
   const location = useLocation();
+  const [searchParams, setSearchParams] = useSearchParams();
+
+  const handleFocus = (index) => {
+    setSearchParams({ groupId: searchParams.get("groupId"), focus: index });
+    emblaApi.scrollTo(2);
+  };
 
   return (
     <div className="border rounded-lg overflow-auto">
@@ -21,7 +27,13 @@ const Summary = ({ personData }) => {
               <td className="p-2">
                 {person.expenditures.map((expenditure, index) => (
                   <div key={index}>
-                    <Link
+                    <div
+                      onClick={() => handleFocus(index)}
+                      className="text-green-500 text-sm"
+                    >
+                      {expenditure === 0 ? "" : expenditure.toFixed(2)}
+                    </div>
+                    {/* <Link
                       to={`${location.pathname}/spendings?${new URLSearchParams(
                         {
                           focus: index,
@@ -30,7 +42,7 @@ const Summary = ({ personData }) => {
                       className="text-green-500 text-sm"
                     >
                       {expenditure === 0 ? "" : expenditure.toFixed(2)}
-                    </Link>
+                    </Link> */}
                   </div>
                 ))}
               </td>

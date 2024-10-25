@@ -13,7 +13,6 @@ const MainPage = () => {
     startIndex: 1,
   });
   const remainingSpaceDiv = useRef(null);
-  const navbarDiv = useRef(null);
   const [refresh, setRefresh] = useState(new Date());
   const [divHeight, setDivHeight] = useState("0");
   const navigate = useNavigate();
@@ -54,10 +53,7 @@ const MainPage = () => {
     <div className="min-w-[350px] h-dvh flex flex-col">
       <Toaster position="top-center"></Toaster>
       {/* Navbar */}
-      <div
-        className="flex justify-between items-center px-5 py-2 bg-slate-200"
-        ref={navbarDiv}
-      >
+      <div className="flex justify-between items-center px-5 py-2 bg-slate-200">
         <div onClick={sidebarButton} className="cursor-pointer">
           <Bars3Icon className="size-8"></Bars3Icon>
         </div>
@@ -94,7 +90,10 @@ const MainPage = () => {
                     {sidebarGroups.map((group) => (
                       <div
                         key={group.id}
-                        onClick={() => navigate("/?groupId=" + group.id)}
+                        onClick={() => {
+                          navigate("/?groupId=" + group.id);
+                          emblaApi.scrollTo(1);
+                        }}
                         className="p-1 text-slate-50 border rounded-lg cursor-pointer truncate"
                       >
                         {group.name}
@@ -102,7 +101,7 @@ const MainPage = () => {
                     ))}
                   </div>
                 </div>
-                <div className="p-4">
+                <div className="px-2 pb-10">
                   <div
                     onClick={() => {
                       navigate("/newGroup");
@@ -138,7 +137,7 @@ const MainPage = () => {
             </div>
             {/* Add Details */}
             <div
-              className="flex-none w-full min-w-0"
+              className="flex-none w-full min-w-0 overflow-auto"
               style={{ height: `${divHeight}` }}
             >
               <div className="flex flex-col 2xl:w-[40%] xl:w-[50%] lg:w-[60%] md:w-[70%] sm:w-[90%] w-[96%] mx-auto h-full">

@@ -31,7 +31,7 @@ const AddOverview = ({ emblaApi }) => {
       <div>
         <button
           onClick={() => backButton()}
-          className="flex items-center p-1 border rounded-lg"
+          className="flex items-center p-1 border mt-6 rounded-lg"
         >
           <ArrowUturnLeftIcon className="size-6"></ArrowUturnLeftIcon>
           <div className="ml-3">Zurück</div>

@@ -76,7 +76,7 @@ const NewPerson = ({ emblaApi }) => {
   return (
     <form className="flex flex-col grow" autoComplete="off">
       <div className="flex flex-col grow">
-        <div className="text-3xl mb-8 pl-3">Neue Person hinzufügen</div>
+        <div className="text-3xl mb-8">Neue Person hinzufügen</div>
         <div className="text-lg mt-10 relative">
           <Input
             ref={inputRef}

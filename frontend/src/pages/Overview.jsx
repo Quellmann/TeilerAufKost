@@ -61,6 +61,9 @@ const Overview = () => {
   };
 
   useEffect(() => {
+    if (searchParams.get("groupId") != groupId) {
+      setIsLoading(true);
+    }
     setGroupId(searchParams.get("groupId"));
     return;
   }, [searchParams]);

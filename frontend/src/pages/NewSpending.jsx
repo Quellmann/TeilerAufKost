@@ -1,19 +1,12 @@
 import React, { useState, useEffect } from "react";
 import { Input } from "@headlessui/react";
-import {
-  Listbox,
-  ListboxButton,
-  ListboxOption,
-  ListboxOptions,
-} from "@headlessui/react";
-import { CheckIcon, ChevronDownIcon } from "@heroicons/react/20/solid";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import { API_BASE_URL } from "../config";
 import toast from "react-hot-toast";
-import clsx from "clsx";
 
 const NewSpending = ({ emblaApi, setRefresh }) => {
   const [data, setData] = useState([]);
+  const [editMode, setEditMode] = useState(false);
   const [searchParams] = useSearchParams();
   const groupId = searchParams.get("groupId");
   const navigate = useNavigate();
@@ -25,6 +18,22 @@ const NewSpending = ({ emblaApi, setRefresh }) => {
     individualValueHistory: [],
   });
 
+  const [percentages, setPercentages] = useState({});
+
+  useEffect(() => {
+    if (searchParams.get("spending")) {
+      setEditMode(true);
+      setForm({
+        title: searchParams.get("title"),
+        amount: searchParams.get("amount"),
+        from: JSON.parse(searchParams.get("from")),
+        to: JSON.parse(searchParams.get("to")),
+        individualValueHistory: [],
+      });
+    }
+    return;
+  }, [searchParams]);
+
   const formValidation = () => {
     !form.title && toast.error("Gib einen gültigen Titel an");
     !form.amount && toast.error("Gib einen gültigen Betrag an");
@@ -34,39 +43,60 @@ const NewSpending = ({ emblaApi, setRefresh }) => {
     return form.title && form.amount && form.from && form.to.length > 0;
   };
 
-  const displayMultiplePeople = () => {
-    if (form.to.length > 1) {
-      return form.to.length + " Personen";
-    }
-    return form.to.map((elmt) => elmt.name);
+  const handleMultiplePersonSelection = (member) => {
+    setForm((prev) => ({
+      ...prev,
+      to: form.to.map((elmt) => elmt.name).includes(member)
+        ? form.to.filter((elmt) => elmt.name != member)
+        : [...form.to, { name: member, amount: 0 }],
+    }));
   };
 
-  const handleMultiplePersonSelection = (selectedPeople) => {
-    const formToField = data.groupMember
-      .filter((member) => selectedPeople.includes(member))
-      .map((member) => ({ name: member, amount: 0 }));
-    setForm((prev) => ({ ...prev, to: formToField }));
+  const handleFocus = (e) => {
+    e.target.select();
   };
 
   const individualValueHandler = (input, value, person) => {
-    const convertedValue = +(input === "percent"
-      ? ((form.amount * value) / 100).toFixed(2)
-      : value);
+    value = value.replace(/,/g, ".");
+    const parts = value.split(".");
+    if (parts.length > 2) {
+      value = parts[0] + "." + parts.slice(1).join("");
+    }
+    value = value.replace(/[^0-9.]/g, "");
+    if (!value.endsWith(".")) {
+      const convertedValue = +(input === "percent"
+        ? ((form.amount * value) / 100).toFixed(2)
+        : value);
 
-    setForm((prev) => ({
-      ...prev,
-      individualValueHistory: [
-        ...prev.individualValueHistory.filter((elmt) => elmt != person),
-        person,
-      ],
-    }));
+      if (input === "percent") {
+        setPercentages((prev) => ({
+          ...prev,
+          person: (value / form.amount) * 100,
+        }));
+      }
 
-    setForm((prev) => ({
-      ...prev,
-      to: prev.to.map((elmt) =>
-        elmt.name === person ? { ...elmt, amount: convertedValue } : elmt
-      ),
-    }));
+      setForm((prev) => ({
+        ...prev,
+        individualValueHistory: [
+          ...prev.individualValueHistory.filter((elmt) => elmt != person),
+          person,
+        ],
+      }));
+
+      setForm((prev) => ({
+        ...prev,
+        to: prev.to.map((elmt) =>
+          elmt.name === person ? { ...elmt, amount: convertedValue } : elmt
+        ),
+      }));
+    } else {
+      setForm((prev) => ({
+        ...prev,
+        to: prev.to.map((elmt) =>
+          elmt.name === person ? { ...elmt, amount: value } : elmt
+        ),
+      }));
+    }
   };
 
   const recalculateUneditedMembers = () => {
@@ -113,20 +143,21 @@ const NewSpending = ({ emblaApi, setRefresh }) => {
 
   useEffect(() => {
     recalculateUneditedMembers();
-  }, [form.individualValueHistory, form.amount]);
+  }, [form.individualValueHistory, form.to.length, form.amount]);
 
-  useEffect(() => {
-    if (form.to.length > 0) {
-      setForm((prev) => ({ ...prev, individualValueHistory: [] }));
-      setForm((prev) => ({
-        ...prev,
-        to: prev.to.map((member) => ({
-          ...member,
-          amount: (form.amount / form.to.length).toFixed(2),
-        })),
-      }));
-    }
-  }, [form.to.length, form.amount]);
+  // useEffect(() => {
+  //   if (form.to.length > 0) {
+  //     setForm((prev) => ({
+  //       ...prev,
+  //       to: prev.to.map((member) => ({
+  //         ...member,
+  //         amount: form.individualValueHistory.includes(member.name)
+  //           ? member.amount
+  //           : (form.amount / form.to.length).toFixed(2),
+  //       })),
+  //     }));
+  //   }
+  // }, [form.to.length, form.amount]);
 
   const handleAmountInput = (e) => {
     let value = e.target.value;
@@ -179,19 +210,22 @@ const NewSpending = ({ emblaApi, setRefresh }) => {
   return (
     <form className="flex flex-col justify-between grow" autoComplete="off">
       <div className="flex flex-col grow">
-        <div className="text-3xl mb-8 pl-3">Neue Ausgabe hinzufügen</div>
-        <div className="text-lg pl-3">
+        <div className="text-3xl mb-8">
+          {editMode ? "Ausgabe bearbeiten" : "Neue Ausgabe hinzufügen"}
+        </div>
+        <div className="text-lg">
           <Input
             onChange={(e) =>
               setForm((prevState) => ({ ...prevState, title: e.target.value }))
             }
+            value={form.title}
             placeholder="Titel"
             className="border w-full rounded-lg p-2 text-center"
             name="spending_title"
             type="text"
           />
         </div>
-        <div className="text-lg pl-3 mt-3">
+        <div className="text-lg mt-3">
           <Input
             onChange={(e) => handleAmountInput(e)}
             value={form.amount}
@@ -203,157 +237,114 @@ const NewSpending = ({ emblaApi, setRefresh }) => {
             min="0"
           />
         </div>
-        <div className="text-lg pl-3 mt-3">
-          <div className="grid grid-cols-2">
-            <span>Von</span>
-            <Listbox
-              value={form.from}
-              onChange={(value) =>
-                setForm((prev) => ({ ...prev, from: value }))
-              }
-            >
-              <ListboxButton
-                className={clsx(
-                  "relative block w-full rounded-lg border bg-slate-100 py-1.5 pr-8 pl-3 text-left text-sm/6 text-black min-h-10",
-                  "focus:outline-none data-[focus]:outline-2 data-[focus]:-outline-offset-2 data-[focus]:outline-black/25"
-                )}
+        <div className="flex flex-col justify-center border rounded-lg mt-10 divide-y">
+          <div className="self-center text-lg p-2">Bezahlt von:</div>
+          <div className="flex overflow-auto justify-between gap-2 p-2">
+            {data.groupMember?.map((member, index) => (
+              <div
+                key={index}
+                onClick={() => setForm((prev) => ({ ...prev, from: member }))}
+                className={`w-20 h-20 rounded-full flex flex-shrink-0 justify-center transition-colors duration-200 items-center cursor-pointer ${
+                  form.from == member
+                    ? "bg-slate-800 text-slate-50"
+                    : "bg-slate-200"
+                }`}
               >
-                {form.from}
-                <ChevronDownIcon
-                  className="group pointer-events-none absolute top-2.5 right-2.5 size-4 fill-black/60"
-                  aria-hidden="true"
-                />
-              </ListboxButton>
-              <ListboxOptions
-                anchor="bottom"
-                transition
-                className={clsx(
-                  "w-[var(--button-width)] rounded-xl border border-slate-200 bg-slate-100 p-1 mt-1 [--anchor-gap:var(--spacing-1)] focus:outline-none",
-                  "transition duration-100 ease-in data-[leave]:data-[closed]:opacity-0"
-                )}
-              >
-                {data.groupMember?.map((person, index) => (
-                  <ListboxOption
-                    key={index}
-                    value={person}
-                    className="group flex cursor-default items-center gap-2 rounded-lg py-1.5 px-3 select-none data-[focus]:bg-black/10"
-                  >
-                    <CheckIcon className="invisible size-4 fill-black group-data-[selected]:visible" />
-                    <div className="text-sm/6 text-black">{person}</div>
-                  </ListboxOption>
-                ))}
-              </ListboxOptions>
-            </Listbox>
+                <span className="truncate p-2 select-none">{member}</span>
+              </div>
+            ))}
           </div>
-          <div className="grid grid-cols-2 mt-24">
-            <span>An</span>
-            <Listbox
-              value={form.to?.map((elmt) => elmt.name)}
-              onChange={(selectedPeople) =>
-                handleMultiplePersonSelection(selectedPeople)
-              }
-              multiple
-            >
-              <ListboxButton
-                className={clsx(
-                  "relative block w-full rounded-lg border bg-slate-100 py-1.5 pr-8 pl-3 text-left text-sm/6 text-black min-h-10",
-                  "focus:outline-none data-[focus]:outline-2 data-[focus]:-outline-offset-2 data-[focus]:outline-black/25"
-                )}
-              >
-                {displayMultiplePeople()}
-                <ChevronDownIcon
-                  className="group pointer-events-none absolute top-2.5 right-2.5 size-4 fill-black/60"
-                  aria-hidden="true"
-                />
-              </ListboxButton>
-              <ListboxOptions
-                anchor="bottom"
-                transition
-                className={clsx(
-                  "w-full md:w-[var(--button-width)] rounded-xl border border-slate-200 bg-slate-100 p-1 m-1 [--anchor-gap:var(--spacing-1)] focus:outline-none",
-                  "transition duration-100 ease-in data-[leave]:data-[closed]:opacity-0"
-                )}
-              >
-                {data.groupMember?.map((person, index) => (
-                  <ListboxOption
-                    key={index}
-                    value={person}
-                    className="group flex h-[38px] cursor-default items-center gap-2 rounded-lg py-1.5 px-3 select-none data-[focus]:bg-black/10"
-                  >
-                    <CheckIcon className="invisible size-4 group-data-[selected]:visible" />
-                    <div className="text-sm/6 text-black flex-1 truncate">
-                      {person}
+        </div>
+        <div className="flex flex-col justify-center border rounded-lg mt-10 divide-y">
+          <div className="self-center text-lg p-2">Für:</div>
+          <div className="flex overflow-auto justify-between items-start gap-5 p-2">
+            {data.groupMember?.map((member, index) => (
+              <div key={index} className="flex flex-col justify-center">
+                <div
+                  key={index}
+                  onClick={() => handleMultiplePersonSelection(member)}
+                  className={`w-20 h-20 rounded-full flex flex-shrink-0 justify-center transition-colors duration-200 items-center cursor-pointer ${
+                    form.to.map((elmt) => elmt.name).includes(member)
+                      ? "bg-slate-800 text-slate-50"
+                      : "bg-slate-200"
+                  }`}
+                >
+                  <span className="truncate p-2 select-none">{member}</span>
+                </div>
+                {form.to.map((elmt) => elmt.name).includes(member) && (
+                  <>
+                    <div className="flex items-center pt-2 relative">
+                      <Input
+                        autoComplete="off"
+                        onFocus={(e) => handleFocus(e)}
+                        onChange={(e) =>
+                          individualValueHandler(
+                            "amount",
+                            e.target.value,
+                            member
+                          )
+                        }
+                        value={
+                          form.to.find((elmt) => elmt.name === member).amount
+                        }
+                        className="border w-20 rounded-lg text-right pr-5"
+                      />
+                      <div className="text-black/50 absolute right-2">€</div>
                     </div>
-                    {form.to?.map(
-                      (elmt, j) =>
-                        elmt.name === person && (
-                          <div key={j} className="flex grow justify-around">
-                            <div className="flex items-center">
-                              <Input
-                                autoComplete="off"
-                                onClick={(e) => e.stopPropagation()}
-                                onChange={(e) =>
-                                  individualValueHandler(
-                                    "amount",
-                                    e.target.value,
-                                    person
-                                  )
-                                }
-                                value={elmt.amount}
-                                className="border w-16 rounded-lg text-right"
-                                name={"amount" + person}
-                                type="number"
-                                step="0.01"
-                                min="0"
-                              />
-                              <div>€</div>
-                            </div>
-                            <div className="flex items-center">
-                              <Input
-                                autoComplete="off"
-                                onClick={(e) => e.stopPropagation()}
-                                onChange={(e) =>
-                                  individualValueHandler(
-                                    "percent",
-                                    e.target.value,
-                                    person
-                                  )
-                                }
-                                value={
-                                  elmt.amount != 0 || form.amount != 0
-                                    ? (
-                                        (elmt.amount / form.amount) *
-                                        100
-                                      ).toFixed(2)
-                                    : 0
-                                }
-                                className="border w-16 rounded-lg text-right"
-                                name={"percent" + person}
-                                type="number"
-                                step="0.01"
-                                min="0"
-                              />
-                              <div>%</div>
-                            </div>
-                          </div>
-                        )
-                    )}
-                  </ListboxOption>
-                ))}
-              </ListboxOptions>
-            </Listbox>
+                    <div className="flex items-center pt-2 relative">
+                      <Input
+                        autoComplete="off"
+                        onFocus={(e) => handleFocus(e)}
+                        onChange={(e) =>
+                          individualValueHandler(
+                            "percent",
+                            e.target.value,
+                            member
+                          )
+                        }
+                        value={
+                          percentages.member
+                          // form.to.find((elmt) => elmt.name === member).amount !=
+                          //   0 || form.amount != 0
+                          //   ? (
+                          //       (form.to.find((elmt) => elmt.name === member)
+                          //         .amount /
+                          //         form.amount) *
+                          //       100
+                          //     ).toFixed(2)
+                          //   : 0
+                        }
+                        className="border w-20 rounded-lg text-right pr-5"
+                      />
+                      <div className="text-black/50 absolute right-1">%</div>
+                    </div>
+                  </>
+                )}
+              </div>
+            ))}
           </div>
         </div>
       </div>
-      <div className="flex justify-center mb-10">
+      <div className="flex justify-around my-10">
+        {editMode && (
+          <button
+            onClick={(e) => {
+              e.preventDefault();
+              submitForm();
+            }}
+            className="rounded-lg bg-slate-200 hover:bg-red-400 transition-colors py-2 px-10 "
+          >
+            Löschen
+          </button>
+        )}
         <button
           onClick={(e) => {
             e.preventDefault();
             submitForm();
           }}
-          className="rounded-lg bg-slate-200 hover:bg-green-400 transition-colors py-2 px-20 "
+          className="rounded-lg bg-slate-200 hover:bg-green-400 transition-colors py-2 px-10"
         >
-          Speichern
+          {editMode ? "Update" : "Speichern"}
         </button>
       </div>
     </form>
