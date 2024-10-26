@@ -33,32 +33,18 @@ const Summary = ({ personData, emblaApi }) => {
                     >
                       {expenditure === 0 ? "" : expenditure.toFixed(2)}
                     </div>
-                    {/* <Link
-                      to={`${location.pathname}/spendings?${new URLSearchParams(
-                        {
-                          focus: index,
-                        }
-                      )}`}
-                      className="text-green-500 text-sm"
-                    >
-                      {expenditure === 0 ? "" : expenditure.toFixed(2)}
-                    </Link> */}
                   </div>
                 ))}
               </td>
               <td className="p-2">
                 {person.liabilities.map((liability, index) => (
                   <div key={index}>
-                    <Link
-                      to={`${location.pathname}/spendings?${new URLSearchParams(
-                        {
-                          focus: index,
-                        }
-                      )}`}
+                    <div
+                      onClick={() => handleFocus(index)}
                       className="text-red-500 text-sm"
                     >
                       {liability === 0 ? "" : liability.toFixed(2)}
-                    </Link>
+                    </div>
                   </div>
                 ))}
               </td>

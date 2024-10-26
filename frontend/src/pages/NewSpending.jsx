@@ -123,23 +123,54 @@ const NewSpending = ({ emblaApi, setRefresh }) => {
         ),
       }));
     } else {
+      console.log(remainingAmount / uneditedCount);
       let newSplit = parseFloat((remainingAmount / uneditedCount).toFixed(2));
+      // let newSplit = parseFloat(remainingAmount / uneditedCount);
+
       const notSplittable =
         form.amount - editedTotal - newSplit * uneditedCount;
+
+      console.log(notSplittable);
+
       if (notSplittable > 0.001) {
+        toast.dismiss();
+        toast(
+          `Restbetrag ${notSplittable.toFixed(
+            2
+          )}€ nicht teilbar.\n Personen zahlen 1 Cent mehr`
+        );
         newSplit += 0.01;
+      } else if (notSplittable < 0) {
+        toast.dismiss();
+        toast(
+          `Restbetrag ${notSplittable.toFixed(
+            2
+          )}€ nicht teilbar.\n Personen zahlen 1 Cent mehr`
+        );
       }
 
       setForm((prev) => ({
         ...prev,
-        to: prev.to.map((member) =>
-          form.individualValueHistory.includes(member.name)
-            ? member
-            : { ...member, amount: parseFloat(newSplit.toFixed(2)) }
-        ),
+        to: prev.to.map((member) => {
+          if (form.individualValueHistory.includes(member.name)) {
+            return member;
+          } else {
+            setPercentages((prev) => ({
+              ...prev,
+              [member.name]: newSplit.toFixed(2)
+                ? ((newSplit / form.amount) * 100).toFixed(2)
+                : "",
+            }));
+            return { ...member, amount: newSplit.toFixed(2) };
+          }
+        }),
       }));
     }
   };
+
+  useEffect(() => {
+    // console.log(percentages);
+  }, [percentages]);
 
   useEffect(() => {
     recalculateUneditedMembers();
@@ -225,12 +256,12 @@ const NewSpending = ({ emblaApi, setRefresh }) => {
             type="text"
           />
         </div>
-        <div className="text-lg mt-3">
+        <div className="text-lg mt-3 flex justify-center">
           <Input
             onChange={(e) => handleAmountInput(e)}
             value={form.amount}
             placeholder="Betrag"
-            className="border w-full rounded-lg py-2 text-center"
+            className="border rounded-lg py-2 text-center"
             name="spending_amount"
             type="number"
             step="0.01"
@@ -239,15 +270,13 @@ const NewSpending = ({ emblaApi, setRefresh }) => {
         </div>
         <div className="flex flex-col justify-center border rounded-lg mt-10 divide-y">
           <div className="self-center text-lg p-2">Bezahlt von:</div>
-          <div className="flex overflow-auto justify-between gap-2 p-2">
+          <div className="flex overflow-auto justify-between gap-3 p-2">
             {data.groupMember?.map((member, index) => (
               <div
                 key={index}
                 onClick={() => setForm((prev) => ({ ...prev, from: member }))}
-                className={`w-20 h-20 rounded-full flex flex-shrink-0 justify-center transition-colors duration-200 items-center cursor-pointer ${
-                  form.from == member
-                    ? "bg-slate-800 text-slate-50"
-                    : "bg-slate-200"
+                className={`w-20 h-20 border rounded-full flex flex-shrink-0 justify-center transition-colors duration-200 items-center cursor-pointer ${
+                  form.from == member ? "bg-amber-500 text-slate-50" : ""
                 }`}
               >
                 <span className="truncate p-2 select-none">{member}</span>
@@ -263,10 +292,10 @@ const NewSpending = ({ emblaApi, setRefresh }) => {
                 <div
                   key={index}
                   onClick={() => handleMultiplePersonSelection(member)}
-                  className={`w-20 h-20 rounded-full flex flex-shrink-0 justify-center transition-colors duration-200 items-center cursor-pointer ${
+                  className={`w-20 h-20 border rounded-full flex flex-shrink-0 justify-center transition-colors duration-200 items-center cursor-pointer ${
                     form.to.map((elmt) => elmt.name).includes(member)
-                      ? "bg-slate-800 text-slate-50"
-                      : "bg-slate-200"
+                      ? "bg-slate-600 text-slate-50"
+                      : ""
                   }`}
                 >
                   <span className="truncate p-2 select-none">{member}</span>
@@ -302,18 +331,7 @@ const NewSpending = ({ emblaApi, setRefresh }) => {
                             member
                           )
                         }
-                        value={
-                          percentages.member
-                          // form.to.find((elmt) => elmt.name === member).amount !=
-                          //   0 || form.amount != 0
-                          //   ? (
-                          //       (form.to.find((elmt) => elmt.name === member)
-                          //         .amount /
-                          //         form.amount) *
-                          //       100
-                          //     ).toFixed(2)
-                          //   : 0
-                        }
+                        value={percentages[member]}
                         className="border w-20 rounded-lg text-right pr-5"
                       />
                       <div className="text-black/50 absolute right-1">%</div>
