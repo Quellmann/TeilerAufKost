@@ -3,6 +3,8 @@ import { Input } from "@headlessui/react";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import { API_BASE_URL } from "../config";
 import toast from "react-hot-toast";
+import { InformationCircleIcon } from "@heroicons/react/24/outline";
+import { Switch } from "@headlessui/react";
 
 const NewSpending = ({ emblaApi, setRefresh }) => {
   const [data, setData] = useState([]);
@@ -17,6 +19,8 @@ const NewSpending = ({ emblaApi, setRefresh }) => {
     to: [{ name: "", amount: 0 }],
     individualValueHistory: [],
   });
+  const [tip, setTip] = useState("");
+  const [percentagesEnabled, setPercentagesEnabled] = useState(false);
 
   const [percentages, setPercentages] = useState({});
 
@@ -62,40 +66,59 @@ const NewSpending = ({ emblaApi, setRefresh }) => {
     if (parts.length > 2) {
       value = parts[0] + "." + parts.slice(1).join("");
     }
-    value = value.replace(/[^0-9.]/g, "");
-    if (!value.endsWith(".")) {
-      const convertedValue = +(input === "percent"
-        ? ((form.amount * value) / 100).toFixed(2)
-        : value);
+    value = value.replace(/[^0-9.]/g, "").substring(0, 5);
 
+    // set edit history
+    setForm((prev) => ({
+      ...prev,
+      individualValueHistory: [
+        ...prev.individualValueHistory.filter((elmt) => elmt != person),
+        person,
+      ],
+    }));
+
+    if (!value.endsWith(".")) {
+      // if input is in percent do this
       if (input === "percent") {
         setPercentages((prev) => ({
           ...prev,
-          person: (value / form.amount) * 100,
+          [person]: value,
+        }));
+        setForm((prev) => ({
+          ...prev,
+          to: prev.to.map((elmt) =>
+            elmt.name === person
+              ? { ...elmt, amount: ((value / 100) * form.amount).toFixed(2) }
+              : elmt
+          ),
+        }));
+      } else {
+        // if input is in € do this
+        setPercentages((prev) => ({
+          ...prev,
+          [person]: ((value / form.amount) * 100).toFixed(2),
+        }));
+        setForm((prev) => ({
+          ...prev,
+          to: prev.to.map((elmt) =>
+            elmt.name === person ? { ...elmt, amount: value } : elmt
+          ),
         }));
       }
-
-      setForm((prev) => ({
-        ...prev,
-        individualValueHistory: [
-          ...prev.individualValueHistory.filter((elmt) => elmt != person),
-          person,
-        ],
-      }));
-
-      setForm((prev) => ({
-        ...prev,
-        to: prev.to.map((elmt) =>
-          elmt.name === person ? { ...elmt, amount: convertedValue } : elmt
-        ),
-      }));
     } else {
-      setForm((prev) => ({
-        ...prev,
-        to: prev.to.map((elmt) =>
-          elmt.name === person ? { ...elmt, amount: value } : elmt
-        ),
-      }));
+      if (input === "percent") {
+        setPercentages((prev) => ({
+          ...prev,
+          [person]: value,
+        }));
+      } else {
+        setForm((prev) => ({
+          ...prev,
+          to: prev.to.map((elmt) =>
+            elmt.name === person ? { ...elmt, amount: value } : elmt
+          ),
+        }));
+      }
     }
   };
 
@@ -104,10 +127,13 @@ const NewSpending = ({ emblaApi, setRefresh }) => {
       .filter((member) => form.individualValueHistory.includes(member.name))
       .reduce((a, b) => a + b.amount, 0);
     const uneditedCount = form.to.length - form.individualValueHistory.length;
-
     const remainingAmount = form.amount - editedTotal;
 
     if (remainingAmount < 0) {
+      toast.dismiss();
+      toast(
+        "Individueller Betrag größer als der Gesamtbetrag. Beträge werden zurück-\ngesetzt, bis Teilung möglich ist."
+      );
       setForm((prev) => ({
         ...prev,
         individualValueHistory: prev.individualValueHistory.slice(1),
@@ -118,36 +144,39 @@ const NewSpending = ({ emblaApi, setRefresh }) => {
         ...prev,
         to: prev.to.map((member) =>
           lastChange == member.name
-            ? { ...member, amount: member.amount + parseFloat(remainingAmount) }
+            ? {
+                ...member,
+                amount: +member.amount + parseFloat(remainingAmount),
+              }
             : member
         ),
       }));
     } else {
-      console.log(remainingAmount / uneditedCount);
-      let newSplit = parseFloat((remainingAmount / uneditedCount).toFixed(2));
-      // let newSplit = parseFloat(remainingAmount / uneditedCount);
+      let newSplit = parseFloat(
+        (Math.floor((remainingAmount / uneditedCount) * 100) / 100).toFixed(2)
+      );
 
       const notSplittable =
         form.amount - editedTotal - newSplit * uneditedCount;
-
-      console.log(notSplittable);
 
       if (notSplittable > 0.001) {
         toast.dismiss();
         toast(
           `Restbetrag ${notSplittable.toFixed(
             2
-          )}€ nicht teilbar.\n Personen zahlen 1 Cent mehr`
+          )}€ nicht gleichmäßig teilbar. Personen zahlen 1 Cent mehr`
         );
         newSplit += 0.01;
-      } else if (notSplittable < 0) {
-        toast.dismiss();
-        toast(
-          `Restbetrag ${notSplittable.toFixed(
-            2
-          )}€ nicht teilbar.\n Personen zahlen 1 Cent mehr`
-        );
       }
+      const newAmounts = form.to.map((member) =>
+        form.individualValueHistory.includes(member.name)
+          ? member
+          : { ...member, amount: +newSplit.toFixed(2) }
+      );
+
+      console.log(newAmounts);
+
+      const sumOfAmounts = newAmounts.reduce((a, b) => a + +b.amount, 0);
 
       setForm((prev) => ({
         ...prev,
@@ -157,11 +186,12 @@ const NewSpending = ({ emblaApi, setRefresh }) => {
           } else {
             setPercentages((prev) => ({
               ...prev,
-              [member.name]: newSplit.toFixed(2)
-                ? ((newSplit / form.amount) * 100).toFixed(2)
-                : "",
+              [member.name]:
+                sumOfAmounts === 0
+                  ? 0
+                  : +((newSplit / sumOfAmounts) * 100).toFixed(2),
             }));
-            return { ...member, amount: newSplit.toFixed(2) };
+            return { ...member, amount: +newSplit.toFixed(2) };
           }
         }),
       }));
@@ -169,26 +199,12 @@ const NewSpending = ({ emblaApi, setRefresh }) => {
   };
 
   useEffect(() => {
-    // console.log(percentages);
-  }, [percentages]);
+    // console.log(form.individualValueHistory);
+  }, [form.individualValueHistory]);
 
   useEffect(() => {
     recalculateUneditedMembers();
   }, [form.individualValueHistory, form.to.length, form.amount]);
-
-  // useEffect(() => {
-  //   if (form.to.length > 0) {
-  //     setForm((prev) => ({
-  //       ...prev,
-  //       to: prev.to.map((member) => ({
-  //         ...member,
-  //         amount: form.individualValueHistory.includes(member.name)
-  //           ? member.amount
-  //           : (form.amount / form.to.length).toFixed(2),
-  //       })),
-  //     }));
-  //   }
-  // }, [form.to.length, form.amount]);
 
   const handleAmountInput = (e) => {
     let value = e.target.value;
@@ -256,7 +272,7 @@ const NewSpending = ({ emblaApi, setRefresh }) => {
             type="text"
           />
         </div>
-        <div className="text-lg mt-3 flex justify-center">
+        <div className="text-lg mt-10 flex justify-center gap-3">
           <Input
             onChange={(e) => handleAmountInput(e)}
             value={form.amount}
@@ -268,9 +284,31 @@ const NewSpending = ({ emblaApi, setRefresh }) => {
             min="0"
           />
         </div>
+        <div className="text-lg mt-3 flex justify-center gap-3">
+          <div className="relative">
+            <Input
+              onChange={(e) => setTip(e.target.value)}
+              value={tip}
+              placeholder="Trinkgeld"
+              className="border rounded-lg py-2 text-center text-sky-400"
+              name="tip_amount"
+              type="number"
+              step="0.01"
+              min="0"
+            />
+            <InformationCircleIcon
+              onClick={() => {
+                toast(
+                  "Trinkgeld wird unter allen Zahlenden zu gleichen Anteilen aufgeteilt."
+                );
+              }}
+              className="absolute top-3 right-2 size-6 text-black/50"
+            ></InformationCircleIcon>
+          </div>
+        </div>
         <div className="flex flex-col justify-center border rounded-lg mt-10 divide-y">
-          <div className="self-center text-lg p-2">Bezahlt von:</div>
-          <div className="flex overflow-auto justify-between gap-3 p-2">
+          <div className="self-start text-lg p-2">Bezahlt von:</div>
+          <div className="flex overflow-auto justify-between gap-3 p-4">
             {data.groupMember?.map((member, index) => (
               <div
                 key={index}
@@ -279,14 +317,29 @@ const NewSpending = ({ emblaApi, setRefresh }) => {
                   form.from == member ? "bg-amber-500 text-slate-50" : ""
                 }`}
               >
-                <span className="truncate p-2 select-none">{member}</span>
+                <div className="p-1 text-ellipsis whitespace-normal break-all line-clamp-2 select-none text-center">
+                  {member}
+                </div>
               </div>
             ))}
           </div>
         </div>
-        <div className="flex flex-col justify-center border rounded-lg mt-10 divide-y">
-          <div className="self-center text-lg p-2">Für:</div>
-          <div className="flex overflow-auto justify-between items-start gap-5 p-2">
+        <div className="flex relative flex-col justify-center border rounded-lg mt-10 divide-y">
+          <div className="absolute top-3 right-2 flex gap-2">
+            <div className="text-black/50">€</div>
+            <Switch
+              checked={percentagesEnabled}
+              onChange={setPercentagesEnabled}
+              className="group inline-flex h-6 w-11 items-center rounded-full bg-gray-400 transition "
+            >
+              <span className="size-4 translate-x-1 rounded-full bg-white transition group-data-[checked]:translate-x-6" />
+            </Switch>
+            <div className="text-black/50">%</div>
+          </div>
+          <div className="self-start text-lg p-2">
+            Für: {form.to.length} Personen
+          </div>
+          <div className="flex overflow-auto justify-between items-start gap-5 p-4">
             {data.groupMember?.map((member, index) => (
               <div key={index} className="flex flex-col justify-center">
                 <div
@@ -298,44 +351,56 @@ const NewSpending = ({ emblaApi, setRefresh }) => {
                       : ""
                   }`}
                 >
-                  <span className="truncate p-2 select-none">{member}</span>
+                  <div className="p-1 text-ellipsis whitespace-normal break-all line-clamp-2 select-none text-center">
+                    {member}
+                  </div>
                 </div>
                 {form.to.map((elmt) => elmt.name).includes(member) && (
                   <>
-                    <div className="flex items-center pt-2 relative">
-                      <Input
-                        autoComplete="off"
-                        onFocus={(e) => handleFocus(e)}
-                        onChange={(e) =>
-                          individualValueHandler(
-                            "amount",
-                            e.target.value,
-                            member
-                          )
-                        }
-                        value={
-                          form.to.find((elmt) => elmt.name === member).amount
-                        }
-                        className="border w-20 rounded-lg text-right pr-5"
-                      />
-                      <div className="text-black/50 absolute right-2">€</div>
-                    </div>
-                    <div className="flex items-center pt-2 relative">
-                      <Input
-                        autoComplete="off"
-                        onFocus={(e) => handleFocus(e)}
-                        onChange={(e) =>
-                          individualValueHandler(
-                            "percent",
-                            e.target.value,
-                            member
-                          )
-                        }
-                        value={percentages[member]}
-                        className="border w-20 rounded-lg text-right pr-5"
-                      />
-                      <div className="text-black/50 absolute right-1">%</div>
-                    </div>
+                    {percentagesEnabled ? (
+                      <div className="flex items-center pt-2 relative">
+                        <Input
+                          autoComplete="off"
+                          onFocus={(e) => handleFocus(e)}
+                          onChange={(e) =>
+                            individualValueHandler(
+                              "percent",
+                              e.target.value,
+                              member
+                            )
+                          }
+                          value={percentages[member]}
+                          className="border w-20 rounded-lg text-right pr-5"
+                        />
+                        <div className="text-black/50 absolute right-1">%</div>
+                      </div>
+                    ) : (
+                      <div className="flex items-center pt-2 relative">
+                        <Input
+                          autoComplete="off"
+                          onFocus={(e) => handleFocus(e)}
+                          onChange={(e) =>
+                            individualValueHandler(
+                              "amount",
+                              e.target.value,
+                              member
+                            )
+                          }
+                          value={
+                            form.to.find((elmt) => elmt.name === member).amount
+                          }
+                          className="border w-20 rounded-lg text-right pr-5"
+                        />
+                        <div className="text-black/50 absolute right-2">€</div>
+                      </div>
+                    )}
+                    {tip && (
+                      <div className="flex h-5 relative justify-center text-sky-400">
+                        <div className="absolute top-0 right-2">
+                          {(tip / form.to.length).toFixed(2)} €
+                        </div>
+                      </div>
+                    )}
                   </>
                 )}
               </div>

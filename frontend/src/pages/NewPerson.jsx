@@ -5,7 +5,7 @@ import { UserPlusIcon, XMarkIcon } from "@heroicons/react/24/outline";
 import { API_BASE_URL } from "../config";
 import toast from "react-hot-toast";
 
-const NewPerson = ({ emblaApi }) => {
+const NewPerson = ({ emblaApi, setRefresh }) => {
   const [memberInput, setMemberInput] = useState("");
   const [groupMember, setGroupMember] = useState([]);
   const [data, setData] = useState([]);
@@ -50,7 +50,7 @@ const NewPerson = ({ emblaApi }) => {
         body: JSON.stringify({ groupMember: groupMember }),
       });
       const group = await response.json();
-      navigate(`/${group._id}`);
+      setRefresh(new Date());
     }
   };
 
@@ -126,7 +126,7 @@ const NewPerson = ({ emblaApi }) => {
         <button
           onClick={(e) => {
             e.preventDefault();
-            submitForm;
+            submitForm();
           }}
           className="rounded-lg bg-slate-200 hover:bg-green-400 transition-colors py-2 px-20"
         >
