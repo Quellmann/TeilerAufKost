@@ -40,3 +40,31 @@ export async function newSpending(req, res) {
         res.status(500).json({ message: "Internal server error" });
     }
 }
+
+export async function updateSpending(req, res) {
+    try {
+        const spending = await Spending.findById(req.params.spendingId)
+            spending.title = req.body.title,
+            spending.amount = req.body.amount,
+            spending.tip = req.body.tip,
+            spending.from = req.body.from,
+            spending.to = req.body.to,
+            spending.individualValueHistory = req.body.individualValueHistory,
+            spending.isBalancingTransaction = req.body.isBalancingTransaction,
+        spending.save();
+        res.status(200).json(spending);
+    } catch (error) {
+        console.error("Error creating spending:", error);
+        res.status(500).json({ message: "Internal server error" });
+    }
+}
+
+export async function deleteSpending(req, res) {
+    try {
+        const spending = await Spending.findByIdAndDelete(req.params.spendingId)
+        res.status(200).json(spending);
+    } catch (error) {
+        console.error("Error creating spending:", error);
+        res.status(500).json({ message: "Internal server error" });
+    }
+}

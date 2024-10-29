@@ -15,13 +15,12 @@ const NewSpending = ({ emblaApi, setRefresh }) => {
   const [form, setForm] = useState({
     title: "",
     amount: "",
+    tip: "",
     from: "",
     to: [{ name: "", amount: 0 }],
     individualValueHistory: [],
   });
-  const [tip, setTip] = useState("");
   const [percentagesEnabled, setPercentagesEnabled] = useState(false);
-
   const [percentages, setPercentages] = useState({});
 
   useEffect(() => {
@@ -32,7 +31,9 @@ const NewSpending = ({ emblaApi, setRefresh }) => {
         amount: searchParams.get("amount"),
         from: JSON.parse(searchParams.get("from")),
         to: JSON.parse(searchParams.get("to")),
-        individualValueHistory: [],
+        individualValueHistory: JSON.parse(searchParams.get("to")).map(
+          (elmt) => elmt.name
+        ),
       });
     }
     return;
@@ -48,12 +49,20 @@ const NewSpending = ({ emblaApi, setRefresh }) => {
   };
 
   const handleMultiplePersonSelection = (member) => {
-    setForm((prev) => ({
-      ...prev,
-      to: form.to.map((elmt) => elmt.name).includes(member)
-        ? form.to.filter((elmt) => elmt.name != member)
-        : [...form.to, { name: member, amount: 0 }],
-    }));
+    if (form.to.map((elmt) => elmt.name).includes(member)) {
+      setForm((prev) => ({
+        ...prev,
+        individualValueHistory: prev.individualValueHistory.filter(
+          (elmt) => elmt != member
+        ),
+        to: form.to.filter((elmt) => elmt.name != member),
+      }));
+    } else {
+      setForm((prev) => ({
+        ...prev,
+        to: [...form.to, { name: member, amount: 0 }],
+      }));
+    }
   };
 
   const handleFocus = (e) => {
@@ -63,19 +72,10 @@ const NewSpending = ({ emblaApi, setRefresh }) => {
   const individualValueHandler = (input, value, person) => {
     value = value.replace(/,/g, ".");
     const parts = value.split(".");
-    if (parts.length > 2) {
-      value = parts[0] + "." + parts.slice(1).join("");
+    if (parts.length > 1) {
+      value = parts[0] + "." + parts.slice(1).join("").substring(0, 2);
     }
-    value = value.replace(/[^0-9.]/g, "").substring(0, 5);
-
-    // set edit history
-    setForm((prev) => ({
-      ...prev,
-      individualValueHistory: [
-        ...prev.individualValueHistory.filter((elmt) => elmt != person),
-        person,
-      ],
-    }));
+    value = value.replace(/[^0-9.]/g, "");
 
     if (!value.endsWith(".")) {
       // if input is in percent do this
@@ -120,12 +120,20 @@ const NewSpending = ({ emblaApi, setRefresh }) => {
         }));
       }
     }
+    // set edit history
+    setForm((prev) => ({
+      ...prev,
+      individualValueHistory: [
+        ...prev.individualValueHistory.filter((elmt) => elmt != person),
+        person,
+      ],
+    }));
   };
 
   const recalculateUneditedMembers = () => {
     const editedTotal = form.to
       .filter((member) => form.individualValueHistory.includes(member.name))
-      .reduce((a, b) => a + b.amount, 0);
+      .reduce((a, b) => a + +b.amount, 0);
     const uneditedCount = form.to.length - form.individualValueHistory.length;
     const remainingAmount = form.amount - editedTotal;
 
@@ -138,12 +146,13 @@ const NewSpending = ({ emblaApi, setRefresh }) => {
         ...prev,
         individualValueHistory: prev.individualValueHistory.slice(1),
       }));
-    } else if (uneditedCount === 0) {
-      const lastChange = form.individualValueHistory.at(-1);
+    } else if (uneditedCount === 0 && remainingAmount) {
+      const lastChange = form.individualValueHistory.at(0);
+
       setForm((prev) => ({
         ...prev,
         to: prev.to.map((member) =>
-          lastChange == member.name
+          lastChange === member.name
             ? {
                 ...member,
                 amount: +member.amount + parseFloat(remainingAmount),
@@ -174,14 +183,19 @@ const NewSpending = ({ emblaApi, setRefresh }) => {
           : { ...member, amount: +newSplit.toFixed(2) }
       );
 
-      console.log(newAmounts);
-
       const sumOfAmounts = newAmounts.reduce((a, b) => a + +b.amount, 0);
 
       setForm((prev) => ({
         ...prev,
         to: prev.to.map((member) => {
-          if (form.individualValueHistory.includes(member.name)) {
+          if (prev.individualValueHistory.includes(member.name)) {
+            setPercentages((prev) => ({
+              ...prev,
+              [member.name]:
+                sumOfAmounts === 0
+                  ? 0
+                  : +((member.amount / sumOfAmounts) * 100).toFixed(2),
+            }));
             return member;
           } else {
             setPercentages((prev) => ({
@@ -199,34 +213,54 @@ const NewSpending = ({ emblaApi, setRefresh }) => {
   };
 
   useEffect(() => {
-    // console.log(form.individualValueHistory);
-  }, [form.individualValueHistory]);
-
-  useEffect(() => {
     recalculateUneditedMembers();
   }, [form.individualValueHistory, form.to.length, form.amount]);
 
-  const handleAmountInput = (e) => {
-    let value = e.target.value;
-
-    if (value.includes(".")) {
-      const parts = value.split(".");
-      value = parts[0] + "." + parts[1].slice(0, 2);
+  const handleAmountInput = (value, type) => {
+    value = value.replace(/,/g, ".");
+    const parts = value.split(".");
+    if (parts.length > 1) {
+      value = parts[0] + "." + parts.slice(1).join("").substring(0, 2);
     }
-    setForm((prevState) => ({ ...prevState, amount: value }));
+    value = value.replace(/[^0-9.]/g, "");
+
+    if (type === "amount") {
+      setForm((prevState) => ({ ...prevState, amount: value }));
+    } else if (type === "tip") {
+      setForm((prevState) => ({ ...prevState, tip: value }));
+    }
   };
 
-  const submitForm = async () => {
+  const submitForm = async (type) => {
     if (formValidation()) {
       emblaApi.scrollTo(1);
-      const response = await fetch(`${API_BASE_URL}/${groupId}/newSpending`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(form),
-      });
-      const group = await response.json();
+      if (type === "new") {
+        const response = await fetch(`${API_BASE_URL}/${groupId}/newSpending`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(form),
+        });
+      } else if (type === "update") {
+        const response = await fetch(
+          `${API_BASE_URL}/${searchParams.get("spending")}/updateSpending`,
+          {
+            method: "PATCH",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(form),
+          }
+        );
+      } else if (type === "delete") {
+        const response = await fetch(
+          `${API_BASE_URL}/${searchParams.get("spending")}/deleteSpending`,
+          {
+            method: "DELETE",
+          }
+        );
+      }
       setRefresh(new Date());
     }
   };
@@ -245,10 +279,6 @@ const NewSpending = ({ emblaApi, setRefresh }) => {
         navigate("/");
       }
       setData(data);
-      setForm((prevState) => ({
-        ...prevState,
-        to: data.groupMember?.map((member) => ({ name: member, amount: 0 })),
-      }));
     }
     groupId && fetchData();
     return;
@@ -272,37 +302,37 @@ const NewSpending = ({ emblaApi, setRefresh }) => {
             type="text"
           />
         </div>
-        <div className="text-lg mt-10 flex justify-center gap-3">
-          <Input
-            onChange={(e) => handleAmountInput(e)}
-            value={form.amount}
-            placeholder="Betrag"
-            className="border rounded-lg py-2 text-center"
-            name="spending_amount"
-            type="number"
-            step="0.01"
-            min="0"
-          />
+        <div className=" text-lg mt-10 flex justify-center gap-3">
+          <div className="relative">
+            <Input
+              onChange={(e) => handleAmountInput(e.target.value, "amount")}
+              value={form.amount}
+              placeholder="Betrag"
+              className="border rounded-lg py-2 px-4 text-center"
+              name="spending_amount"
+            />
+            <div className="absolute right-2 top-2.5 text-black/50">€</div>
+          </div>
         </div>
+
         <div className="text-lg mt-3 flex justify-center gap-3">
           <div className="relative">
             <Input
-              onChange={(e) => setTip(e.target.value)}
-              value={tip}
+              onChange={(e) => handleAmountInput(e.target.value, "tip")}
+              value={form.tip}
               placeholder="Trinkgeld"
-              className="border rounded-lg py-2 text-center text-sky-400"
+              className="border rounded-lg py-2 px-4 text-center text-sky-400"
               name="tip_amount"
-              type="number"
-              step="0.01"
-              min="0"
             />
+            <div className="absolute right-2 top-2.5 text-black/50">€</div>
             <InformationCircleIcon
               onClick={() => {
+                toast.dismiss();
                 toast(
                   "Trinkgeld wird unter allen Zahlenden zu gleichen Anteilen aufgeteilt."
                 );
               }}
-              className="absolute top-3 right-2 size-6 text-black/50"
+              className="absolute top-3 right-0 translate-x-8 size-6 text-black/50"
             ></InformationCircleIcon>
           </div>
         </div>
@@ -325,19 +355,19 @@ const NewSpending = ({ emblaApi, setRefresh }) => {
           </div>
         </div>
         <div className="flex relative flex-col justify-center border rounded-lg mt-10 divide-y">
-          <div className="absolute top-3 right-2 flex gap-2">
-            <div className="text-black/50">€</div>
-            <Switch
-              checked={percentagesEnabled}
-              onChange={setPercentagesEnabled}
-              className="group inline-flex h-6 w-11 items-center rounded-full bg-gray-400 transition "
-            >
-              <span className="size-4 translate-x-1 rounded-full bg-white transition group-data-[checked]:translate-x-6" />
-            </Switch>
-            <div className="text-black/50">%</div>
-          </div>
           <div className="self-start text-lg p-2">
             Für: {form.to.length} Personen
+            <div className="absolute top-3 right-2 flex gap-2">
+              <div className="text-black/50">€</div>
+              <Switch
+                checked={percentagesEnabled}
+                onChange={setPercentagesEnabled}
+                className="group inline-flex h-6 w-11 items-center rounded-full bg-gray-400 transition "
+              >
+                <span className="size-4 translate-x-1 rounded-full bg-white transition group-data-[checked]:translate-x-6" />
+              </Switch>
+              <div className="text-black/50">%</div>
+            </div>
           </div>
           <div className="flex overflow-auto justify-between items-start gap-5 p-4">
             {data.groupMember?.map((member, index) => (
@@ -394,10 +424,10 @@ const NewSpending = ({ emblaApi, setRefresh }) => {
                         <div className="text-black/50 absolute right-2">€</div>
                       </div>
                     )}
-                    {tip && (
+                    {form.tip && (
                       <div className="flex h-5 relative justify-center text-sky-400">
                         <div className="absolute top-0 right-2">
-                          {(tip / form.to.length).toFixed(2)} €
+                          {(form.tip / form.to.length).toFixed(2)} €
                         </div>
                       </div>
                     )}
@@ -413,7 +443,7 @@ const NewSpending = ({ emblaApi, setRefresh }) => {
           <button
             onClick={(e) => {
               e.preventDefault();
-              submitForm();
+              submitForm("delete");
             }}
             className="rounded-lg bg-slate-200 hover:bg-red-400 transition-colors py-2 px-10 "
           >
@@ -423,7 +453,7 @@ const NewSpending = ({ emblaApi, setRefresh }) => {
         <button
           onClick={(e) => {
             e.preventDefault();
-            submitForm();
+            submitForm(editMode ? "update" : "new");
           }}
           className="rounded-lg bg-slate-200 hover:bg-green-400 transition-colors py-2 px-10"
         >

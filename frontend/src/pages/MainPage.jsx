@@ -58,7 +58,9 @@ const MainPage = () => {
           <Bars3Icon className="size-8"></Bars3Icon>
         </div>
         <div
-          onClick={() => navigate("/")}
+          onClick={() => {
+            navigate("/"), emblaApi.scrollTo(1);
+          }}
           className="flex items-center gap-2 cursor-pointer"
         >
           <img src="/logo_cropped.png" className="size-16"></img>
