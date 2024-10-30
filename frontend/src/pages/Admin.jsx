@@ -89,7 +89,7 @@ const Admin = () => {
                           "Du kannst diese Aktion nicht rückgängig machen.",
                         button: "Löschen",
                       }}
-                      callback={deleteGroup(elmt._id)}
+                      callback={() => deleteGroup(elmt._id)}
                     ></AcceptModal>
                   </td>
                 </tr>

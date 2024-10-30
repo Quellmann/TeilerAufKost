@@ -28,7 +28,7 @@ const MainPage = () => {
     }
   }, [emblaApi]);
 
-  const addOverviewButton = useCallback(() => {
+  const addOverviewButton = () => {
     if (emblaApi) {
       setSearchParams({
         groupId: searchParams.get("groupId"),
@@ -36,7 +36,7 @@ const MainPage = () => {
       });
       emblaApi.scrollTo(2);
     }
-  }, [emblaApi]);
+  };
 
   const closeSidebar = useCallback(() => {
     if (emblaApi && emblaApi.selectedScrollSnap() == 0) {
