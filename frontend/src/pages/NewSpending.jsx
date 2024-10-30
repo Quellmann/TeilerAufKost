@@ -249,7 +249,7 @@ const NewSpending = ({ emblaApi, setRefresh }) => {
       const formAndTip = {
         ...form,
         amount: +form.amount + +form.tip,
-        tip: tip ? tip : 0,
+        tip: form.tip ? form.tip : 0,
         to: form.to.map((member) => ({
           ...member,
           amount: +member.amount + +form.tip / form.to.length,
