@@ -11,7 +11,7 @@ const Summary = ({ personData, emblaApi }) => {
   };
 
   return (
-    <div className="border rounded-lg overflow-auto">
+    <div className="border rounded-lg overflow-auto m-0.5">
       <table className="min-w-full table-fixed">
         <thead>
           <tr className="border-b">
@@ -29,7 +29,7 @@ const Summary = ({ personData, emblaApi }) => {
                   <div key={index}>
                     <div
                       onClick={() => handleFocus(index)}
-                      className="text-green-500 text-sm"
+                      className="text-green-500 text-sm cursor-pointer"
                     >
                       {expenditure === 0 ? "" : expenditure.toFixed(2)}
                     </div>
@@ -41,7 +41,7 @@ const Summary = ({ personData, emblaApi }) => {
                   <div key={index}>
                     <div
                       onClick={() => handleFocus(index)}
-                      className="text-red-500 text-sm"
+                      className="text-red-500 text-sm cursor-pointer"
                     >
                       {liability === 0 ? "" : liability.toFixed(2)}
                     </div>

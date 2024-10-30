@@ -1,15 +1,6 @@
 import React, { useEffect, useState } from "react";
-import {
-  useLocation,
-  useOutletContext,
-  useSearchParams,
-} from "react-router-dom";
+import { useOutletContext, useSearchParams } from "react-router-dom";
 import { PencilSquareIcon, ChevronDownIcon } from "@heroicons/react/24/outline";
-import {
-  Disclosure,
-  DisclosureButton,
-  DisclosurePanel,
-} from "@headlessui/react";
 
 const Spendings = ({ spendings }) => {
   const [search, setSearch] = useState("");
@@ -47,6 +38,7 @@ const Spendings = ({ spendings }) => {
       type: spending.isBalancingTransaction ? "transaction" : "spending",
       title: spending.title,
       amount: spending.amount,
+      tip: spending.tip,
       from: JSON.stringify(spending.from),
       to: JSON.stringify(spending.to),
     });
@@ -65,7 +57,7 @@ const Spendings = ({ spendings }) => {
         />
         <MagnifyingGlassIcon className="absolute top-0 left-1 translate-y-2.5 translate-x-1 size-6 "></MagnifyingGlassIcon>
       </div> */}
-      <div className="flex flex-col mt-5 border rounded-lg divide-y">
+      <div className="flex flex-col mt-5 border rounded-lg divide-y m-0.5">
         {spendings.length === 0 ? (
           <div className="p-3">Es wurden noch keine Ausgaben verbucht.</div>
         ) : (
@@ -106,32 +98,46 @@ const Spendings = ({ spendings }) => {
                     index == focusedSpending ? "max-h-screen" : "max-h-0"
                   }`}
                 >
-                  <div className="p-4 bg-white text-gray-700">
-                    <div className="text-sm grid grid-cols-5">
+                  <div className="rounded-b-lg p-4 bg-white text-gray-700">
+                    <div className="text-sm grid grid-cols-8">
                       <div className="col-span-3">
                         <div className="text-lg border-b">Von:</div>
-                        <div className="flex flex-col gap-14">
-                          <div>{spending.from}</div>
-                        </div>
+                        <div className="truncate pr-2">{spending.from}</div>
                       </div>
-                      <div className="justify-self-start w-full">
+                      <div className="col-span-3 justify-self-start w-full">
                         <div className="text-lg border-b">An:</div>
                         {spending.to.map((person, index) => (
-                          <div key={index} className="truncate">
+                          <div key={index} className="truncate pr-2">
                             {person.name}
                           </div>
                         ))}
                       </div>
-                      <div className="justify-self-start w-full">
+                      <div className="col-span-2 justify-self-start w-full">
                         <div className="text-lg border-b">Betrag:</div>
                         {spending.to.map((person, index) => (
-                          <div className="text-left" key={index}>
-                            {person.amount}€
+                          <div key={index} className="grid grid-cols-2 gap-x-1">
+                            <div className="text-right">{person.amount}</div>
+                            <div>€</div>
                           </div>
                         ))}
                       </div>
                     </div>
-                    <div className="flex justify-center mt-5 ">
+                    <div className="grid grid-cols-8 mt-5 border-t text-sm items-center">
+                      <div className="col-span-3">Trinkgeld:</div>
+                      <div className="col-span-3">
+                        <div>Gesamt</div>
+                        <div>Pro Person</div>
+                      </div>
+                      <div className="col-span-2 text-sky-400 grid grid-cols-2 gap-x-1">
+                        <div className="text-right">{spending.tip}</div>
+                        <div> €</div>
+                        <div className="text-right">
+                          {spending.tip / spending.to.length}
+                        </div>
+                        <div>€</div>
+                      </div>
+                    </div>
+                    <div className="flex justify-start mt-5 ">
                       <button
                         onClick={() => handleEditSpending(spending)}
                         className="flex items-center"

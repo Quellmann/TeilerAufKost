@@ -68,3 +68,13 @@ export async function deleteSpending(req, res) {
         res.status(500).json({ message: "Internal server error" });
     }
 }
+
+export async function deleteGroupSpendings(req, res) {
+    try {
+        const spending = await Spending.deleteMany({ groupId: req.params.groupId})
+        res.status(200).json(spending);
+    } catch (error) {
+        console.error("Error creating spending:", error);
+        res.status(500).json({ message: "Internal server error" });
+    }
+}

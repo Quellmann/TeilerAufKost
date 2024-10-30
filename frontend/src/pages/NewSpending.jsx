@@ -17,7 +17,7 @@ const NewSpending = ({ emblaApi, setRefresh }) => {
     amount: "",
     tip: "",
     from: "",
-    to: [{ name: "", amount: 0 }],
+    to: [],
     individualValueHistory: [],
   });
   const [percentagesEnabled, setPercentagesEnabled] = useState(false);
@@ -26,15 +26,26 @@ const NewSpending = ({ emblaApi, setRefresh }) => {
   useEffect(() => {
     if (searchParams.get("spending")) {
       setEditMode(true);
-      setForm({
+      let formMinusTip = {
         title: searchParams.get("title"),
         amount: searchParams.get("amount"),
+        tip: searchParams.get("tip"),
         from: JSON.parse(searchParams.get("from")),
         to: JSON.parse(searchParams.get("to")),
         individualValueHistory: JSON.parse(searchParams.get("to")).map(
           (elmt) => elmt.name
         ),
-      });
+      };
+      formMinusTip = {
+        ...formMinusTip,
+        amount: +formMinusTip.amount - +formMinusTip.tip,
+        to: formMinusTip.to.map((member) => ({
+          ...member,
+          amount: +member.amount - +formMinusTip.tip / formMinusTip.to.length,
+        })),
+      };
+      setForm(formMinusTip);
+    } else {
     }
     return;
   }, [searchParams]);
@@ -234,13 +245,21 @@ const NewSpending = ({ emblaApi, setRefresh }) => {
   const submitForm = async (type) => {
     if (formValidation()) {
       emblaApi.scrollTo(1);
+      const formAndTip = {
+        ...form,
+        amount: +form.amount + +form.tip,
+        to: form.to.map((member) => ({
+          ...member,
+          amount: +member.amount + +form.tip / form.to.length,
+        })),
+      };
       if (type === "new") {
         const response = await fetch(`${API_BASE_URL}/${groupId}/newSpending`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify(form),
+          body: JSON.stringify(formAndTip),
         });
       } else if (type === "update") {
         const response = await fetch(
@@ -250,7 +269,7 @@ const NewSpending = ({ emblaApi, setRefresh }) => {
             headers: {
               "Content-Type": "application/json",
             },
-            body: JSON.stringify(form),
+            body: JSON.stringify(formAndTip),
           }
         );
       } else if (type === "delete") {
@@ -279,6 +298,11 @@ const NewSpending = ({ emblaApi, setRefresh }) => {
         navigate("/");
       }
       setData(data);
+      !searchParams.get("spending") &&
+        setForm((prev) => ({
+          ...prev,
+          to: data.groupMember.map((member) => ({ name: member, amount: 0 })),
+        }));
     }
     groupId && fetchData();
     return;
@@ -357,7 +381,7 @@ const NewSpending = ({ emblaApi, setRefresh }) => {
         <div className="flex relative flex-col justify-center border rounded-lg mt-10 divide-y">
           <div className="self-start text-lg p-2">
             Für: {form.to.length} Personen
-            <div className="absolute top-3 right-2 flex gap-2">
+            <div className="absolute top-2 right-2 flex gap-2 items-center">
               <div className="text-black/50">€</div>
               <Switch
                 checked={percentagesEnabled}
@@ -387,7 +411,7 @@ const NewSpending = ({ emblaApi, setRefresh }) => {
                 </div>
                 {form.to.map((elmt) => elmt.name).includes(member) && (
                   <>
-                    {percentagesEnabled ? (
+                    {percentagesEnabled && percentages[member] ? (
                       <div className="flex items-center pt-2 relative">
                         <Input
                           autoComplete="off"

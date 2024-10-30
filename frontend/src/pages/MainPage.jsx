@@ -5,6 +5,8 @@ import { Toaster } from "react-hot-toast";
 import AddOverview from "../components/AddOverview";
 import AddDetails from "../components/AddDetails";
 import { Outlet, useNavigate, useSearchParams } from "react-router-dom";
+import { API_BASE_URL } from "../config";
+import { responsiveFontSizes } from "@mui/material";
 
 const MainPage = () => {
   const [sidebarGroups, setSidebarGroups] = useState([]);
@@ -16,7 +18,7 @@ const MainPage = () => {
   const [refresh, setRefresh] = useState(new Date());
   const [divHeight, setDivHeight] = useState("0");
   const navigate = useNavigate();
-  const [searchParams] = useSearchParams();
+  const [searchParams, setSearchParams] = useSearchParams();
 
   const sidebarButton = useCallback(() => {
     if (emblaApi) {
@@ -27,7 +29,13 @@ const MainPage = () => {
   }, [emblaApi]);
 
   const addOverviewButton = useCallback(() => {
-    if (emblaApi) emblaApi.scrollTo(2);
+    if (emblaApi) {
+      setSearchParams({
+        groupId: searchParams.get("groupId"),
+        type: "spending",
+      });
+      emblaApi.scrollTo(2);
+    }
   }, [emblaApi]);
 
   const closeSidebar = useCallback(() => {
@@ -35,6 +43,26 @@ const MainPage = () => {
       emblaApi.scrollTo(1);
     }
   }, [emblaApi]);
+
+  const deleteNonExistingGroups = async () => {
+    const response = await fetch(
+      `${API_BASE_URL}/groups?groupIds=${JSON.stringify(
+        JSON.parse(localStorage.getItem("groupSubscription")).map(
+          (group) => group.id
+        )
+      )}`,
+      {
+        method: "GET",
+      }
+    );
+    const data = await response.json();
+    const idsInDatabase = data.map((elmt) => ({
+      id: elmt._id,
+      name: elmt.groupName,
+    }));
+    localStorage.setItem("groupSubscription", JSON.stringify(idsInDatabase));
+    setSidebarGroups(idsInDatabase);
+  };
 
   useEffect(() => {
     if (remainingSpaceDiv.current) {
@@ -46,11 +74,12 @@ const MainPage = () => {
     );
     if (subscribedGroups) {
       setSidebarGroups(JSON.parse(localStorage.getItem("groupSubscription")));
+      deleteNonExistingGroups();
     }
   }, []);
 
   return (
-    <div className="min-w-[350px] h-dvh flex flex-col">
+    <div className="min-w-[320px] h-dvh flex flex-col">
       <Toaster position="top-center"></Toaster>
       {/* Navbar */}
       <div className="flex justify-between items-center px-5 py-2 bg-slate-200">
@@ -124,17 +153,8 @@ const MainPage = () => {
             >
               <div className="flex flex-col 2xl:w-[40%] xl:w-[50%] lg:w-[60%] md:w-[70%] sm:w-[90%] w-[96%] mx-auto h-full">
                 <Outlet
-                  context={[setSidebarGroups, refresh, emblaApi]}
+                  context={[setSidebarGroups, refresh, emblaApi, setRefresh]}
                 ></Outlet>
-              </div>
-            </div>
-            {/* Add Overview */}
-            <div
-              className="flex-none w-full min-w-0"
-              style={{ height: `${divHeight}` }}
-            >
-              <div className="flex flex-col 2xl:w-[40%] xl:w-[50%] lg:w-[60%] md:w-[70%] sm:w-[90%] w-[96%] mx-auto h-full">
-                <AddOverview emblaApi={emblaApi}></AddOverview>
               </div>
             </div>
             {/* Add Details */}

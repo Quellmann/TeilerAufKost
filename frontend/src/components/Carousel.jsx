@@ -3,7 +3,7 @@ import useEmblaCarousel from "embla-carousel-react";
 import Statistics from "./Statistics";
 import Balancing from "./Balancing";
 import Summary from "./Summary";
-import Spendings from "../pages/Spendings";
+import Spendings from "./Spendings";
 import { ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/24/outline";
 import Options from "./Options";
 

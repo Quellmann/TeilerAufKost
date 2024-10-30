@@ -55,7 +55,7 @@ const Balancing = ({ personData }) => {
   };
 
   return (
-    <div className="border rounded-lg overflow-auto">
+    <div className="border rounded-lg overflow-auto m-0.5">
       <table className="min-w-full table-auto">
         <thead>
           <tr className="border-b">
@@ -72,19 +72,21 @@ const Balancing = ({ personData }) => {
               <td className="p-2">{balancing.to}</td>
               <td className="p-2">{balancing.amount.toFixed(2)} €</td>
               <td className="p-1">
-                <Link
-                  to={`/?groupId=${groupId}&${new URLSearchParams({
-                    type: "transaction",
-                    amount: balancing.amount.toFixed(2),
-                    from: balancing.from,
-                    to: balancing.to,
-                  })}`}
-                  className="flex justify-center border rounded-lg px-1 py-1 hover:bg-green-400"
-                  onClick={() => emblaApi.scrollTo(3)}
-                >
-                  <BanknotesIcon className="w-6"></BanknotesIcon>
-                  <ArrowRightIcon className="w-6"></ArrowRightIcon>
-                </Link>
+                <div className="flex justify-center">
+                  <Link
+                    to={`/?groupId=${groupId}&${new URLSearchParams({
+                      type: "transaction",
+                      amount: balancing.amount.toFixed(2),
+                      from: balancing.from,
+                      to: balancing.to,
+                    })}`}
+                    className="flex justify-center rounded-lg px-4 py-1 border hover:bg-green-400"
+                    onClick={() => emblaApi.scrollTo(2)}
+                  >
+                    <BanknotesIcon className="w-6"></BanknotesIcon>
+                    {/* <ArrowRightIcon className="w-6"></ArrowRightIcon> */}
+                  </Link>
+                </div>
               </td>
             </tr>
           ))}

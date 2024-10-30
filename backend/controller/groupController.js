@@ -1,5 +1,6 @@
 import mongoose from "mongoose";
 import { Group } from "../models/group.js";
+import { Spending } from "../models/spending.js";
 
 export async function getAllGroups(req, res) {
   try {
@@ -62,6 +63,17 @@ export async function updateGroup(req, res) {
       { $addToSet: { groupMember: { $each: req.body.groupMember } } },
       { new: true }
     );
+    res.status(200).json(group);
+  } catch (error) {
+    console.error("Error updating group:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+}
+
+export async function deleteGroup(req, res) {
+  try {
+    const group = await Group.findByIdAndDelete(req.params.groupId)
+    const spending = await Spending.deleteMany({ groupId: req.params.groupId})
     res.status(200).json(group);
   } catch (error) {
     console.error("Error updating group:", error);
