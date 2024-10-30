@@ -28,6 +28,7 @@ export async function newSpending(req, res) {
             groupId: req.params.groupId,
             title: req.body.title,
             amount: req.body.amount,
+            tip: req.body.tip,
             from: req.body.from,
             to: req.body.to,
             individualValueHistory: req.body.individualValueHistory,

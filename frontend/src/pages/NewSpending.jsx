@@ -153,6 +153,7 @@ const NewSpending = ({ emblaApi, setRefresh }) => {
       toast(
         "Individueller Betrag größer als der Gesamtbetrag. Beträge werden zurück-\ngesetzt, bis Teilung möglich ist."
       );
+      // this state change triggers a recall of this function by the useEffect down below
       setForm((prev) => ({
         ...prev,
         individualValueHistory: prev.individualValueHistory.slice(1),
@@ -248,6 +249,7 @@ const NewSpending = ({ emblaApi, setRefresh }) => {
       const formAndTip = {
         ...form,
         amount: +form.amount + +form.tip,
+        tip: tip ? tip : 0,
         to: form.to.map((member) => ({
           ...member,
           amount: +member.amount + +form.tip / form.to.length,
