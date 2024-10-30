@@ -20,35 +20,58 @@ const Summary = ({ personData, emblaApi }) => {
             <th className="text-left p-2 w-1/3">Verbraucht</th>
           </tr>
         </thead>
-        <tbody className="divide-y">
+        <tbody className="">
           {personData.map((person, personIndex) => (
-            <tr key={personIndex}>
-              <td className="p-2">{person.name}</td>
-              <td className="p-2">
-                {person.expenditures.map((expenditure, index) => (
-                  <div key={index}>
-                    <div
-                      onClick={() => handleFocus(index)}
-                      className="text-green-500 text-sm cursor-pointer"
-                    >
-                      {expenditure === 0 ? "" : expenditure.toFixed(2)}
-                    </div>
+            <>
+              <tr className="border-t" key={personIndex}>
+                <td className="p-2">{person.name}</td>
+                <td className="p-2">
+                  <div>
+                    {person.expenditures.map((expenditure, index) => (
+                      <div key={index}>
+                        <div
+                          onClick={() => handleFocus(index)}
+                          className="text-green-500 text-sm cursor-pointer"
+                        >
+                          {expenditure === 0 ? "" : expenditure.toFixed(2)}
+                        </div>
+                      </div>
+                    ))}
                   </div>
-                ))}
-              </td>
-              <td className="p-2">
-                {person.liabilities.map((liability, index) => (
-                  <div key={index}>
-                    <div
-                      onClick={() => handleFocus(index)}
-                      className="text-red-500 text-sm cursor-pointer"
-                    >
-                      {liability === 0 ? "" : liability.toFixed(2)}
-                    </div>
+                </td>
+                <td className="p-2">
+                  <div>
+                    {person.liabilities.map((liability, index) => (
+                      <div key={index}>
+                        <div
+                          onClick={() => handleFocus(index)}
+                          className="text-red-500 text-sm cursor-pointer"
+                        >
+                          {liability === 0 ? "" : liability.toFixed(2)}
+                        </div>
+                      </div>
+                    ))}
                   </div>
-                ))}
-              </td>
-            </tr>
+                </td>
+              </tr>
+              <tr className="border-t border-dashed">
+                <td className="px-2 text-sm text-black/30">Summe:</td>
+                <td className="px-2">
+                  <div className="text-sm text-green-500">
+                    {person.expenditures.reduce((a, b) => a + b, 0)
+                      ? person.expenditures.reduce((a, b) => a + b, 0)
+                      : ""}
+                  </div>
+                </td>
+                <td className="px-2">
+                  <div className="text-sm text-red-500">
+                    {person.liabilities.reduce((a, b) => a + b, 0)
+                      ? person.liabilities.reduce((a, b) => a + b, 0)
+                      : ""}
+                  </div>
+                </td>
+              </tr>
+            </>
           ))}
         </tbody>
       </table>
