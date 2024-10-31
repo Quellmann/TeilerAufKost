@@ -22,6 +22,7 @@ const NewSpending = ({ emblaApi, setRefresh }) => {
   });
   const [percentagesEnabled, setPercentagesEnabled] = useState(false);
   const [percentages, setPercentages] = useState({});
+  const [userHasEdited, setUserHasEdited] = useState(false);
 
   useEffect(() => {
     if (searchParams.get("spending")) {
@@ -41,10 +42,24 @@ const NewSpending = ({ emblaApi, setRefresh }) => {
         amount: +formMinusTip.amount - +formMinusTip.tip,
         to: formMinusTip.to.map((member) => ({
           ...member,
-          amount: +member.amount - +formMinusTip.tip / formMinusTip.to.length,
+          amount: (
+            +member.amount -
+            +formMinusTip.tip / formMinusTip.to.length
+          ).toFixed(2),
         })),
       };
       setForm(formMinusTip);
+
+      const sumOfAmounts = formMinusTip.to.reduce((a, b) => a + +b.amount, 0);
+      setPercentages((prev) =>
+        formMinusTip.to.reduce((acc, member) => {
+          acc[member.name] =
+            sumOfAmounts === 0
+              ? 0
+              : +((member.amount / sumOfAmounts) * 100).toFixed(2);
+          return acc;
+        }, {})
+      );
     } else {
     }
     return;
@@ -60,6 +75,7 @@ const NewSpending = ({ emblaApi, setRefresh }) => {
   };
 
   const handleMultiplePersonSelection = (member) => {
+    setUserHasEdited(true);
     if (form.to.map((elmt) => elmt.name).includes(member)) {
       setForm((prev) => ({
         ...prev,
@@ -81,6 +97,7 @@ const NewSpending = ({ emblaApi, setRefresh }) => {
   };
 
   const individualValueHandler = (input, value, person) => {
+    setUserHasEdited(true);
     value = value.replace(/,/g, ".");
     const parts = value.split(".");
     if (parts.length > 1) {
@@ -142,93 +159,108 @@ const NewSpending = ({ emblaApi, setRefresh }) => {
   };
 
   const recalculateUneditedMembers = () => {
-    const editedTotal = form.to
-      .filter((member) => form.individualValueHistory.includes(member.name))
-      .reduce((a, b) => a + +b.amount, 0);
-    const uneditedCount = form.to.length - form.individualValueHistory.length;
-    const remainingAmount = form.amount - editedTotal;
+    if (userHasEdited) {
+      const editedTotal = form.to
+        .filter((member) => form.individualValueHistory.includes(member.name))
+        .reduce((a, b) => a + +b.amount, 0);
+      const uneditedCount = form.to.length - form.individualValueHistory.length;
+      const remainingAmount = form.amount - editedTotal;
 
-    if (remainingAmount < 0) {
-      toast.dismiss();
-      toast(
-        "Individueller Betrag größer als der Gesamtbetrag. Beträge werden zurück-\ngesetzt, bis Teilung möglich ist."
-      );
-      // this state change triggers a recall of this function by the useEffect down below
-      setForm((prev) => ({
-        ...prev,
-        individualValueHistory: prev.individualValueHistory.slice(1),
-      }));
-    } else if (uneditedCount === 0 && remainingAmount) {
-      const lastChange = form.individualValueHistory.at(0);
-
-      setForm((prev) => ({
-        ...prev,
-        to: prev.to.map((member) =>
-          lastChange === member.name
-            ? {
-                ...member,
-                amount: +member.amount + parseFloat(remainingAmount),
-              }
-            : member
-        ),
-      }));
-    } else {
-      let newSplit = parseFloat(
-        (Math.floor((remainingAmount / uneditedCount) * 100) / 100).toFixed(2)
-      );
-
-      const notSplittable =
-        form.amount - editedTotal - newSplit * uneditedCount;
-
-      if (notSplittable > 0.001) {
+      if (remainingAmount < 0) {
         toast.dismiss();
         toast(
-          `Restbetrag ${notSplittable.toFixed(
-            2
-          )}€ nicht gleichmäßig teilbar. Personen zahlen 1 Cent mehr`
+          "Individueller Betrag größer als der Gesamtbetrag. Beträge werden zurück-\ngesetzt, bis Teilung möglich ist."
         );
-        newSplit += 0.01;
+        // this state change triggers a recall of this function by the useEffect down below
+
+        setForm((prev) => ({
+          ...prev,
+          individualValueHistory: prev.individualValueHistory.slice(1),
+        }));
+      } else if (uneditedCount === 0 && remainingAmount) {
+        const lastChange = form.individualValueHistory.at(0);
+
+        setForm((prev) => ({
+          ...prev,
+          to: prev.to.map((member) => {
+            if (lastChange === member.name) {
+              setPercentages((prev) => ({
+                ...prev,
+                [member.name]: +(
+                  ((+member.amount + +remainingAmount) / +form.amount) *
+                  100
+                ).toFixed(2),
+              }));
+              return {
+                ...member,
+                amount: (+member.amount + parseFloat(remainingAmount)).toFixed(
+                  2
+                ),
+              };
+            } else {
+              return member;
+            }
+          }),
+        }));
+      } else {
+        let newSplit = parseFloat(
+          (Math.floor((remainingAmount / uneditedCount) * 100) / 100).toFixed(2)
+        );
+
+        const notSplittable =
+          form.amount - editedTotal - newSplit * uneditedCount;
+
+        if (notSplittable > 0.001) {
+          toast.dismiss();
+          toast(
+            `Restbetrag ${notSplittable.toFixed(
+              2
+            )}€ nicht gleichmäßig teilbar. Personen zahlen 1 Cent mehr`
+          );
+          newSplit += 0.01;
+        }
+        const newAmounts = form.to.map((member) =>
+          form.individualValueHistory.includes(member.name)
+            ? member
+            : { ...member, amount: +newSplit.toFixed(2) }
+        );
+
+        const sumOfAmounts = newAmounts.reduce((a, b) => a + +b.amount, 0);
+
+        setForm((prev) => ({
+          ...prev,
+          to: prev.to.map((member) => {
+            if (prev.individualValueHistory.includes(member.name)) {
+              setPercentages((prev) => ({
+                ...prev,
+                [member.name]:
+                  sumOfAmounts === 0
+                    ? 0
+                    : +((member.amount / sumOfAmounts) * 100).toFixed(2),
+              }));
+              return member;
+            } else {
+              setPercentages((prev) => ({
+                ...prev,
+                [member.name]:
+                  sumOfAmounts === 0
+                    ? 0
+                    : +((newSplit / sumOfAmounts) * 100).toFixed(2),
+              }));
+              return { ...member, amount: +newSplit.toFixed(2) };
+            }
+          }),
+        }));
       }
-      const newAmounts = form.to.map((member) =>
-        form.individualValueHistory.includes(member.name)
-          ? member
-          : { ...member, amount: +newSplit.toFixed(2) }
-      );
-
-      const sumOfAmounts = newAmounts.reduce((a, b) => a + +b.amount, 0);
-
-      setForm((prev) => ({
-        ...prev,
-        to: prev.to.map((member) => {
-          if (prev.individualValueHistory.includes(member.name)) {
-            setPercentages((prev) => ({
-              ...prev,
-              [member.name]:
-                sumOfAmounts === 0
-                  ? 0
-                  : +((member.amount / sumOfAmounts) * 100).toFixed(2),
-            }));
-            return member;
-          } else {
-            setPercentages((prev) => ({
-              ...prev,
-              [member.name]:
-                sumOfAmounts === 0
-                  ? 0
-                  : +((newSplit / sumOfAmounts) * 100).toFixed(2),
-            }));
-            return { ...member, amount: +newSplit.toFixed(2) };
-          }
-        }),
-      }));
     }
   };
 
   useEffect(() => {
     recalculateUneditedMembers();
-  }, [form.individualValueHistory, form.to.length, form.amount]);
+  }, [form.individualValueHistory, form.to.length, form.amount, userHasEdited]);
 
   const handleAmountInput = (value, type) => {
+    setUserHasEdited(true);
     value = value.replace(/,/g, ".");
     const parts = value.split(".");
     if (parts.length > 1) {

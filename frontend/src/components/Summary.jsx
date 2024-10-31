@@ -22,8 +22,8 @@ const Summary = ({ personData, emblaApi }) => {
         </thead>
         <tbody className="">
           {personData.map((person, personIndex) => (
-            <>
-              <tr className="border-t" key={personIndex}>
+            <React.Fragment key={personIndex}>
+              <tr className="border-t">
                 <td className="p-2">{person.name}</td>
                 <td className="p-2">
                   <div>
@@ -71,7 +71,7 @@ const Summary = ({ personData, emblaApi }) => {
                   </div>
                 </td>
               </tr>
-            </>
+            </React.Fragment>
           ))}
         </tbody>
       </table>
