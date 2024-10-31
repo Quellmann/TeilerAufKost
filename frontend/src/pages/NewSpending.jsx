@@ -5,11 +5,12 @@ import { API_BASE_URL } from "../config";
 import toast from "react-hot-toast";
 import { InformationCircleIcon } from "@heroicons/react/24/outline";
 import { Switch } from "@headlessui/react";
+import DeleteModal from "../components/DeleteModal";
 
 const NewSpending = ({ emblaApi, setRefresh }) => {
   const [data, setData] = useState([]);
   const [editMode, setEditMode] = useState(false);
-  const [searchParams] = useSearchParams();
+  const [searchParams, setSearchParams] = useSearchParams();
   const groupId = searchParams.get("groupId");
   const navigate = useNavigate();
   const [form, setForm] = useState({
@@ -23,6 +24,7 @@ const NewSpending = ({ emblaApi, setRefresh }) => {
   const [percentagesEnabled, setPercentagesEnabled] = useState(false);
   const [percentages, setPercentages] = useState({});
   const [userHasEdited, setUserHasEdited] = useState(false);
+  const [isOpen, setIsOpen] = useState(false);
 
   useEffect(() => {
     if (searchParams.get("spending")) {
@@ -60,7 +62,20 @@ const NewSpending = ({ emblaApi, setRefresh }) => {
           return acc;
         }, {})
       );
-    } else {
+    } else if (searchParams.get("type") === "balancing") {
+      setForm((prev) => ({
+        ...prev,
+        title: "Ausgleichszahlung",
+        amount: searchParams.get("amount"),
+        from: searchParams.get("from"),
+        to: [
+          {
+            name: searchParams.get("to"),
+            amount: searchParams.get("amount"),
+          },
+        ],
+      }));
+      setPercentages((prev) => ({ ...prev, [searchParams.get("to")]: 100 }));
     }
     return;
   }, [searchParams]);
@@ -315,6 +330,7 @@ const NewSpending = ({ emblaApi, setRefresh }) => {
         );
       }
       setRefresh(new Date());
+      setSearchParams({ groupId: searchParams.get("groupId") });
     }
   };
 
@@ -332,7 +348,9 @@ const NewSpending = ({ emblaApi, setRefresh }) => {
         navigate("/");
       }
       setData(data);
-      !searchParams.get("spending") &&
+      !(
+        searchParams.get("spending") || searchParams.get("type") === "balancing"
+      ) &&
         setForm((prev) => ({
           ...prev,
           to: data.groupMember.map((member) => ({ name: member, amount: 0 })),
@@ -360,7 +378,7 @@ const NewSpending = ({ emblaApi, setRefresh }) => {
             type="text"
           />
         </div>
-        <div className=" text-lg mt-10 flex justify-center gap-3">
+        <div className=" text-lg mt-5 flex justify-center gap-3">
           <div className="relative">
             <Input
               onChange={(e) => handleAmountInput(e.target.value, "amount")}
@@ -394,7 +412,7 @@ const NewSpending = ({ emblaApi, setRefresh }) => {
             ></InformationCircleIcon>
           </div>
         </div>
-        <div className="flex flex-col justify-center border rounded-lg mt-10 divide-y">
+        <div className="flex flex-col justify-center border rounded-lg mt-5 divide-y">
           <div className="self-start text-lg p-2">Bezahlt von:</div>
           <div className="flex overflow-auto justify-between gap-3 p-4">
             {data.groupMember?.map((member, index) => (
@@ -412,7 +430,7 @@ const NewSpending = ({ emblaApi, setRefresh }) => {
             ))}
           </div>
         </div>
-        <div className="flex relative flex-col justify-center border rounded-lg mt-10 divide-y">
+        <div className="flex relative flex-col justify-center border rounded-lg mt-5 divide-y">
           <div className="self-start text-lg p-2">
             Für: {form.to.length} Personen
             <div className="absolute top-2 right-2 flex gap-2 items-center">
@@ -501,9 +519,9 @@ const NewSpending = ({ emblaApi, setRefresh }) => {
           <button
             onClick={(e) => {
               e.preventDefault();
-              submitForm("delete");
+              setIsOpen(true);
             }}
-            className="rounded-lg bg-slate-200 hover:bg-red-400 transition-colors py-2 px-10 "
+            className="rounded-lg bg-slate-200 hover:bg-red-500 hover:text-white transition-colors py-2 px-10 "
           >
             Löschen
           </button>
@@ -518,6 +536,12 @@ const NewSpending = ({ emblaApi, setRefresh }) => {
           {editMode ? "Update" : "Speichern"}
         </button>
       </div>
+      <DeleteModal
+        isOpen={isOpen}
+        setIsOpen={setIsOpen}
+        text={"Bitte bestätige, dass du diese Ausgabe löschen willst."}
+        callback={() => submitForm("delete")}
+      ></DeleteModal>
     </form>
   );
 };

@@ -59,14 +59,16 @@ const Summary = ({ personData, emblaApi }) => {
                 <td className="px-2">
                   <div className="text-sm text-green-500">
                     {person.expenditures.reduce((a, b) => a + b, 0)
-                      ? person.expenditures.reduce((a, b) => a + b, 0)
+                      ? person.expenditures
+                          .reduce((a, b) => a + b, 0)
+                          .toFixed(2)
                       : ""}
                   </div>
                 </td>
                 <td className="px-2">
                   <div className="text-sm text-red-500">
                     {person.liabilities.reduce((a, b) => a + b, 0)
-                      ? person.liabilities.reduce((a, b) => a + b, 0)
+                      ? person.liabilities.reduce((a, b) => a + b, 0).toFixed(2)
                       : ""}
                   </div>
                 </td>

@@ -1,7 +1,6 @@
 import React from "react";
 
 import NewSpending from "../pages/NewSpending";
-import NewTransaction from "../pages/NewTransaction";
 import NewPerson from "../pages/NewPerson";
 import { ArrowUturnLeftIcon } from "@heroicons/react/24/outline";
 import { useSearchParams } from "react-router-dom";
@@ -18,12 +17,12 @@ const AddDetails = ({ emblaApi, setRefresh }) => {
             setRefresh={setRefresh}
           ></NewSpending>
         );
-      case "transaction":
+      case "balancing":
         return (
-          <NewTransaction
+          <NewSpending
             emblaApi={emblaApi}
             setRefresh={setRefresh}
-          ></NewTransaction>
+          ></NewSpending>
         );
       case "person":
         return (
@@ -41,7 +40,7 @@ const AddDetails = ({ emblaApi, setRefresh }) => {
             emblaApi.scrollTo(1);
             setSearchParams({ groupId: searchParams.get("groupId") });
           }}
-          className="flex items-center p-1 border rounded-lg mb-10 mt-6"
+          className="flex items-center p-1 border rounded-lg mb-5 mt-6"
         >
           <ArrowUturnLeftIcon className="size-6"></ArrowUturnLeftIcon>
           <div className="ml-3">Zurück</div>

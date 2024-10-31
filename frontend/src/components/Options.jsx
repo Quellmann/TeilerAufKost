@@ -12,7 +12,7 @@ import {
   useSearchParams,
 } from "react-router-dom";
 import { API_BASE_URL } from "../config";
-import AcceptModal from "./AcceptModal";
+import DeleteModal from "./DeleteModal";
 
 const Options = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -77,17 +77,12 @@ const Options = () => {
         <ArrowLeftStartOnRectangleIcon className="size-6 mr-3"></ArrowLeftStartOnRectangleIcon>
         Gruppe verlassen
       </div>
-      <AcceptModal
+      <DeleteModal
         isOpen={isOpen}
         setIsOpen={setIsOpen}
-        modalData={{
-          title: "Ausgaben löschen",
-          text1: "Bist du sicher, dass du alle Ausgaben löschen willst?",
-          text2: "Du kannst diese Aktion nicht rückgängig machen.",
-          button: "Löschen",
-        }}
+        text={"Bitte bestätige, dass du alle Ausgaben löschen willst."}
         callback={() => deleteGroupSpendings()}
-      ></AcceptModal>
+      ></DeleteModal>
     </div>
   );
 };

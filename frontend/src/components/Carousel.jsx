@@ -58,10 +58,10 @@ const Carousel = ({ personData, spendings }) => {
         </div>
         <div className="flex-none w-full min-w-0">
           <div className="flex justify-center text-xl mb-5">Statistik</div>
-          {/* <Statistics
+          <Statistics
             personData={personData}
             spendings={spendings}
-          ></Statistics> */}
+          ></Statistics>
         </div>
         <div className="flex-none w-full min-w-0">
           <div className="flex justify-center text-xl mb-5">Optionen</div>

@@ -41,7 +41,7 @@ const NewPerson = ({ emblaApi, setRefresh }) => {
 
   const submitForm = async () => {
     if (formValidation()) {
-      emblaApi.scrollTo(0);
+      emblaApi.scrollTo(1);
       const response = await fetch(`${API_BASE_URL}/${groupId}/updateGroup`, {
         method: "PATCH",
         headers: {

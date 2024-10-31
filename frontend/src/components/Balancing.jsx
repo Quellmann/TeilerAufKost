@@ -75,7 +75,7 @@ const Balancing = ({ personData }) => {
                 <div className="flex justify-center">
                   <Link
                     to={`/?groupId=${groupId}&${new URLSearchParams({
-                      type: "transaction",
+                      type: "balancing",
                       amount: balancing.amount.toFixed(2),
                       from: balancing.from,
                       to: balancing.to,
@@ -83,8 +83,7 @@ const Balancing = ({ personData }) => {
                     className="flex justify-center rounded-lg px-4 py-1 border hover:bg-green-400"
                     onClick={() => emblaApi.scrollTo(2)}
                   >
-                    <BanknotesIcon className="w-6"></BanknotesIcon>
-                    {/* <ArrowRightIcon className="w-6"></ArrowRightIcon> */}
+                    <BanknotesIcon className="w-6 text-gray-700"></BanknotesIcon>
                   </Link>
                 </div>
               </td>

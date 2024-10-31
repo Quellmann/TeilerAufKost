@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { API_BASE_URL } from "../config";
 import { Link, useNavigate } from "react-router-dom";
 import { TrashIcon } from "@heroicons/react/24/outline";
-import AcceptModal from "../components/AcceptModal";
+import DeleteModal from "../components/DeleteModal";
 
 const Admin = () => {
   const [data, setData] = useState([]);
@@ -78,19 +78,14 @@ const Admin = () => {
                     >
                       <TrashIcon className="size-5"></TrashIcon>
                     </div>
-                    <AcceptModal
+                    <DeleteModal
                       isOpen={isOpen}
                       setIsOpen={setIsOpen}
-                      modalData={{
-                        title: "Gruppe löschen",
-                        text1:
-                          "Bist du sicher, dass du diese Gruppe löschen willst?",
-                        text2:
-                          "Du kannst diese Aktion nicht rückgängig machen.",
-                        button: "Löschen",
-                      }}
+                      text={
+                        "Bitte bestätige, dass du diese Gruppe löschen willst?"
+                      }
                       callback={() => deleteGroup(elmt._id)}
-                    ></AcceptModal>
+                    ></DeleteModal>
                   </td>
                 </tr>
               ))}
