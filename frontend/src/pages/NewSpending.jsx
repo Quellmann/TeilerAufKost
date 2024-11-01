@@ -110,8 +110,76 @@ const NewSpending = ({ emblaApi, setRefresh }) => {
   const handleFocus = (e) => {
     e.target.select();
   };
+  const handleBlur = (member, type) => {
+    switch (type) {
+      case "amount": {
+        recalculateUneditedMembers();
+        break;
+      }
+      case "personal_percent": {
+        setForm((prev) => ({
+          ...prev,
+          to: prev.to.map((elmt) =>
+            elmt.name === member
+              ? {
+                  ...elmt,
+                  amount: ((percentages[member] / 100) * form.amount).toFixed(
+                    2
+                  ),
+                }
+              : elmt
+          ),
+        }));
+        // set edit history
+        setForm((prev) => ({
+          ...prev,
+          individualValueHistory: [
+            ...prev.individualValueHistory.filter((elmt) => elmt != member),
+            member,
+          ],
+        }));
+        break;
+      }
+      case "personal_amount": {
+        // set edit history
+        setForm((prev) => ({
+          ...prev,
+          individualValueHistory: [
+            ...prev.individualValueHistory.filter((elmt) => elmt != member),
+            member,
+          ],
+        }));
+        break;
+      }
+    }
+  };
 
   const individualValueHandler = (input, value, person) => {
+    setUserHasEdited(true);
+    value = value.replace(/,/g, ".");
+    const parts = value.split(".");
+    if (parts.length > 1) {
+      value = parts[0] + "." + parts.slice(1).join("").substring(0, 2);
+    }
+    value = value.replace(/[^0-9.]/g, "");
+
+    // if input is in percent do this
+    if (input === "percent") {
+      setPercentages((prev) => ({
+        ...prev,
+        [person]: value,
+      }));
+    } else {
+      setForm((prev) => ({
+        ...prev,
+        to: prev.to.map((elmt) =>
+          elmt.name === person ? { ...elmt, amount: value } : elmt
+        ),
+      }));
+    }
+  };
+
+  const individualValueHandler2 = (input, value, person) => {
     setUserHasEdited(true);
     value = value.replace(/,/g, ".");
     const parts = value.split(".");
@@ -127,14 +195,16 @@ const NewSpending = ({ emblaApi, setRefresh }) => {
           ...prev,
           [person]: value,
         }));
-        setForm((prev) => ({
-          ...prev,
-          to: prev.to.map((elmt) =>
-            elmt.name === person
-              ? { ...elmt, amount: ((value / 100) * form.amount).toFixed(2) }
-              : elmt
-          ),
-        }));
+        // if (!inputHasFocus) {
+        //   setForm((prev) => ({
+        //     ...prev,
+        //     to: prev.to.map((elmt) =>
+        //       elmt.name === person
+        //         ? { ...elmt, amount: ((value / 100) * form.amount).toFixed(2) }
+        //         : elmt
+        //     ),
+        //   }));
+        // }
       } else {
         // if input is in € do this
         setPercentages((prev) => ({
@@ -192,6 +262,7 @@ const NewSpending = ({ emblaApi, setRefresh }) => {
           ...prev,
           individualValueHistory: prev.individualValueHistory.slice(1),
         }));
+        // recalculateUneditedMembers();
       } else if (uneditedCount === 0 && remainingAmount) {
         const lastChange = form.individualValueHistory.at(0);
 
@@ -221,7 +292,6 @@ const NewSpending = ({ emblaApi, setRefresh }) => {
         let newSplit = parseFloat(
           (Math.floor((remainingAmount / uneditedCount) * 100) / 100).toFixed(2)
         );
-
         const notSplittable =
           form.amount - editedTotal - newSplit * uneditedCount;
 
@@ -230,7 +300,7 @@ const NewSpending = ({ emblaApi, setRefresh }) => {
           toast(
             `Restbetrag ${notSplittable.toFixed(
               2
-            )}€ nicht gleichmäßig teilbar. Personen zahlen 1 Cent mehr`
+            )}€ nicht gleichmäßig teilbar. Beträge werden einheitlich aufgerundet.`
           );
           newSplit += 0.01;
         }
@@ -272,7 +342,7 @@ const NewSpending = ({ emblaApi, setRefresh }) => {
 
   useEffect(() => {
     recalculateUneditedMembers();
-  }, [form.individualValueHistory, form.to.length, form.amount, userHasEdited]);
+  }, [form.to.length, form.individualValueHistory]);
 
   const handleAmountInput = (value, type) => {
     setUserHasEdited(true);
@@ -348,13 +418,16 @@ const NewSpending = ({ emblaApi, setRefresh }) => {
         navigate("/");
       }
       setData(data);
-      !(
-        searchParams.get("spending") || searchParams.get("type") === "balancing"
-      ) &&
+
+      if (!(searchParams.get("mode") === "edit")) {
         setForm((prev) => ({
           ...prev,
           to: data.groupMember.map((member) => ({ name: member, amount: 0 })),
         }));
+        data.groupMember.map((member) =>
+          setPercentages((prev) => ({ ...prev, [member]: 0 }))
+        );
+      }
     }
     groupId && fetchData();
     return;
@@ -382,6 +455,8 @@ const NewSpending = ({ emblaApi, setRefresh }) => {
           <div className="relative">
             <Input
               onChange={(e) => handleAmountInput(e.target.value, "amount")}
+              onFocus={(e) => handleFocus(e)}
+              onBlur={(e) => handleBlur(e, "amount")}
               value={form.amount}
               placeholder="Betrag"
               className="border rounded-lg py-2 px-4 text-center"
@@ -395,6 +470,7 @@ const NewSpending = ({ emblaApi, setRefresh }) => {
           <div className="relative">
             <Input
               onChange={(e) => handleAmountInput(e.target.value, "tip")}
+              onFocus={(e) => handleFocus(e)}
               value={form.tip}
               placeholder="Trinkgeld"
               className="border rounded-lg py-2 px-4 text-center text-sky-400"
@@ -463,11 +539,12 @@ const NewSpending = ({ emblaApi, setRefresh }) => {
                 </div>
                 {form.to.map((elmt) => elmt.name).includes(member) && (
                   <>
-                    {percentagesEnabled && percentages[member] ? (
+                    {percentagesEnabled ? (
                       <div className="flex items-center pt-2 relative">
                         <Input
                           autoComplete="off"
                           onFocus={(e) => handleFocus(e)}
+                          onBlur={() => handleBlur(member, "personal_percent")}
                           onChange={(e) =>
                             individualValueHandler(
                               "percent",
@@ -485,6 +562,7 @@ const NewSpending = ({ emblaApi, setRefresh }) => {
                         <Input
                           autoComplete="off"
                           onFocus={(e) => handleFocus(e)}
+                          onBlur={() => handleBlur(member, "personal_amount")}
                           onChange={(e) =>
                             individualValueHandler(
                               "amount",
