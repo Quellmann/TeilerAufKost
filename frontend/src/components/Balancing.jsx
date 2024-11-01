@@ -76,6 +76,7 @@ const Balancing = ({ personData }) => {
                   <Link
                     to={`/?groupId=${groupId}&${new URLSearchParams({
                       type: "balancing",
+                      mode: "edit",
                       amount: balancing.amount.toFixed(2),
                       from: balancing.from,
                       to: balancing.to,
