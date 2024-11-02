@@ -54,10 +54,18 @@ const Statistics = ({ personData, spendings }) => {
     );
 
     setPieSeries(
-      personData.map((person) => ({
-        value: Math.abs(person.liabilities.reduce((a, b) => a + b, 0)),
-        label: person.name,
-      }))
+      personData.map((person) => {
+        const total_liablities = Math.abs(
+          person.liabilities.reduce((a, b) => a + b, 0)
+        );
+
+        return {
+          value: total_liablities,
+          percent:
+            total_liablities / spendings.reduce((a, b) => a + +b.amount, 0),
+          label: person.name,
+        };
+      })
     );
 
     setBarSeries(
@@ -105,7 +113,7 @@ const Statistics = ({ personData, spendings }) => {
     const tooltipPosition = {
       ...mousePosition,
       // Add the y-coordinate of the <svg/> to the to margin between the <svg/> and the drawing area
-      y: svgRef.current.getBoundingClientRect().top + drawingArea.top,
+      y: svgRef.current.getBoundingClientRect().top + drawingArea.top - 40,
     };
 
     // console.log(mousePosition);
@@ -137,8 +145,15 @@ const Statistics = ({ personData, spendings }) => {
                 className={`w-3 h-3 rounded-full`}
               ></div>
               <div className="w-20 truncate">{tooltipData.label}</div>
-              <div className="flex justify-self-end">
-                {tooltipData.formattedValue} €
+              <div>
+                <div className="text-right flex justify-end">
+                  {tooltipData.formattedValue}
+                  <div className="px-1.5">€</div>
+                </div>
+                <div className="text-right flex justify-end">
+                  {(tooltipData.value.percent * 100).toFixed(2)}
+                  <div className="px-1">%</div>
+                </div>
               </div>
             </div>
           </div>
