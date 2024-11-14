@@ -117,7 +117,9 @@ const Spendings = ({ spendings }) => {
                         <div className="text-lg border-b">Betrag:</div>
                         {spending.to.map((person, index) => (
                           <div key={index} className="grid grid-cols-2 gap-x-1">
-                            <div className="text-right">{person.amount}</div>
+                            <div className="text-right">
+                              {person.amount.toFixed(2)}
+                            </div>
                             <div>€</div>
                           </div>
                         ))}
@@ -130,10 +132,12 @@ const Spendings = ({ spendings }) => {
                         <div>Pro Person</div>
                       </div>
                       <div className="col-span-2 text-sky-400 grid grid-cols-2 gap-x-1">
-                        <div className="text-right">{spending.tip}</div>
+                        <div className="text-right">
+                          {spending.tip.toFixed(2)}
+                        </div>
                         <div> €</div>
                         <div className="text-right">
-                          {spending.tip / spending.to.length}
+                          {(spending.tip / spending.to.length).toFixed(2)}
                         </div>
                         <div>€</div>
                       </div>
