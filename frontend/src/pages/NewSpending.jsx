@@ -46,7 +46,7 @@ const NewSpending = ({ emblaApi, setRefresh }) => {
           ...member,
           amount: (
             +member.amount -
-            +formMinusTip.tip / formMinusTip.to.length
+            +(+formMinusTip.tip / formMinusTip.to.length).toFixed(2)
           ).toFixed(2),
         })),
       };

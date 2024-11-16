@@ -20,13 +20,13 @@ class Person {
       return person ? -person.amount : 0;
     });
     this.expenditures = spendings.map((item) => {
-      return item.from === name ? item.amount : 0;
+      return item.from === name ? item.to.reduce((a, b) => a + b.amount, 0) : 0;
     });
     this.balance = () => {
-      return (
+      return +(
         this.liabilities.reduce((a, b) => a + b, 0) +
         this.expenditures.reduce((a, b) => a + b, 0)
-      );
+      ).toFixed(2);
     };
   }
 }
