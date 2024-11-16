@@ -28,16 +28,19 @@ const Balancing = ({ personData }) => {
         let currentSender = senders.pop();
         let senderBalanceRemaining = currentSender.balance;
         if (currentBalance + senderBalanceRemaining < 0) {
+          // case 1 sender has more liabilities than needed to equalize saldo of receiver
+          // sender gets readded to possible money senders
           senderBalanceRemaining += currentBalance;
           result.push({
             from: currentSender.name,
             to: currentReceiver.name,
-            amount: currentBalance,
+            amount: +currentBalance,
           });
           currentSender.balance = senderBalanceRemaining;
           senders.push(currentSender);
           break;
         } else {
+          // case 2 sender can equalize his liabilities by sending the saldo to a receiver
           currentBalance += senderBalanceRemaining;
           result.push({
             from: currentSender.name,
@@ -46,7 +49,7 @@ const Balancing = ({ personData }) => {
           });
         }
         if (i > 1000) {
-          console.log("iterations bound");
+          console.log("exceeding maximum iteration steps");
           return [];
         }
       }
@@ -70,7 +73,9 @@ const Balancing = ({ personData }) => {
             <tr key={personIndex}>
               <td className="p-2">{balancing.from}</td>
               <td className="p-2">{balancing.to}</td>
-              <td className="p-2">{balancing.amount.toFixed(2)} €</td>
+              <td onClick={() => console.log(balancing.amount)} className="p-2">
+                {balancing.amount.toFixed(2)} €
+              </td>
               <td className="p-1">
                 <div className="flex justify-center">
                   <Link

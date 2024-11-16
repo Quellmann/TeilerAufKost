@@ -6,6 +6,7 @@ import toast from "react-hot-toast";
 import { InformationCircleIcon } from "@heroicons/react/24/outline";
 import { Switch } from "@headlessui/react";
 import DeleteModal from "../components/DeleteModal";
+import BalancingTransactionModal from "../components/BalancingTransactionModal";
 
 const NewSpending = ({ emblaApi, setRefresh }) => {
   const [data, setData] = useState([]);
@@ -25,6 +26,7 @@ const NewSpending = ({ emblaApi, setRefresh }) => {
   const [percentages, setPercentages] = useState({});
   const [userHasEdited, setUserHasEdited] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
+  const [isOpenBalancing, setIsOpenBalancing] = useState(false);
 
   useEffect(() => {
     if (searchParams.get("spending")) {
@@ -46,7 +48,7 @@ const NewSpending = ({ emblaApi, setRefresh }) => {
           ...member,
           amount: (
             +member.amount -
-            +formMinusTip.tip / formMinusTip.to.length
+            +(+formMinusTip.tip / formMinusTip.to.length).toFixed(2)
           ).toFixed(2),
         })),
       };
@@ -74,6 +76,7 @@ const NewSpending = ({ emblaApi, setRefresh }) => {
             amount: searchParams.get("amount"),
           },
         ],
+        isBalancingTransaction: true,
       }));
       setPercentages((prev) => ({ ...prev, [searchParams.get("to")]: 100 }));
     }
@@ -110,6 +113,7 @@ const NewSpending = ({ emblaApi, setRefresh }) => {
   const handleFocus = (e) => {
     e.target.select();
   };
+
   const handleBlur = (member, type) => {
     switch (type) {
       case "amount": {
@@ -179,69 +183,69 @@ const NewSpending = ({ emblaApi, setRefresh }) => {
     }
   };
 
-  const individualValueHandler2 = (input, value, person) => {
-    setUserHasEdited(true);
-    value = value.replace(/,/g, ".");
-    const parts = value.split(".");
-    if (parts.length > 1) {
-      value = parts[0] + "." + parts.slice(1).join("").substring(0, 2);
-    }
-    value = value.replace(/[^0-9.]/g, "");
+  // const individualValueHandler2 = (input, value, person) => {
+  //   setUserHasEdited(true);
+  //   value = value.replace(/,/g, ".");
+  //   const parts = value.split(".");
+  //   if (parts.length > 1) {
+  //     value = parts[0] + "." + parts.slice(1).join("").substring(0, 2);
+  //   }
+  //   value = value.replace(/[^0-9.]/g, "");
 
-    if (!value.endsWith(".")) {
-      // if input is in percent do this
-      if (input === "percent") {
-        setPercentages((prev) => ({
-          ...prev,
-          [person]: value,
-        }));
-        // if (!inputHasFocus) {
-        //   setForm((prev) => ({
-        //     ...prev,
-        //     to: prev.to.map((elmt) =>
-        //       elmt.name === person
-        //         ? { ...elmt, amount: ((value / 100) * form.amount).toFixed(2) }
-        //         : elmt
-        //     ),
-        //   }));
-        // }
-      } else {
-        // if input is in € do this
-        setPercentages((prev) => ({
-          ...prev,
-          [person]: ((value / form.amount) * 100).toFixed(2),
-        }));
-        setForm((prev) => ({
-          ...prev,
-          to: prev.to.map((elmt) =>
-            elmt.name === person ? { ...elmt, amount: value } : elmt
-          ),
-        }));
-      }
-    } else {
-      if (input === "percent") {
-        setPercentages((prev) => ({
-          ...prev,
-          [person]: value,
-        }));
-      } else {
-        setForm((prev) => ({
-          ...prev,
-          to: prev.to.map((elmt) =>
-            elmt.name === person ? { ...elmt, amount: value } : elmt
-          ),
-        }));
-      }
-    }
-    // set edit history
-    setForm((prev) => ({
-      ...prev,
-      individualValueHistory: [
-        ...prev.individualValueHistory.filter((elmt) => elmt != person),
-        person,
-      ],
-    }));
-  };
+  //   if (!value.endsWith(".")) {
+  //     // if input is in percent do this
+  //     if (input === "percent") {
+  //       setPercentages((prev) => ({
+  //         ...prev,
+  //         [person]: value,
+  //       }));
+  //       // if (!inputHasFocus) {
+  //       //   setForm((prev) => ({
+  //       //     ...prev,
+  //       //     to: prev.to.map((elmt) =>
+  //       //       elmt.name === person
+  //       //         ? { ...elmt, amount: ((value / 100) * form.amount).toFixed(2) }
+  //       //         : elmt
+  //       //     ),
+  //       //   }));
+  //       // }
+  //     } else {
+  //       // if input is in € do this
+  //       setPercentages((prev) => ({
+  //         ...prev,
+  //         [person]: ((value / form.amount) * 100).toFixed(2),
+  //       }));
+  //       setForm((prev) => ({
+  //         ...prev,
+  //         to: prev.to.map((elmt) =>
+  //           elmt.name === person ? { ...elmt, amount: value } : elmt
+  //         ),
+  //       }));
+  //     }
+  //   } else {
+  //     if (input === "percent") {
+  //       setPercentages((prev) => ({
+  //         ...prev,
+  //         [person]: value,
+  //       }));
+  //     } else {
+  //       setForm((prev) => ({
+  //         ...prev,
+  //         to: prev.to.map((elmt) =>
+  //           elmt.name === person ? { ...elmt, amount: value } : elmt
+  //         ),
+  //       }));
+  //     }
+  //   }
+  //   // set edit history
+  //   setForm((prev) => ({
+  //     ...prev,
+  //     individualValueHistory: [
+  //       ...prev.individualValueHistory.filter((elmt) => elmt != person),
+  //       person,
+  //     ],
+  //   }));
+  // };
 
   const recalculateUneditedMembers = () => {
     if (userHasEdited) {
@@ -369,7 +373,7 @@ const NewSpending = ({ emblaApi, setRefresh }) => {
         tip: form.tip ? form.tip : 0,
         to: form.to.map((member) => ({
           ...member,
-          amount: +member.amount + +form.tip / form.to.length,
+          amount: +member.amount + +(+form.tip / form.to.length).toFixed(2),
         })),
       };
       if (type === "new") {
@@ -399,6 +403,7 @@ const NewSpending = ({ emblaApi, setRefresh }) => {
           }
         );
       }
+      console.log(formAndTip);
       setRefresh(new Date());
       setSearchParams({ groupId: searchParams.get("groupId") });
     }
@@ -607,7 +612,16 @@ const NewSpending = ({ emblaApi, setRefresh }) => {
         <button
           onClick={(e) => {
             e.preventDefault();
-            submitForm(editMode ? "update" : "new");
+            if (
+              form.from &&
+              form.to.length === 1 &&
+              !form.isBalancingTransaction
+            ) {
+              // setIsOpenBalancing(true);
+              submitForm(editMode ? "update" : "new");
+            } else {
+              submitForm(editMode ? "update" : "new");
+            }
           }}
           className="rounded-lg bg-slate-200 hover:bg-green-400 transition-colors py-2 px-10"
         >
@@ -620,6 +634,13 @@ const NewSpending = ({ emblaApi, setRefresh }) => {
         text={"Bitte bestätige, dass du diese Ausgabe löschen willst."}
         callback={() => submitForm("delete")}
       ></DeleteModal>
+      <BalancingTransactionModal
+        isOpen={isOpenBalancing}
+        setIsOpen={setIsOpenBalancing}
+        form={form}
+        setForm={setForm}
+        callback={() => submitForm(editMode ? "update" : "new")}
+      ></BalancingTransactionModal>
     </form>
   );
 };

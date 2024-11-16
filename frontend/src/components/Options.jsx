@@ -61,7 +61,7 @@ const Options = () => {
         className="flex p-3 justify-center items-center border rounded-lg hover:bg-slate-300 cursor-pointer text-xl"
       >
         <UserPlusIcon className="size-6 mr-3"></UserPlusIcon>
-        Person hinzufügen
+        Mitglieder verwalten
       </div>
       <div
         onClick={() => setIsOpen(true)}

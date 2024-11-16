@@ -13,9 +13,6 @@ import {
 } from "@mui/x-charts/ChartsTooltip";
 import { useDrawingArea, useSvgRef } from "@mui/x-charts/hooks";
 
-import Stack from "@mui/material/Stack";
-import Typography from "@mui/material/Typography";
-import Paper from "@mui/material/Paper";
 import { CheckIcon } from "@heroicons/react/24/outline";
 
 const Statistics = ({ personData, spendings }) => {
@@ -26,6 +23,24 @@ const Statistics = ({ personData, spendings }) => {
   const [addTotal, setAddTotal] = useState(false);
 
   const convertLineData = () => {
+    const skipEntryIndices = spendings.reduce((acc, spending, index) => {
+      if (spending.isBalancingTransaction) {
+        acc.push(index);
+      }
+      return acc;
+    }, []);
+    spendings = spendings.filter(
+      (spending, index) => !skipEntryIndices.includes(index)
+    );
+    personData = personData.map((person) => ({
+      ...person,
+      liabilities: person.liabilities.filter(
+        (item, index) => !skipEntryIndices.includes(index)
+      ),
+      // expenditures: person.expenditures.filter(
+      //   (item, index) => !skipEntryIndices.includes(index)
+      // ),
+    }));
     setDataXAxis([
       {
         data: spendings,
@@ -58,6 +73,9 @@ const Statistics = ({ personData, spendings }) => {
         const total_liablities = Math.abs(
           person.liabilities.reduce((a, b) => a + b, 0)
         );
+        // const total_expenditures = Math.abs(
+        //   person.expenditures.reduce((a, b) => a + b, 0)
+        // );
 
         return {
           value: total_liablities,
