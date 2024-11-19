@@ -36,7 +36,7 @@ const Spendings = ({ spendings }) => {
       groupId: searchParams.get("groupId"),
       mode: "edit",
       spending: spending._id,
-      type: spending.isBalancingTransaction ? "transaction" : "spending",
+      type: spending.isBalancingTransaction ? "balancing" : "spending",
       title: spending.title,
       amount: spending.amount,
       tip: spending.tip,
