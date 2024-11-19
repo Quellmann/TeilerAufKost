@@ -6,7 +6,6 @@ import toast from "react-hot-toast";
 import { InformationCircleIcon } from "@heroicons/react/24/outline";
 import { Switch } from "@headlessui/react";
 import DeleteModal from "../components/DeleteModal";
-import BalancingTransactionModal from "../components/BalancingTransactionModal";
 
 const NewSpending = ({ emblaApi, setRefresh }) => {
   const [data, setData] = useState([]);
@@ -21,12 +20,12 @@ const NewSpending = ({ emblaApi, setRefresh }) => {
     from: "",
     to: [],
     individualValueHistory: [],
+    isBalancingTransaction: false,
   });
   const [percentagesEnabled, setPercentagesEnabled] = useState(false);
   const [percentages, setPercentages] = useState({});
   const [userHasEdited, setUserHasEdited] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
-  const [isOpenBalancing, setIsOpenBalancing] = useState(false);
 
   useEffect(() => {
     if (searchParams.get("spending")) {
@@ -40,6 +39,8 @@ const NewSpending = ({ emblaApi, setRefresh }) => {
         individualValueHistory: JSON.parse(searchParams.get("to")).map(
           (elmt) => elmt.name
         ),
+        isBalancingTransaction:
+          searchParams.get("type") === "transaction" ? true : false,
       };
       formMinusTip = {
         ...formMinusTip,
@@ -64,7 +65,7 @@ const NewSpending = ({ emblaApi, setRefresh }) => {
           return acc;
         }, {})
       );
-    } else if (searchParams.get("type") === "balancing") {
+    } else if (searchParams.get("type") === "transaction") {
       setForm((prev) => ({
         ...prev,
         title: "Ausgleichszahlung",
@@ -182,70 +183,6 @@ const NewSpending = ({ emblaApi, setRefresh }) => {
       }));
     }
   };
-
-  // const individualValueHandler2 = (input, value, person) => {
-  //   setUserHasEdited(true);
-  //   value = value.replace(/,/g, ".");
-  //   const parts = value.split(".");
-  //   if (parts.length > 1) {
-  //     value = parts[0] + "." + parts.slice(1).join("").substring(0, 2);
-  //   }
-  //   value = value.replace(/[^0-9.]/g, "");
-
-  //   if (!value.endsWith(".")) {
-  //     // if input is in percent do this
-  //     if (input === "percent") {
-  //       setPercentages((prev) => ({
-  //         ...prev,
-  //         [person]: value,
-  //       }));
-  //       // if (!inputHasFocus) {
-  //       //   setForm((prev) => ({
-  //       //     ...prev,
-  //       //     to: prev.to.map((elmt) =>
-  //       //       elmt.name === person
-  //       //         ? { ...elmt, amount: ((value / 100) * form.amount).toFixed(2) }
-  //       //         : elmt
-  //       //     ),
-  //       //   }));
-  //       // }
-  //     } else {
-  //       // if input is in € do this
-  //       setPercentages((prev) => ({
-  //         ...prev,
-  //         [person]: ((value / form.amount) * 100).toFixed(2),
-  //       }));
-  //       setForm((prev) => ({
-  //         ...prev,
-  //         to: prev.to.map((elmt) =>
-  //           elmt.name === person ? { ...elmt, amount: value } : elmt
-  //         ),
-  //       }));
-  //     }
-  //   } else {
-  //     if (input === "percent") {
-  //       setPercentages((prev) => ({
-  //         ...prev,
-  //         [person]: value,
-  //       }));
-  //     } else {
-  //       setForm((prev) => ({
-  //         ...prev,
-  //         to: prev.to.map((elmt) =>
-  //           elmt.name === person ? { ...elmt, amount: value } : elmt
-  //         ),
-  //       }));
-  //     }
-  //   }
-  //   // set edit history
-  //   setForm((prev) => ({
-  //     ...prev,
-  //     individualValueHistory: [
-  //       ...prev.individualValueHistory.filter((elmt) => elmt != person),
-  //       person,
-  //     ],
-  //   }));
-  // };
 
   const recalculateUneditedMembers = () => {
     if (userHasEdited) {
@@ -442,7 +379,13 @@ const NewSpending = ({ emblaApi, setRefresh }) => {
     <form className="flex flex-col justify-between grow" autoComplete="off">
       <div className="flex flex-col grow">
         <div className="text-3xl mb-8">
-          {editMode ? "Ausgabe bearbeiten" : "Neue Ausgabe hinzufügen"}
+          {editMode
+            ? form.isBalancingTransaction
+              ? "Transaktion bearbeiten"
+              : "Ausgabe bearbeiten"
+            : form.isBalancingTransaction
+            ? "Neue Transaktion hinzufügen"
+            : "Neue Ausgabe hinzufügen"}
         </div>
         <div className="text-lg">
           <Input
@@ -490,6 +433,30 @@ const NewSpending = ({ emblaApi, setRefresh }) => {
                 );
               }}
               className="absolute top-3 right-0 translate-x-8 size-6 text-black/50"
+            ></InformationCircleIcon>
+          </div>
+        </div>
+        <div className="text-lg mt-3 flex justify-center gap-3">
+          <div className="relative flex items-center">
+            <div className="text-black/50 pr-2">Ausgabe</div>
+            <Switch
+              checked={form.isBalancingTransaction}
+              onChange={(e) =>
+                setForm((prev) => ({ ...prev, isBalancingTransaction: e }))
+              }
+              className="group inline-flex h-6 w-11 items-center rounded-full bg-gray-400 transition"
+            >
+              <span className="size-4 translate-x-1 rounded-full bg-white transition group-data-[checked]:translate-x-6" />
+            </Switch>
+            <div className="text-black/50 pl-2">Transaktion</div>
+            <InformationCircleIcon
+              onClick={() => {
+                toast.dismiss();
+                toast(
+                  "Transaktionen sind Geldbewegungen, die nicht als Verbrauch gewertet werden. Beispielsweise wenn du einer Person 10€ gibst, um gemeinsam eine Rechnung zu begleichen."
+                );
+              }}
+              className="absolute top-1 right-1 translate-x-11 size-6 text-black/50"
             ></InformationCircleIcon>
           </div>
         </div>
@@ -612,16 +579,7 @@ const NewSpending = ({ emblaApi, setRefresh }) => {
         <button
           onClick={(e) => {
             e.preventDefault();
-            if (
-              form.from &&
-              form.to.length === 1 &&
-              !form.isBalancingTransaction
-            ) {
-              // setIsOpenBalancing(true);
-              submitForm(editMode ? "update" : "new");
-            } else {
-              submitForm(editMode ? "update" : "new");
-            }
+            submitForm(editMode ? "update" : "new");
           }}
           className="rounded-lg bg-slate-200 hover:bg-green-400 transition-colors py-2 px-10"
         >
@@ -634,13 +592,6 @@ const NewSpending = ({ emblaApi, setRefresh }) => {
         text={"Bitte bestätige, dass du diese Ausgabe löschen willst."}
         callback={() => submitForm("delete")}
       ></DeleteModal>
-      <BalancingTransactionModal
-        isOpen={isOpenBalancing}
-        setIsOpen={setIsOpenBalancing}
-        form={form}
-        setForm={setForm}
-        callback={() => submitForm(editMode ? "update" : "new")}
-      ></BalancingTransactionModal>
     </form>
   );
 };

@@ -17,7 +17,7 @@ const AddDetails = ({ emblaApi, setRefresh }) => {
             setRefresh={setRefresh}
           ></NewSpending>
         );
-      case "balancing":
+      case "transaction":
         return (
           <NewSpending
             emblaApi={emblaApi}

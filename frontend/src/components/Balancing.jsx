@@ -80,7 +80,7 @@ const Balancing = ({ personData }) => {
                 <div className="flex justify-center">
                   <Link
                     to={`/?groupId=${groupId}&${new URLSearchParams({
-                      type: "balancing",
+                      type: "transaction",
                       mode: "edit",
                       amount: balancing.amount.toFixed(2),
                       from: balancing.from,
