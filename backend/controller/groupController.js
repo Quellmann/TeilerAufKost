@@ -60,7 +60,8 @@ export async function updateGroup(req, res) {
   try {
     const group = await Group.findByIdAndUpdate(
       req.params.groupId,
-      { $addToSet: { groupMember: { $each: req.body.groupMember } } },
+      // { $addToSet: { groupMember: { $each: req.body.groupMember } } },
+      { $set: req.body.data },
       { new: true }
     );
     res.status(200).json(group);

@@ -104,7 +104,7 @@ const Overview = () => {
       setData(data);
       setSpendings(spending_data);
       setPersonData(
-        data.groupMember.map((member) => new Person(member, spending_data))
+        data.groupMember.map((member) => new Person(member.name, spending_data))
       );
       setIsLoading(false);
       return Promise.resolve();
@@ -157,11 +157,11 @@ const Overview = () => {
             <div className="flex flex-col divide-y rounded-lg border text-xl">
               {data.groupMember?.map((member, index) => (
                 <div key={index} className="flex justify-between p-3">
-                  <div className="">{member}</div>
+                  <div className="">{member.name}</div>
                   <div className="">
                     <div>
                       {personData
-                        .find((person) => person.name === member)
+                        .find((person) => person.name === member.name)
                         .balance()
                         .toFixed(2)}{" "}
                       €

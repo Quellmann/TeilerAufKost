@@ -1,14 +1,40 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Input } from "@headlessui/react";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { UserPlusIcon, XMarkIcon } from "@heroicons/react/24/outline";
+import {
+  ChevronLeftIcon,
+  ChevronRightIcon,
+  UserPlusIcon,
+  XMarkIcon,
+} from "@heroicons/react/24/outline";
 import { API_BASE_URL } from "../config";
 import toast from "react-hot-toast";
 
+class Person {
+  constructor(name, spendings) {
+    this.name = name;
+    this.liabilities = spendings.map((item) => {
+      const person = item.to.find((person) => person.name === name);
+      return person ? -person.amount : 0;
+    });
+    this.expenditures = spendings.map((item) => {
+      // calculate exact expanditure with rounding to 2 decimal cent values
+      return item.from === name ? item.to.reduce((a, b) => a + b.amount, 0) : 0;
+    });
+    this.balance = () => {
+      return +(
+        this.liabilities.reduce((a, b) => a + b, 0) +
+        this.expenditures.reduce((a, b) => a + b, 0)
+      ).toFixed(2);
+    };
+  }
+}
+
 const NewPerson = ({ emblaApi, setRefresh }) => {
   const [memberInput, setMemberInput] = useState("");
-  const [groupMember, setGroupMember] = useState([]);
   const [data, setData] = useState([]);
+  const [spendings, setSpendings] = useState([]);
+  const [personData, setPersonData] = useState([]);
   const inputRef = useRef(null);
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
@@ -17,7 +43,13 @@ const NewPerson = ({ emblaApi, setRefresh }) => {
   // Function to handle adding a member
   const handleAddMember = () => {
     if (memberInput) {
-      setGroupMember((prevState) => [...prevState, memberInput]);
+      setData((prev) => ({
+        ...prev,
+        groupMember: [
+          ...prev.groupMember,
+          { name: memberInput, household: prev.groupMember.length },
+        ],
+      }));
       setMemberInput("");
     } else {
       toast.error("Ungültiger Name");
@@ -33,10 +65,61 @@ const NewPerson = ({ emblaApi, setRefresh }) => {
     }
   };
 
-  const formValidation = () => {
-    !groupMember.length > 0 && toast.error("Füge eine Person hinzu");
+  const handleHouseholdClick = (type, member) => {
+    if (
+      type === "decrease" &&
+      data.groupMember.find((elmt) => elmt.name === member.name).household -
+        1 >=
+        0
+    ) {
+      setData((prev) => ({
+        ...prev,
+        groupMember: prev.groupMember.map((elmt) =>
+          elmt.name === member.name
+            ? { name: elmt.name, household: elmt.household - 1 }
+            : elmt
+        ),
+      }));
+    } else if (
+      type === "increase" &&
+      data.groupMember.find((elmt) => elmt.name === member.name).household + 1 <
+        data.groupMember.length
+    ) {
+      setData((prev) => ({
+        ...prev,
+        groupMember: prev.groupMember.map((elmt) =>
+          elmt.name === member.name
+            ? { name: elmt.name, household: elmt.household + 1 }
+            : elmt
+        ),
+      }));
+    }
+  };
 
-    return groupMember.length > 0;
+  const handleDelete = (id) => {
+    if (
+      personData.find((elmt) => elmt.name === data.groupMember[id].name) &&
+      personData[id].balance()
+    ) {
+      toast.dismiss();
+      toast.error(
+        "Begleiche zuerst die Schulden dieser Person, bevor du sie löschst."
+      );
+    } else {
+      setPersonData((prev) =>
+        prev.filter((elmt) => elmt.name != data.groupMember[id].name)
+      );
+      setData((prev) => ({
+        ...prev,
+        groupMember: prev.groupMember.filter((elmt, index) => index != id),
+      }));
+    }
+  };
+
+  const formValidation = () => {
+    !data.groupMember.length > 0 && toast.error("Füge eine Person hinzu");
+
+    return data.groupMember.length > 0;
   };
 
   const submitForm = async () => {
@@ -47,7 +130,7 @@ const NewPerson = ({ emblaApi, setRefresh }) => {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ groupMember: groupMember }),
+        body: JSON.stringify({ data: data }),
       });
       const group = await response.json();
       setRefresh(new Date());
@@ -57,17 +140,34 @@ const NewPerson = ({ emblaApi, setRefresh }) => {
   useEffect(() => {
     async function fetchData() {
       const groupResponse = await fetch(`${API_BASE_URL}/${groupId}`);
-      if (!groupResponse.ok) {
-        const message = `An error has occurred: ${groupResponse.statusText}`;
+      const spendingResponse = await fetch(
+        `${API_BASE_URL}/${groupId}/spendings`
+      );
+
+      if (!groupResponse.ok || !spendingResponse.ok) {
+        const message = `An error has occurred: ${
+          groupResponse.statusText || spendingResponse.statusText
+        }`;
         console.error(message);
-        return;
+        navigate("/not-found");
+        throw new Error(message);
       }
+
       const data = await groupResponse.json();
-      if (!data) {
-        console.warn(`Data not found`);
-        navigate("/");
+      const spending_data = await spendingResponse.json();
+
+      if (!data || !spending_data) {
+        const message = "Data not found";
+        console.warn(message);
+        navigate("/not-found");
+        throw new Error(message);
       }
+
       setData(data);
+      setSpendings(spending_data);
+      setPersonData(
+        data.groupMember.map((member) => new Person(member.name, spending_data))
+      );
     }
     fetchData();
     return;
@@ -76,7 +176,7 @@ const NewPerson = ({ emblaApi, setRefresh }) => {
   return (
     <form className="flex flex-col grow" autoComplete="off">
       <div className="flex flex-col grow">
-        <div className="text-3xl mb-8">Neue Person hinzufügen</div>
+        <div className="text-3xl mb-8">Mitglieder bearbeiten</div>
         <div className="text-lg mt-10 relative">
           <Input
             ref={inputRef}
@@ -96,27 +196,43 @@ const NewPerson = ({ emblaApi, setRefresh }) => {
           </div>
         </div>
         <div className="grid grid-cols-1 my-5 border rounded-lg divide-y">
+          {/* tablehead */}
+          <div className="py-1 grid grid-cols-4 font-bold">
+            <div className="pl-2">Nummer</div>
+            <div>Name</div>
+            <div>Haushalt</div>
+            <div className="text-right mr-2">Löschen</div>
+          </div>
+          {/* tablerows */}
           {data.groupMember?.map((member, index) => (
-            <div key={index} className="py-1 grid grid-cols-3">
-              <div className="pl-2 ">{index + 1 + "."}</div>
-              <div className="w-28">{member}</div>
-            </div>
-          ))}
-          {groupMember.map((member, index) => (
-            <div key={index} className="py-1 grid grid-cols-3">
-              <div className="pl-2 ">
-                {data.groupMember.length + index + 1 + "."}
+            <div key={index} className="py-1 grid grid-cols-4">
+              <div className="pl-2">{index + 1 + "."}</div>
+              <div className="w-28">{member.name}</div>
+              {/* household selector */}
+              <div className="flex items-center select-none">
+                <div
+                  onClick={() => handleHouseholdClick("decrease", member)}
+                  className="p-0.5 cursor-pointer hover:bg-slate-200 rounded-full"
+                >
+                  <ChevronLeftIcon className="size-5"></ChevronLeftIcon>
+                </div>
+                <div className="px-1">{member.household}</div>
+                <div
+                  onClick={() => handleHouseholdClick("increase", member)}
+                  className="p-0.5 cursor-pointer hover:bg-slate-200 rounded-full"
+                >
+                  <ChevronRightIcon className="size-5"></ChevronRightIcon>
+                </div>
               </div>
-              <div className="w-28">{member}</div>
               <div
                 className="justify-self-end mr-2 cursor-pointer hover:bg-slate-200 rounded-full"
-                onClick={() =>
-                  setGroupMember(
-                    groupMember.filter((person, idx) => idx != index)
-                  )
-                }
+                onClick={() => handleDelete(index)}
               >
-                <XMarkIcon className="size-6"></XMarkIcon>
+                <XMarkIcon
+                  className={`size-6 ${
+                    personData[index]?.balance() && "text-black/30"
+                  }`}
+                ></XMarkIcon>
               </div>
             </div>
           ))}

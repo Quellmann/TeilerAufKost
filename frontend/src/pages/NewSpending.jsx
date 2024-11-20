@@ -364,10 +364,13 @@ const NewSpending = ({ emblaApi, setRefresh }) => {
       if (!(searchParams.get("mode") === "edit")) {
         setForm((prev) => ({
           ...prev,
-          to: data.groupMember.map((member) => ({ name: member, amount: 0 })),
+          to: data.groupMember.map((member) => ({
+            name: member.name,
+            amount: 0,
+          })),
         }));
         data.groupMember.map((member) =>
-          setPercentages((prev) => ({ ...prev, [member]: 0 }))
+          setPercentages((prev) => ({ ...prev, [member.name]: 0 }))
         );
       }
     }
@@ -466,13 +469,15 @@ const NewSpending = ({ emblaApi, setRefresh }) => {
             {data.groupMember?.map((member, index) => (
               <div
                 key={index}
-                onClick={() => setForm((prev) => ({ ...prev, from: member }))}
+                onClick={() =>
+                  setForm((prev) => ({ ...prev, from: member.name }))
+                }
                 className={`w-20 h-20 border rounded-full flex flex-shrink-0 justify-center transition-colors duration-200 items-center cursor-pointer ${
-                  form.from == member ? "bg-amber-500 text-slate-50" : ""
+                  form.from == member.name ? "bg-amber-500 text-slate-50" : ""
                 }`}
               >
                 <div className="p-1 text-ellipsis whitespace-normal break-all line-clamp-2 select-none text-center">
-                  {member}
+                  {member.name}
                 </div>
               </div>
             ))}
@@ -498,33 +503,35 @@ const NewSpending = ({ emblaApi, setRefresh }) => {
               <div key={index} className="flex flex-col justify-center">
                 <div
                   key={index}
-                  onClick={() => handleMultiplePersonSelection(member)}
+                  onClick={() => handleMultiplePersonSelection(member.name)}
                   className={`w-20 h-20 border rounded-full flex flex-shrink-0 justify-center transition-colors duration-200 items-center cursor-pointer ${
-                    form.to.map((elmt) => elmt.name).includes(member)
+                    form.to.map((elmt) => elmt.name).includes(member.name)
                       ? "bg-slate-600 text-slate-50"
                       : ""
                   }`}
                 >
                   <div className="p-1 text-ellipsis whitespace-normal break-all line-clamp-2 select-none text-center">
-                    {member}
+                    {member.name}
                   </div>
                 </div>
-                {form.to.map((elmt) => elmt.name).includes(member) && (
+                {form.to.map((elmt) => elmt.name).includes(member.name) && (
                   <>
                     {percentagesEnabled ? (
                       <div className="flex items-center pt-2 relative">
                         <Input
                           autoComplete="off"
                           onFocus={(e) => handleFocus(e)}
-                          onBlur={() => handleBlur(member, "personal_percent")}
+                          onBlur={() =>
+                            handleBlur(member.name, "personal_percent")
+                          }
                           onChange={(e) =>
                             individualValueHandler(
                               "percent",
                               e.target.value,
-                              member
+                              member.name
                             )
                           }
-                          value={percentages[member]}
+                          value={percentages[member.name]}
                           className="border w-20 rounded-lg text-right pr-5"
                         />
                         <div className="text-black/50 absolute right-1">%</div>
@@ -534,16 +541,19 @@ const NewSpending = ({ emblaApi, setRefresh }) => {
                         <Input
                           autoComplete="off"
                           onFocus={(e) => handleFocus(e)}
-                          onBlur={() => handleBlur(member, "personal_amount")}
+                          onBlur={() =>
+                            handleBlur(member.name, "personal_amount")
+                          }
                           onChange={(e) =>
                             individualValueHandler(
                               "amount",
                               e.target.value,
-                              member
+                              member.name
                             )
                           }
                           value={
-                            form.to.find((elmt) => elmt.name === member).amount
+                            form.to.find((elmt) => elmt.name === member.name)
+                              .amount
                           }
                           className="border w-20 rounded-lg text-right pr-5"
                         />
