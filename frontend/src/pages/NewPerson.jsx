@@ -62,6 +62,8 @@ const NewPerson = ({ emblaApi, setRefresh }) => {
   const handleKeyDown = (e) => {
     if (e.key === "Enter") {
       handleAddMember();
+      e.stopPropagation();
+      e.preventDefault();
     }
   };
 

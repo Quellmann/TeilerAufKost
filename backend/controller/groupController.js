@@ -45,8 +45,8 @@ export async function getGroupById(req, res) {
 export async function createGroup(req, res) {
   try {
     const newGroup = new Group({
-      groupName: req.body.groupName,
-      groupMember: req.body.groupMember,
+      groupName: req.body.data.groupName,
+      groupMember: req.body.data.groupMember,
     });
     const group = await newGroup.save();
     res.status(200).json(group);

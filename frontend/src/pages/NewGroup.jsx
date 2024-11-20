@@ -1,22 +1,32 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Input } from "@headlessui/react";
-import { useNavigate, useOutletContext } from "react-router-dom";
-import { UserPlusIcon, XMarkIcon } from "@heroicons/react/24/outline";
+import { useNavigate, useSearchParams } from "react-router-dom";
+import {
+  ChevronLeftIcon,
+  ChevronRightIcon,
+  UserPlusIcon,
+  XMarkIcon,
+} from "@heroicons/react/24/outline";
 import { API_BASE_URL } from "../config";
 import toast from "react-hot-toast";
 
 const NewGroup = () => {
   const [memberInput, setMemberInput] = useState("");
-  const [groupName, setGroupName] = useState("");
-  const [groupMember, setGroupMember] = useState([]);
+  const [data, setData] = useState({ groupName: "", groupMember: [] });
   const inputRef = useRef(null);
-  const refresh = useOutletContext();
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
 
   // Function to handle adding a member
   const handleAddMember = () => {
     if (memberInput) {
-      setGroupMember((prevState) => [...prevState, memberInput]);
+      setData((prev) => ({
+        ...prev,
+        groupMember: [
+          ...prev.groupMember,
+          { name: memberInput, household: prev.groupMember.length },
+        ],
+      }));
       setMemberInput("");
     } else {
       toast.error("Ungültiger Name");
@@ -29,14 +39,53 @@ const NewGroup = () => {
   const handleKeyDown = (e) => {
     if (e.key === "Enter") {
       handleAddMember();
+      e.stopPropagation();
+      e.preventDefault();
     }
   };
 
-  const formValidation = () => {
-    !groupName && toast.error("Gib einen Gruppenamen an");
-    !groupMember.length > 0 && toast.error("Füge eine Person hinzu");
+  const handleHouseholdClick = (type, member) => {
+    if (
+      type === "decrease" &&
+      data.groupMember.find((elmt) => elmt.name === member.name).household -
+        1 >=
+        0
+    ) {
+      setData((prev) => ({
+        ...prev,
+        groupMember: prev.groupMember.map((elmt) =>
+          elmt.name === member.name
+            ? { name: elmt.name, household: elmt.household - 1 }
+            : elmt
+        ),
+      }));
+    } else if (
+      type === "increase" &&
+      data.groupMember.find((elmt) => elmt.name === member.name).household + 1 <
+        data.groupMember.length
+    ) {
+      setData((prev) => ({
+        ...prev,
+        groupMember: prev.groupMember.map((elmt) =>
+          elmt.name === member.name
+            ? { name: elmt.name, household: elmt.household + 1 }
+            : elmt
+        ),
+      }));
+    }
+  };
 
-    return groupName && groupMember.length > 0;
+  const handleDelete = (id) => {
+    setData((prev) => ({
+      ...prev,
+      groupMember: prev.groupMember.filter((elmt, index) => index != id),
+    }));
+  };
+
+  const formValidation = () => {
+    !data.groupMember.length > 0 && toast.error("Füge eine Person hinzu");
+
+    return data.groupMember.length > 0;
   };
 
   const submitForm = async () => {
@@ -46,29 +95,25 @@ const NewGroup = () => {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({
-          groupName: groupName,
-          groupMember: groupMember,
-        }),
+        body: JSON.stringify({ data: data }),
       });
       const group = await response.json();
-      refresh.current = new Date();
-      navigate(`/?groupId=${group._id}`);
+      navigate(`/?groupId=${group._id}`, { replace: true });
     }
   };
 
   return (
-    <form
-      className="pt-10 flex flex-col grow justify-between"
-      autoComplete="off"
-    >
-      <div>
-        <div className="text-xl mb-8 pl-3">Neue Gruppe hinzufügen</div>
-        <div className="text-lg">
+    <form className="flex flex-col grow" autoComplete="off">
+      <div className="flex flex-col grow">
+        <div className="text-3xl mb-8 mt-10">Neue Gruppe hinzufügen</div>
+        <div className="text-lg mt-10 relative">
           <Input
-            onChange={(e) => setGroupName(e.target.value)}
-            placeholder="Name"
-            className="border w-full rounded-lg p-2 text-center"
+            value={data.groupName}
+            onChange={(e) =>
+              setData((prev) => ({ ...prev, groupName: e.target.value }))
+            }
+            placeholder="Gruppenname"
+            className="border w-full rounded-lg p-2 h-10 text-center"
             name="group_name"
             type="text"
           />
@@ -91,26 +136,44 @@ const NewGroup = () => {
             <UserPlusIcon className="size-6" />
           </div>
         </div>
-        {groupMember.length > 0 && (
-          <div className="grid grid-cols-1 my-5 border rounded-lg divide-y mx-auto">
-            {groupMember.map((member, index) => (
-              <div key={index} className="py-1 grid grid-cols-3">
-                <div className="pl-2 ">{index + 1 + "."}</div>
-                <div className="w-28">{member}</div>
+        <div className="grid grid-cols-1 my-5 border rounded-lg divide-y">
+          {/* tablehead */}
+          <div className="py-1 grid grid-cols-4 font-bold">
+            <div className="pl-2">Nummer</div>
+            <div>Name</div>
+            <div>Haushalt</div>
+            <div className="text-right mr-2">Löschen</div>
+          </div>
+          {/* tablerows */}
+          {data.groupMember?.map((member, index) => (
+            <div key={index} className="py-1 grid grid-cols-4">
+              <div className="pl-2">{index + 1 + "."}</div>
+              <div className="w-28">{member.name}</div>
+              {/* household selector */}
+              <div className="flex items-center select-none">
                 <div
-                  className="justify-self-end mr-2 cursor-pointer hover:bg-slate-200 rounded-full"
-                  onClick={() =>
-                    setGroupMember(
-                      groupMember.filter((person, idx) => idx != index)
-                    )
-                  }
+                  onClick={() => handleHouseholdClick("decrease", member)}
+                  className="p-0.5 cursor-pointer hover:bg-slate-200 rounded-full"
                 >
-                  <XMarkIcon className="size-6"></XMarkIcon>
+                  <ChevronLeftIcon className="size-5"></ChevronLeftIcon>
+                </div>
+                <div className="px-1">{member.household}</div>
+                <div
+                  onClick={() => handleHouseholdClick("increase", member)}
+                  className="p-0.5 cursor-pointer hover:bg-slate-200 rounded-full"
+                >
+                  <ChevronRightIcon className="size-5"></ChevronRightIcon>
                 </div>
               </div>
-            ))}
-          </div>
-        )}
+              <div
+                className="justify-self-end mr-2 cursor-pointer hover:bg-slate-200 rounded-full"
+                onClick={() => handleDelete(index)}
+              >
+                <XMarkIcon className={`size-6`}></XMarkIcon>
+              </div>
+            </div>
+          ))}
+        </div>
       </div>
       <div className="flex justify-center mb-10">
         <button
