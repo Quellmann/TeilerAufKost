@@ -6,6 +6,7 @@ import DeleteModal from "../components/DeleteModal";
 
 const Admin = () => {
   const [data, setData] = useState([]);
+  const [openGroupId, setOpenGroupId] = useState(null);
   const [isOpen, setIsOpen] = useState(false);
   const navigate = useNavigate();
   useEffect(() => {
@@ -73,19 +74,12 @@ const Admin = () => {
                       onClick={(e) => {
                         e.stopPropagation();
                         setIsOpen(true);
+                        setOpenGroupId(elmt._id);
                       }}
                       className="hover:bg-red-500 hover:text-white rounded-full p-1"
                     >
                       <TrashIcon className="size-5"></TrashIcon>
                     </div>
-                    <DeleteModal
-                      isOpen={isOpen}
-                      setIsOpen={setIsOpen}
-                      text={
-                        "Bitte bestätige, dass du diese Gruppe löschen willst?"
-                      }
-                      callback={() => deleteGroup(elmt._id)}
-                    ></DeleteModal>
                   </td>
                 </tr>
               ))}
@@ -93,6 +87,15 @@ const Admin = () => {
           </table>
         </div>
       </div>
+      <DeleteModal
+        isOpen={isOpen}
+        setIsOpen={setIsOpen}
+        text={"Bitte bestätige, dass du diese Gruppe löschen willst?"}
+        callback={() => {
+          deleteGroup(openGroupId);
+          setOpenGroupId(null);
+        }}
+      ></DeleteModal>
     </div>
   );
 };

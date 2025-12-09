@@ -6,7 +6,7 @@ import groupRoutes from "./routes/groupRoutes.js"
 import spendingRoutes from "./routes/spendingRoutes.js"
 
 const app = express();
-connectToDatabase()
+await connectToDatabase()
 
 app.use(cors());
 app.use(express.json());
