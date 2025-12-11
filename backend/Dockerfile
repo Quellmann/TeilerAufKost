@@ -8,11 +8,9 @@ RUN npm install
 
 COPY . .
 
+# Install MongoDB tools for sync
 RUN apk add --no-cache mongodb-tools
-
-COPY entrypoint.sh /entrypoint.sh
-RUN chmod +x /entrypoint.sh
 
 EXPOSE 3000
 
-ENTRYPOINT ["/entrypoint.sh"]
+CMD ["npm", "run", "dev"]
