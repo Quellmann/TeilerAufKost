@@ -139,24 +139,22 @@ const Overview = () => {
     } else {
       return (
         <>
-          <div>
-            <div className="flex items-center justify-between">
-              <div className="text-3xl py-8 pl-3 truncate">
-                {data.groupName}
-              </div>
+          <div className="mt-6 rounded-lg border border-light-border dark:border-dark-border">
+            <div className="p-2 flex items-center justify-between bg-light-card dark:bg-dark-card rounded-t-lg border-b border-light-border dark:border-dark-border">
+              <div className="text-3xl truncate">{data.groupName}</div>
               <div className="flex">
                 <div
                   onClick={() => setIsOpenQR(true)}
-                  className="p-2 border rounded-lg cursor-pointer"
+                  className="p-1 rounded-lg cursor-pointer"
                 >
                   <QrCodeIcon className="h-7 w-7"></QrCodeIcon>
                 </div>
               </div>
             </div>
-            <div className="text-lg p-3">Saldo</div>
-            <div className="flex flex-col divide-y rounded-lg border text-xl">
+            <div className="text-lg ml-4 mt-2">Saldo</div>
+            <div className="m-2 flex flex-col divide-y rounded-lg text-xl bg-light-card dark:bg-dark-card border divide-light-border dark:divide-dark-border border-light-border dark:border-dark-border">
               {data.groupMember?.map((member, index) => (
-                <div key={index} className="flex justify-between p-3">
+                <div key={index} className="flex justify-between p-2">
                   <div className="">{member.name}</div>
                   <div className="">
                     <div>
@@ -170,7 +168,12 @@ const Overview = () => {
                 </div>
               ))}
             </div>
-            <Carousel personData={personData} spendings={spendings}></Carousel>
+            <div className="mt-5 pt-2 border-t border-light-border dark:border-dark-border">
+              <Carousel
+                personData={personData}
+                spendings={spendings}
+              ></Carousel>
+            </div>
           </div>
           <QRCodeModal
             isOpenQR={isOpenQR}

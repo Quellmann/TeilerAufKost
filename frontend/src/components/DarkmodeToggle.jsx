@@ -18,7 +18,7 @@ const DarkmodeToggle = () => {
     setDarkMode(!darkMode);
     document.documentElement.classList.toggle("dark", !darkMode);
     const audio = new Audio(
-      darkMode ? "/audios/switch-on.mp3" : "/audios/switch-off.mp3"
+      darkMode ? "/audio/switch-on.mp3" : "/audio/switch-off.mp3"
     );
     audio.play();
     localStorage.setItem("darkMode", !darkMode);
@@ -27,12 +27,12 @@ const DarkmodeToggle = () => {
   return (
     <button
       onClick={toggleDarkMode}
-      className="mx-5 p-2 rounded-lg hover:bg-gray-200 dark:hover:bg-sky-900 group"
+      className="p-2 rounded-lg hover:bg-gray-200 dark:hover:bg-sky-900 group"
     >
       {darkMode ? (
-        <MoonIcon className="h-6 w-6 text-slate-200 dark:group-hover:text-sky-400"></MoonIcon>
+        <SunIcon className="h-6 w-6 text-slate-200 dark:group-hover:text-sky-400"></SunIcon>
       ) : (
-        <SunIcon className="h-6 w-6 text-gray-900"></SunIcon>
+        <MoonIcon className="h-6 w-6 text-gray-900"></MoonIcon>
       )}
     </button>
   );

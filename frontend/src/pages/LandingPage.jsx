@@ -1,5 +1,3 @@
-import React from "react";
-
 const LandingPage = () => {
   return (
     <div className="flex-1 h-full overflow-auto scroll-smooth">
@@ -12,7 +10,6 @@ const LandingPage = () => {
         Starte mit einer neuen Gruppe, wähle eine Vorhandene oder scanne die
         Gruppe von einem Freund.
       </div>
-      <div></div>
     </div>
   );
 };

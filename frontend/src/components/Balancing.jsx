@@ -57,17 +57,17 @@ const Balancing = ({ personData }) => {
   };
 
   return (
-    <div className="border rounded-lg overflow-auto m-0.5">
+    <div className="rounded-lg overflow-auto bg-light-card dark:bg-dark-card border border-light-border dark:border-dark-border">
       <table className="min-w-full table-auto">
         <thead>
-          <tr className="border-b">
+          <tr className="border-b border-light-border dark:border-dark-border">
             <th className="text-left p-2">Von</th>
             <th className="text-left p-2">An</th>
             <th className="text-left p-2">Betrag</th>
             <th className="text-center p-2">Begleichen</th>
           </tr>
         </thead>
-        <tbody className="divide-y">
+        <tbody className="divide-y divide-light-border dark:divide-dark-border">
           {balancingCalculation().map((balancing, personIndex) => (
             <tr key={personIndex}>
               <td className="p-2">{balancing.from}</td>
@@ -85,10 +85,10 @@ const Balancing = ({ personData }) => {
                       from: balancing.from,
                       to: balancing.to,
                     })}`}
-                    className="flex justify-center rounded-lg px-4 py-1 border hover:bg-green-400"
+                    className="flex justify-center rounded-lg px-4 py-1 hover:bg-green-400 dark:hover:bg-dark-accent border border-light-border dark:border-dark-border"
                     onClick={() => emblaApi.scrollTo(2)}
                   >
-                    <BanknotesIcon className="w-6 text-gray-700"></BanknotesIcon>
+                    <BanknotesIcon className="w-6 text-gray-700 dark:text-dark-text"></BanknotesIcon>
                   </Link>
                 </div>
               </td>

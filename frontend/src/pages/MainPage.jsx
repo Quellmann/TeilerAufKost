@@ -6,6 +6,7 @@ import AddOverview from "../components/AddOverview";
 import AddDetails from "../components/AddDetails";
 import { Outlet, useNavigate, useSearchParams } from "react-router-dom";
 import { API_BASE_URL } from "../config";
+import DarkmodeToggle from "../components/DarkmodeToggle";
 
 const MainPage = () => {
   const [sidebarGroups, setSidebarGroups] = useState([]);
@@ -78,10 +79,10 @@ const MainPage = () => {
   }, []);
 
   return (
-    <div className="min-w-[320px] h-dvh flex flex-col">
+    <div className="min-w-[320px] h-dvh flex flex-col text-light-text dark:text-dark-text">
       <Toaster position="top-center"></Toaster>
       {/* Navbar */}
-      <div className="flex justify-between items-center px-5 py-2 bg-slate-200">
+      <div className="flex justify-between items-center px-5 py-2 bg-light-bgheader dark:bg-dark-bgheader border-b border-light-border dark:border-dark-border">
         <div onClick={sidebarButton} className="cursor-pointer">
           <Bars3Icon className="size-8"></Bars3Icon>
         </div>
@@ -104,18 +105,24 @@ const MainPage = () => {
         </div>
       </div>
       {/* Remaining Space */}
-      <div className="flex flex-col grow" ref={remainingSpaceDiv}>
+      <div
+        className="flex flex-col grow bg-light-bg dark:bg-dark-bg"
+        ref={remainingSpaceDiv}
+      >
         {/* Outer Carousel */}
         <div className="overflow-hidden relative grow" ref={emblaRef}>
           <div className="flex gap-5 grow">
             {/* Sidebar */}
-            <div className="flex-none w-64 min-w-0 grow">
+            <div className="flex-none w-64 min-w-0 grow border-r border-light-border dark:border-dark-border">
               <div
-                className="w-64 bg-slate-800 grow flex flex-col justify-between"
+                className="w-64 grow flex flex-col justify-between"
                 style={{ height: `${divHeight}` }}
               >
                 <div className="p-2 space-y-2">
-                  <div className="text-slate-50 text-xl">Gruppen</div>
+                  <div className="flex justify-between">
+                    <div className="text-xl">Gruppen</div>
+                    <DarkmodeToggle></DarkmodeToggle>
+                  </div>
                   <div className="flex flex-col gap-2">
                     {sidebarGroups.map((group) => (
                       <div
@@ -124,7 +131,7 @@ const MainPage = () => {
                           navigate("/?groupId=" + group.id);
                           emblaApi.scrollTo(1);
                         }}
-                        className="p-1 text-slate-50 border rounded-lg cursor-pointer truncate"
+                        className="p-1 rounded-lg cursor-pointer truncate bg-light-card dark:bg-dark-card border border-light-border dark:border-dark-border  "
                       >
                         {group.name}
                       </div>
@@ -137,7 +144,7 @@ const MainPage = () => {
                       navigate("/newGroup");
                       emblaApi.scrollTo(1);
                     }}
-                    className="p-2 rounded-lg border bg-slate-50 cursor-pointer text-center"
+                    className="p-2 rounded-lg cursor-pointer text-center bg-light-card dark:bg-dark-card border border-light-border dark:border-dark-border"
                   >
                     Neue Gruppe
                   </div>

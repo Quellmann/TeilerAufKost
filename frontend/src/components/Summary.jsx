@@ -10,10 +10,10 @@ const Summary = ({ personData, emblaApi }) => {
   };
 
   return (
-    <div className="border rounded-lg overflow-auto m-0.5">
+    <div className="rounded-lg overflow-auto bg-light-card dark:bg-dark-card border border-light-border dark:border-dark-border">
       <table className="min-w-full table-fixed">
         <thead>
-          <tr className="border-b">
+          <tr className="border-b border-light-border dark:border-dark-border">
             <th className="text-left p-2 w-1/3">Name</th>
             <th className="text-left p-2 w-1/3">Bezahlt</th>
             <th className="text-left p-2 w-1/3">Verbraucht</th>
@@ -22,7 +22,7 @@ const Summary = ({ personData, emblaApi }) => {
         <tbody className="">
           {personData.map((person, personIndex) => (
             <React.Fragment key={personIndex}>
-              <tr className="border-t">
+              <tr className="border-t border-light-border dark:border-dark-border">
                 <td className="p-2">{person.name}</td>
                 <td className="p-2">
                   <div>
@@ -53,8 +53,8 @@ const Summary = ({ personData, emblaApi }) => {
                   </div>
                 </td>
               </tr>
-              <tr className="border-t border-dashed">
-                <td className="px-2 text-sm text-black/30">Summe:</td>
+              <tr className="border-t border-dashed border-light-border dark:border-dark-border">
+                <td className="px-2 text-sm">Summe:</td>
                 <td className="px-2">
                   <div className="text-sm text-green-500">
                     {person.expenditures.reduce((a, b) => a + b, 0)

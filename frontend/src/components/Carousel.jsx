@@ -36,8 +36,8 @@ const Carousel = ({ personData, spendings }) => {
   }, [emblaApi]);
 
   return (
-    <div className="overflow-hidden my-5 pt-5 border-t relative" ref={emblaRef}>
-      <div className="flex gap-5">
+    <div className="overflow-hidden py-5 relative" ref={emblaRef}>
+      <div className="flex gap-5 p-2">
         <div className="flex-none w-full min-w-0">
           <div className="flex justify-center text-xl mb-5">
             Ausgleichszahlungen

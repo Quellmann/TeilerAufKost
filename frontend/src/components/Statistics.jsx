@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { createTheme, useTheme, ThemeProvider } from "@mui/material/styles";
 import { LineChart } from "@mui/x-charts/LineChart";
 import { PieChart } from "@mui/x-charts/PieChart";
 import { BarChart } from "@mui/x-charts/BarChart";
@@ -21,6 +22,20 @@ const Statistics = ({ personData, spendings }) => {
   const [pieSeries, setPieSeries] = useState([]);
   const [barSeries, setBarSeries] = useState([]);
   const [addTotal, setAddTotal] = useState(false);
+  const [darkMode, setDarkMode] = useState(false);
+  const newTheme = createTheme({
+    palette: { mode: darkMode ? "dark" : "light" },
+  });
+
+  useEffect(() => {
+    const observer = new MutationObserver(() => {
+      setDarkMode(document.documentElement.classList.contains("dark"));
+    });
+
+    observer.observe(document.documentElement, { attributes: true });
+
+    return () => observer.disconnect();
+  }, []);
 
   const convertLineData = () => {
     const skipEntryIndices = spendings.reduce((acc, spending, index) => {
@@ -153,7 +168,7 @@ const Statistics = ({ personData, spendings }) => {
           placement="top"
           anchorEl={virtualElement(tooltipPosition)}
         >
-          <div className="bg-white border rounded-lg text-black/75">
+          <div className="border border-light-border dark:border-dark-border rounded-lg text-light-text dark:text-dark-text bg-light-card dark:bg-dark-card">
             <div className="flex gap-2 p-3 items-center">
               <div
                 style={{ backgroundColor: tooltipData.color }}
@@ -216,7 +231,7 @@ const Statistics = ({ personData, spendings }) => {
           placement="top"
           anchorEl={virtualElement(tooltipPosition)}
         >
-          <div className="bg-white border rounded-lg divide-y text-black/75">
+          <div className="border border-light-border dark:border-dark-border rounded-lg text-light-text dark:text-dark-text bg-light-card dark:bg-dark-card">
             <div className="py-1">
               <div className="text-lg px-3 ">{tooltipData.axisValue.title}</div>
               <div className="text-md px-3 font-light">
@@ -251,37 +266,39 @@ const Statistics = ({ personData, spendings }) => {
   const pieChart = () => {
     return (
       pieSeries && (
-        <PieChart
-          series={[
-            {
-              data: pieSeries,
-              innerRadius: 50,
-              outerRadius: 100,
-              paddingAngle: 2,
-              cornerRadius: 5,
-              startAngle: -45,
-              endAngle: 315,
-            },
-          ]}
-          slotProps={{
-            legend: {
-              direction: "column",
-              position: {
-                vertical: "middle",
-                horizontal: "right",
+        <ThemeProvider theme={newTheme}>
+          <PieChart
+            series={[
+              {
+                data: pieSeries,
+                innerRadius: 50,
+                outerRadius: 100,
+                paddingAngle: 2,
+                cornerRadius: 5,
+                startAngle: -45,
+                endAngle: 315,
               },
-              itemMarkWidth: 18,
-              itemMarkHeight: 3,
-              markGap: 5,
-              itemGap: 10,
-            },
-          }}
-          colors={mangoFusionPalette}
-          tooltip={{
-            trigger: "item",
-          }}
-          slots={{ popper: ItemTooltipFixedY }}
-        />
+            ]}
+            slotProps={{
+              legend: {
+                direction: "column",
+                position: {
+                  vertical: "middle",
+                  horizontal: "right",
+                },
+                itemMarkWidth: 18,
+                itemMarkHeight: 3,
+                markGap: 5,
+                itemGap: 10,
+              },
+            }}
+            colors={mangoFusionPalette}
+            tooltip={{
+              trigger: "item",
+            }}
+            slots={{ popper: ItemTooltipFixedY }}
+          />
+        </ThemeProvider>
       )
     );
   };
@@ -289,28 +306,30 @@ const Statistics = ({ personData, spendings }) => {
   const barChart = () => {
     return (
       barSeries && (
-        <BarChart
-          xAxis={dataXAxis}
-          series={barSeries}
-          borderRadius={8}
-          margin={{
-            top: 66,
-            bottom: 36,
-            left: 36,
-            right: 36,
-          }}
-          slotProps={{
-            legend: {
-              direction: "row",
-              itemMarkWidth: 18,
-              itemMarkHeight: 3,
-              markGap: 5,
-              itemGap: 10,
-            },
-          }}
-          colors={mangoFusionPalette}
-          slots={{ popper: AxisTooltipFixedY }}
-        />
+        <ThemeProvider theme={newTheme}>
+          <BarChart
+            xAxis={dataXAxis}
+            series={barSeries}
+            borderRadius={8}
+            margin={{
+              top: 66,
+              bottom: 36,
+              left: 36,
+              right: 36,
+            }}
+            slotProps={{
+              legend: {
+                direction: "row",
+                itemMarkWidth: 18,
+                itemMarkHeight: 3,
+                markGap: 5,
+                itemGap: 10,
+              },
+            }}
+            colors={mangoFusionPalette}
+            slots={{ popper: AxisTooltipFixedY }}
+          />
+        </ThemeProvider>
       )
     );
   };
@@ -318,28 +337,30 @@ const Statistics = ({ personData, spendings }) => {
   const lineChart = () => {
     return (
       lineSeries && (
-        <LineChart
-          xAxis={dataXAxis}
-          series={lineSeries}
-          margin={{
-            top: 66,
-            bottom: 36,
-            left: 36,
-            right: 36,
-          }}
-          slotProps={{
-            legend: {
-              direction: "row",
-              itemMarkWidth: 18,
-              itemMarkHeight: 3,
-              markGap: 5,
-              itemGap: 10,
-            },
-          }}
-          grid={{ vertical: false, horizontal: true }}
-          colors={mangoFusionPalette}
-          slots={{ popper: AxisTooltipFixedY }}
-        />
+        <ThemeProvider theme={newTheme}>
+          <LineChart
+            xAxis={dataXAxis}
+            series={lineSeries}
+            margin={{
+              top: 66,
+              bottom: 36,
+              left: 36,
+              right: 36,
+            }}
+            slotProps={{
+              legend: {
+                direction: "row",
+                itemMarkWidth: 18,
+                itemMarkHeight: 3,
+                markGap: 5,
+                itemGap: 10,
+              },
+            }}
+            grid={{ vertical: false, horizontal: true }}
+            colors={mangoFusionPalette}
+            slots={{ popper: AxisTooltipFixedY }}
+          />
+        </ThemeProvider>
       )
     );
   };
@@ -349,18 +370,18 @@ const Statistics = ({ personData, spendings }) => {
   }, [personData, spendings]);
 
   return (
-    <div className="flex flex-col gap-5 m-0.5">
-      <div className="flex flex-col border rounded-lg">
+    <div className="flex flex-col gap-5">
+      <div className="flex flex-col rounded-lg bg-light-card dark:bg-dark-card border border-light-border dark:border-dark-border">
         <div className="flex text-xl justify-center">
           Aufsummierter Verbrauch
         </div>
         <div className="flex h-64">{pieChart()}</div>
       </div>
-      <div className="flex flex-col border rounded-lg">
+      <div className="flex flex-col rounded-lg bg-light-card dark:bg-dark-card border border-light-border dark:border-dark-border">
         <div className="flex text-xl justify-center">Anteilige Ausgaben</div>
         <div className="flex w-full h-96">{barChart()}</div>
       </div>
-      <div className="flex flex-col border rounded-lg relative">
+      <div className="flex flex-col rounded-lg bg-light-card dark:bg-dark-card border border-light-border dark:border-dark-border relative">
         <div className="flex text-xl justify-center -translate-x-5 sm:translate-x-5">
           Kummulierte Ausgaben
         </div>
@@ -368,7 +389,7 @@ const Statistics = ({ personData, spendings }) => {
           <div className="text-xs">Gesamt</div>
           <div
             onClick={() => setAddTotal((prev) => !prev)}
-            className={`ml-1 cursor-pointer w-6 h-6 border rounded-md`}
+            className={`ml-1 cursor-pointer w-6 h-6 rounded-md border border-light-border dark:border-dark-border`}
           >
             {" "}
             {addTotal && <CheckIcon></CheckIcon>}

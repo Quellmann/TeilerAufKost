@@ -48,7 +48,7 @@ const Options = () => {
   };
 
   return (
-    <div className="flex flex-col gap-5 m-0.5">
+    <div className="flex flex-col gap-5">
       <div
         onClick={() => {
           emblaApi.scrollTo(2);
@@ -57,21 +57,21 @@ const Options = () => {
             type: "person",
           });
         }}
-        className="flex p-3 justify-center items-center border rounded-lg hover:bg-slate-300 cursor-pointer text-xl"
+        className="flex p-3 justify-center items-center rounded-lg hover:bg-slate-300 cursor-pointer text-xl bg-light-card dark:bg-dark-card border border-light-border dark:border-dark-border"
       >
         <UserPlusIcon className="size-6 mr-3"></UserPlusIcon>
         Mitglieder verwalten
       </div>
       <div
         onClick={() => setIsOpen(true)}
-        className="flex p-3 justify-center items-center border rounded-lg hover:bg-yellow-400 cursor-pointer text-xl"
+        className="flex p-3 justify-center items-center rounded-lg hover:bg-yellow-400 cursor-pointer text-xl bg-light-card dark:bg-dark-card border border-light-border dark:border-dark-border"
       >
         <ArrowPathIcon className="size-6 mr-3"></ArrowPathIcon>
         Ausgaben zurücksetzen
       </div>
       <div
         onClick={() => deleteGroupSubscription()}
-        className="flex p-3 justify-center items-center border rounded-lg hover:bg-red-400 cursor-pointer text-xl"
+        className="flex p-3 justify-center items-center rounded-lg hover:bg-red-400 cursor-pointer text-xl bg-light-card dark:bg-dark-card border border-light-border dark:border-dark-border"
       >
         <ArrowLeftStartOnRectangleIcon className="size-6 mr-3"></ArrowLeftStartOnRectangleIcon>
         Gruppe verlassen
