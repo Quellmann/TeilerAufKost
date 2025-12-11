@@ -6,7 +6,6 @@ import AddOverview from "../components/AddOverview";
 import AddDetails from "../components/AddDetails";
 import { Outlet, useNavigate, useSearchParams } from "react-router-dom";
 import { API_BASE_URL } from "../config";
-import { responsiveFontSizes } from "@mui/material";
 
 const MainPage = () => {
   const [sidebarGroups, setSidebarGroups] = useState([]);

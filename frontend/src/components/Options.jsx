@@ -1,11 +1,10 @@
 import {
   ArrowLeftStartOnRectangleIcon,
   ArrowPathIcon,
-  ExclamationTriangleIcon,
   UserPlusIcon,
 } from "@heroicons/react/24/outline";
 
-import React, { useState } from "react";
+import { useState } from "react";
 import {
   useNavigate,
   useOutletContext,

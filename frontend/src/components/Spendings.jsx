@@ -1,13 +1,12 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useOutletContext, useSearchParams } from "react-router-dom";
 import { PencilSquareIcon, ChevronDownIcon } from "@heroicons/react/24/outline";
 
 const Spendings = ({ spendings }) => {
-  const [search, setSearch] = useState("");
+  const [search] = useState("");
   const [focusedSpending, setFocusedSpending] = useState(undefined);
-  const [isOpen, setIsOpen] = useState(undefined);
   const [searchParams, setSearchParams] = useSearchParams();
-  const [setSidebarGroups, refresh, emblaApi] = useOutletContext();
+  const [emblaApi] = useOutletContext();
 
   useEffect(() => {
     if (searchParams.get("focus")) {

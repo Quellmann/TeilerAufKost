@@ -1,5 +1,3 @@
-import React from "react";
-
 import NewSpending from "../pages/NewSpending";
 import NewPerson from "../pages/NewPerson";
 import { ArrowUturnLeftIcon } from "@heroicons/react/24/outline";

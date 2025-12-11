@@ -1,4 +1,3 @@
-import React from "react";
 import { Link, useOutletContext } from "react-router-dom";
 
 const JoinGroup = ({ groupName, groupId, setJoined }) => {

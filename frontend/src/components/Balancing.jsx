@@ -1,5 +1,4 @@
-import { ArrowRightIcon, BanknotesIcon } from "@heroicons/react/24/outline";
-import React, { useState } from "react";
+import { BanknotesIcon } from "@heroicons/react/24/outline";
 import { Link, useOutletContext, useSearchParams } from "react-router-dom";
 
 const Balancing = ({ personData }) => {

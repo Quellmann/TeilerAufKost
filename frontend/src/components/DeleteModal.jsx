@@ -1,9 +1,5 @@
-import React from "react";
 import { Dialog, DialogPanel } from "@headlessui/react";
-import {
-  ExclamationTriangleIcon,
-  XCircleIcon,
-} from "@heroicons/react/24/outline";
+import { XCircleIcon } from "@heroicons/react/24/outline";
 
 const DeleteModal = ({ text, isOpen, setIsOpen, callback }) => {
   return (

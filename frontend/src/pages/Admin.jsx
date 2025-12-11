@@ -1,6 +1,5 @@
-import React, { useState, useEffect } from "react";
 import { API_BASE_URL } from "../config";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { TrashIcon } from "@heroicons/react/24/outline";
 import DeleteModal from "../components/DeleteModal";
 

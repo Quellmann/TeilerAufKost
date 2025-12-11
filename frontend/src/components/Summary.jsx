@@ -1,8 +1,7 @@
 import React from "react";
-import { Link, useLocation, useSearchParams } from "react-router-dom";
+import { useLocation, useSearchParams } from "react-router-dom";
 
 const Summary = ({ personData, emblaApi }) => {
-  const location = useLocation();
   const [searchParams, setSearchParams] = useSearchParams();
 
   const handleFocus = (index) => {
