@@ -85,7 +85,9 @@ const Carousel = ({ personData, spendings }) => {
           <div
             key={index}
             className={`w-2 h-2 rounded-full transition-all duration-300 ${
-              selectedIndex === index ? "bg-slate-500" : "bg-slate-200"
+              selectedIndex === index
+                ? "bg-dark-border dark:bg-dark-text"
+                : "bg-light-border dark:bg-dark-border"
             }`}
           />
         ))}

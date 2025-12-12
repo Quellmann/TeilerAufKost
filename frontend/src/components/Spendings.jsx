@@ -6,7 +6,7 @@ const Spendings = ({ spendings }) => {
   const [search] = useState("");
   const [focusedSpending, setFocusedSpending] = useState(undefined);
   const [searchParams, setSearchParams] = useSearchParams();
-  const [emblaApi] = useOutletContext();
+  const [, , emblaApi] = useOutletContext();
 
   useEffect(() => {
     if (searchParams.get("focus")) {
@@ -73,7 +73,7 @@ const Spendings = ({ spendings }) => {
                 <div className="text-right">{spending.amount}€</div>
                 <div className="flex justify-end">
                   <ChevronDownIcon
-                    className={`h-5 w-5 text-gray-500 transform transition-transform duration-300 ${
+                    className={`h-5 w-5 transform transition-transform duration-300 ${
                       index == focusedSpending ? "rotate-180" : "rotate-0"
                     }`}
                   />

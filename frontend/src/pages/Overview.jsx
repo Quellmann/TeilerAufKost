@@ -141,7 +141,7 @@ const Overview = () => {
         <>
           <div className="mt-6 rounded-lg border border-light-border dark:border-dark-border">
             <div className="p-2 flex items-center justify-between bg-light-card dark:bg-dark-card rounded-t-lg border-b border-light-border dark:border-dark-border">
-              <div className="text-3xl truncate">{data.groupName}</div>
+              <div className="text-3xl truncate py-1">{data.groupName}</div>
               <div className="flex">
                 <div
                   onClick={() => setIsOpenQR(true)}

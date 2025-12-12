@@ -186,18 +186,18 @@ const NewPerson = ({ emblaApi, setRefresh }) => {
             onChange={(e) => setMemberInput(e.target.value)}
             onKeyDown={handleKeyDown}
             placeholder="Personen"
-            className="border w-full rounded-lg p-2 h-10 text-center"
+            className="w-full rounded-lg p-2 h-10 text-center border border-light-border dark:border-dark-border bg-light-card dark:bg-dark-card"
             name="group_member"
             type="text"
           />
           <div
             onClick={handleAddMember}
-            className="absolute cursor-pointer border-l rounded-lg py-2 px-8 right-0 top-0 h-10 hover:bg-slate-200 hover:outline outline-2 -outline-offset-[3px] outline-black "
+            className="absolute cursor-pointer border border-light-border dark:border-dark-border bg-light-card dark:bg-dark-card rounded-lg py-2 px-8 right-0 top-0 h-10"
           >
             <UserPlusIcon className="size-6" />
           </div>
         </div>
-        <div className="grid grid-cols-1 my-5 border rounded-lg divide-y">
+        <div className="grid grid-cols-1 my-5 rounded-lg divide-y dark:divide-dark-border border border-light-border dark:border-dark-border bg-light-card dark:bg-dark-card">
           {/* tablehead */}
           <div className="py-1 grid grid-cols-4 font-bold">
             <div className="pl-2">Nummer</div>
@@ -231,9 +231,7 @@ const NewPerson = ({ emblaApi, setRefresh }) => {
                 onClick={() => handleDelete(index)}
               >
                 <XMarkIcon
-                  className={`size-6 ${
-                    personData[index]?.balance() && "text-black/30"
-                  }`}
+                  className={`size-6 ${personData[index]?.balance() && ""}`}
                 ></XMarkIcon>
               </div>
             </div>
@@ -246,7 +244,7 @@ const NewPerson = ({ emblaApi, setRefresh }) => {
             e.preventDefault();
             submitForm();
           }}
-          className="rounded-lg bg-slate-200 hover:bg-green-400 transition-colors py-2 px-20"
+          className="rounded-lg py-2 px-20 border border-light-border dark:border-dark-border bg-light-card dark:bg-dark-card"
         >
           Speichern
         </button>

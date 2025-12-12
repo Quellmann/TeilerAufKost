@@ -1,3 +1,4 @@
+import { useState, useEffect } from "react";
 import { API_BASE_URL } from "../config";
 import { useNavigate } from "react-router-dom";
 import { TrashIcon } from "@heroicons/react/24/outline";
@@ -59,12 +60,12 @@ const Admin = () => {
                 <th>Löschen</th>
               </tr>
             </thead>
-            <tbody className="divide-y">
+            <tbody className="divide-y divide-light-border dark:divide-dark-border">
               {data?.map((elmt) => (
                 <tr
                   key={elmt._id}
                   onClick={() => navigate(`/?groupId=${elmt._id}`)}
-                  className="p-2 hover:bg-slate-200 cursor-pointer"
+                  className="p-2 hover:bg-slate-200 dark:hover:bg-slate-700 cursor-pointer"
                 >
                   <td>{elmt.groupName}</td>
                   <td>{elmt.groupMember.length}</td>

@@ -31,17 +31,17 @@ const AddDetails = ({ emblaApi, setRefresh }) => {
     }
   };
   return (
-    <div className="m-1 flex-col flex grow">
+    <div className="mt-6 p-2 flex-col flex grow border border-light-border dark:border-dark-border rounded-lg">
       <div>
         <button
           onClick={() => {
             emblaApi.scrollTo(1);
             setSearchParams({ groupId: searchParams.get("groupId") });
           }}
-          className="flex items-center p-1 border rounded-lg mb-5 mt-6"
+          className="flex items-center p-1 rounded-lg mb-5 border border-light-border dark:border-dark-border"
         >
-          <ArrowUturnLeftIcon className="size-6"></ArrowUturnLeftIcon>
-          <div className="ml-3">Zurück</div>
+          <ArrowUturnLeftIcon className="size-5"></ArrowUturnLeftIcon>
+          <div className="mx-2">Zurück</div>
         </button>
       </div>
       {renderType()}

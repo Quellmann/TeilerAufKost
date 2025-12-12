@@ -397,12 +397,12 @@ const NewSpending = ({ emblaApi, setRefresh }) => {
             }
             value={form.title}
             placeholder="Titel"
-            className="border w-full rounded-lg p-2 text-center"
+            className="w-full rounded-lg p-2 text-center border border-light-border dark:border-dark-border bg-light-card dark:bg-dark-card"
             name="spending_title"
             type="text"
           />
         </div>
-        <div className=" text-lg mt-5 flex justify-center gap-3">
+        <div className="text-lg mt-5 flex justify-center gap-3">
           <div className="relative">
             <Input
               onChange={(e) => handleAmountInput(e.target.value, "amount")}
@@ -410,10 +410,10 @@ const NewSpending = ({ emblaApi, setRefresh }) => {
               onBlur={(e) => handleBlur(e, "amount")}
               value={form.amount}
               placeholder="Betrag"
-              className="border rounded-lg py-2 px-4 text-center"
+              className="w-full rounded-lg p-2 text-center border border-light-border dark:border-dark-border bg-light-card dark:bg-dark-card"
               name="spending_amount"
             />
-            <div className="absolute right-2 top-2.5 text-black/50">€</div>
+            <div className="absolute right-2 top-2.5">€</div>
           </div>
         </div>
 
@@ -424,10 +424,10 @@ const NewSpending = ({ emblaApi, setRefresh }) => {
               onFocus={(e) => handleFocus(e)}
               value={form.tip}
               placeholder="Trinkgeld"
-              className="border rounded-lg py-2 px-4 text-center text-sky-400"
+              className="rounded-lg py-2 px-4 text-center text-sky-400 border border-light-border dark:border-dark-border bg-light-card dark:bg-dark-card"
               name="tip_amount"
             />
-            <div className="absolute right-2 top-2.5 text-black/50">€</div>
+            <div className="absolute right-2 top-2.5">€</div>
             <InformationCircleIcon
               onClick={() => {
                 toast.dismiss();
@@ -435,13 +435,13 @@ const NewSpending = ({ emblaApi, setRefresh }) => {
                   "Trinkgeld wird unter allen Zahlenden zu gleichen Anteilen aufgeteilt."
                 );
               }}
-              className="absolute top-3 right-0 translate-x-8 size-6 text-black/50"
+              className="absolute top-3 right-0 translate-x-8 size-6"
             ></InformationCircleIcon>
           </div>
         </div>
         <div className="text-lg mt-3 flex justify-center gap-3">
           <div className="relative flex items-center">
-            <div className="text-black/50 pr-2">Ausgabe</div>
+            <div className="pr-2">Ausgabe</div>
             <Switch
               checked={form.isBalancingTransaction}
               onChange={(e) =>
@@ -451,7 +451,7 @@ const NewSpending = ({ emblaApi, setRefresh }) => {
             >
               <span className="size-4 translate-x-1 rounded-full bg-white transition group-data-[checked]:translate-x-6" />
             </Switch>
-            <div className="text-black/50 pl-2">Transaktion</div>
+            <div className="pl-2">Transaktion</div>
             <InformationCircleIcon
               onClick={() => {
                 toast.dismiss();
@@ -459,11 +459,11 @@ const NewSpending = ({ emblaApi, setRefresh }) => {
                   "Transaktionen sind Geldbewegungen, die nicht als Verbrauch gewertet werden. Beispielsweise wenn du einer Person 10€ gibst, um gemeinsam eine Rechnung zu begleichen."
                 );
               }}
-              className="absolute top-1 right-1 translate-x-11 size-6 text-black/50"
+              className="absolute top-1 right-1 translate-x-11 size-6"
             ></InformationCircleIcon>
           </div>
         </div>
-        <div className="flex flex-col justify-center border rounded-lg mt-5 divide-y">
+        <div className="flex flex-col justify-center rounded-lg mt-5 divide-y dark:divide-dark-border border border-light-border dark:border-dark-border bg-light-card dark:bg-dark-card">
           <div className="self-start text-lg p-2">Bezahlt von:</div>
           <div className="flex overflow-auto justify-between gap-3 p-4">
             {data.groupMember?.map((member, index) => (
@@ -483,11 +483,11 @@ const NewSpending = ({ emblaApi, setRefresh }) => {
             ))}
           </div>
         </div>
-        <div className="flex relative flex-col justify-center border rounded-lg mt-5 divide-y">
+        <div className="flex relative flex-col justify-center rounded-lg mt-5 divide-y dark:divide-dark-border border border-light-border dark:border-dark-border bg-light-card dark:bg-dark-card">
           <div className="self-start text-lg p-2">
             Für: {form.to.length} Personen
             <div className="absolute top-2 right-2 flex gap-2 items-center">
-              <div className="text-black/50">€</div>
+              <div className="">€</div>
               <Switch
                 checked={percentagesEnabled}
                 onChange={setPercentagesEnabled}
@@ -495,7 +495,7 @@ const NewSpending = ({ emblaApi, setRefresh }) => {
               >
                 <span className="size-4 translate-x-1 rounded-full bg-white transition group-data-[checked]:translate-x-6" />
               </Switch>
-              <div className="text-black/50">%</div>
+              <div className="">%</div>
             </div>
           </div>
           <div className="flex overflow-auto justify-between items-start gap-5 p-4">
@@ -532,9 +532,9 @@ const NewSpending = ({ emblaApi, setRefresh }) => {
                             )
                           }
                           value={percentages[member.name]}
-                          className="border w-20 rounded-lg text-right pr-5"
+                          className="w-20 rounded-lg text-right pr-5 border border-light-border dark:border-dark-border bg-light-card dark:bg-dark-card"
                         />
-                        <div className="text-black/50 absolute right-1">%</div>
+                        <div className="absolute right-1">%</div>
                       </div>
                     ) : (
                       <div className="flex items-center pt-2 relative">
@@ -555,9 +555,9 @@ const NewSpending = ({ emblaApi, setRefresh }) => {
                             form.to.find((elmt) => elmt.name === member.name)
                               .amount
                           }
-                          className="border w-20 rounded-lg text-right pr-5"
+                          className="w-20 rounded-lg text-right pr-5 border border-light-border dark:border-dark-border bg-light-card dark:bg-dark-card"
                         />
-                        <div className="text-black/50 absolute right-2">€</div>
+                        <div className="absolute right-2">€</div>
                       </div>
                     )}
                     {form.tip && (
@@ -581,7 +581,7 @@ const NewSpending = ({ emblaApi, setRefresh }) => {
               e.preventDefault();
               setIsOpen(true);
             }}
-            className="rounded-lg bg-slate-200 hover:bg-red-500 hover:text-white transition-colors py-2 px-10 "
+            className="rounded-lg bg-red-500 transition-colors py-2 px-10 border border-light-border dark:border-dark-border"
           >
             Löschen
           </button>
@@ -591,7 +591,7 @@ const NewSpending = ({ emblaApi, setRefresh }) => {
             e.preventDefault();
             submitForm(editMode ? "update" : "new");
           }}
-          className="rounded-lg bg-slate-200 hover:bg-green-400 transition-colors py-2 px-10"
+          className="rounded-lg transition-colors py-2 px-10 border border-light-border dark:border-dark-border bg-light-card dark:bg-dark-card"
         >
           {editMode ? "Update" : "Speichern"}
         </button>

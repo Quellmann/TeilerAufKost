@@ -2,7 +2,6 @@ import { Bars3Icon, PlusIcon } from "@heroicons/react/24/outline";
 import { useState, useCallback, useRef, useEffect } from "react";
 import useEmblaCarousel from "embla-carousel-react";
 import { Toaster } from "react-hot-toast";
-import AddOverview from "../components/AddOverview";
 import AddDetails from "../components/AddDetails";
 import { Outlet, useNavigate, useSearchParams } from "react-router-dom";
 import { API_BASE_URL } from "../config";
@@ -151,7 +150,7 @@ const MainPage = () => {
                 </div>
               </div>
             </div>
-            {/* Overview */}
+            {/* Overview -> Main Info Page */}
             <div
               className="flex-none w-full min-w-0 overflow-auto"
               onClick={closeSidebar}
@@ -163,7 +162,7 @@ const MainPage = () => {
                 ></Outlet>
               </div>
             </div>
-            {/* Add Details */}
+            {/* Add Details -> Add Transaction/Spending */}
             <div
               className="flex-none w-full min-w-0 overflow-auto"
               style={{ height: `${divHeight}` }}

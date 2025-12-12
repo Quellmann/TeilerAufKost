@@ -43,7 +43,7 @@ const JoinGroup = ({ groupName, groupId, setJoined }) => {
         <div className="mb-10">beitreten?</div>
         <button
           onClick={() => saveGroupSubscription()}
-          className="py-2 px-10 bg-slate-200 rounded-lg hover:bg-green-500 transition-colors"
+          className="py-2 px-10 rounded-lg transition-colors border border-light-border dark:border-dark-border bg-light-card dark:bg-dark-card hover:bg-accent hover:text-white"
         >
           Beitreten
         </button>
@@ -51,7 +51,7 @@ const JoinGroup = ({ groupName, groupId, setJoined }) => {
       <div className="flex justify-center mb-10">
         <Link
           to={"/"}
-          className="rounded-lg bg-slate-200 hover:bg-slate-300 transition-colors py-2 px-20"
+          className="rounded-lg transition-colors py-2 px-20 border border-light-border dark:border-dark-border bg-light-card dark:bg-dark-card hover:bg-accent hover:text-white"
         >
           Zurück
         </Link>
