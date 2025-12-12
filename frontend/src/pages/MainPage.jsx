@@ -1,5 +1,5 @@
 import { Bars3Icon, PlusIcon } from "@heroicons/react/24/outline";
-import { useState, useCallback, useRef, useEffect } from "react";
+import { useState, useCallback, useEffect } from "react";
 import useEmblaCarousel from "embla-carousel-react";
 import { Toaster } from "react-hot-toast";
 import AddDetails from "../components/AddDetails";
@@ -13,9 +13,7 @@ const MainPage = () => {
     watchDrag: false,
     startIndex: 1,
   });
-  const remainingSpaceDiv = useRef(null);
   const [refresh, setRefresh] = useState(new Date());
-  const [divHeight, setDivHeight] = useState("0");
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
 
@@ -64,15 +62,11 @@ const MainPage = () => {
   };
 
   useEffect(() => {
-    if (remainingSpaceDiv.current) {
-      const height = remainingSpaceDiv.current.getBoundingClientRect().height;
-      setDivHeight(`${height}px`);
-    }
     const subscribedGroups = JSON.parse(
       localStorage.getItem("groupSubscription")
     );
     if (subscribedGroups) {
-      setSidebarGroups(JSON.parse(localStorage.getItem("groupSubscription")));
+      setSidebarGroups(subscribedGroups);
       deleteNonExistingGroups();
     }
   }, []);
@@ -104,19 +98,13 @@ const MainPage = () => {
         </div>
       </div>
       {/* Remaining Space */}
-      <div
-        className="flex flex-col grow bg-light-bg dark:bg-dark-bg"
-        ref={remainingSpaceDiv}
-      >
+      <div className="flex-1 flex flex-col min-h-0 bg-light-bg dark:bg-dark-bg">
         {/* Outer Carousel */}
-        <div className="overflow-hidden relative grow" ref={emblaRef}>
-          <div className="flex gap-5 grow">
+        <div className="flex-1 overflow-hidden relative" ref={emblaRef}>
+          <div className="flex gap-5 h-full">
             {/* Sidebar */}
-            <div className="flex-none w-64 min-w-0 grow border-r border-light-border dark:border-dark-border">
-              <div
-                className="w-64 grow flex flex-col justify-between"
-                style={{ height: `${divHeight}` }}
-              >
+            <div className="flex-none w-64 min-w-0 border-r border-light-border dark:border-dark-border overflow-hidden">
+              <div className="w-64 h-full flex flex-col justify-between">
                 <div className="p-2 space-y-2">
                   <div className="flex justify-between">
                     <div className="text-xl">Gruppen</div>
@@ -130,7 +118,7 @@ const MainPage = () => {
                           navigate("/?groupId=" + group.id);
                           emblaApi.scrollTo(1);
                         }}
-                        className="p-1 rounded-lg cursor-pointer truncate bg-light-card dark:bg-dark-card border border-light-border dark:border-dark-border  "
+                        className="p-1 rounded-lg cursor-pointer truncate bg-light-card dark:bg-dark-card border border-light-border dark:border-dark-border"
                       >
                         {group.name}
                       </div>
@@ -152,22 +140,18 @@ const MainPage = () => {
             </div>
             {/* Overview -> Main Info Page */}
             <div
-              className="flex-none w-full min-w-0 overflow-auto"
+              className="flex-none w-full min-w-0 overflow-auto h-full"
               onClick={closeSidebar}
-              style={{ height: `${divHeight}` }}
             >
-              <div className="flex flex-col 2xl:w-[40%] xl:w-[50%] lg:w-[60%] md:w-[70%] sm:w-[90%] w-[96%] mx-auto h-full">
+              <div className="flex flex-col 2xl:w-[40%] xl:w-[50%] lg:w-[60%] md:w-[70%] sm:w-[90%] w-[96%] mx-auto">
                 <Outlet
                   context={[setSidebarGroups, refresh, emblaApi, setRefresh]}
                 ></Outlet>
               </div>
             </div>
             {/* Add Details -> Add Transaction/Spending */}
-            <div
-              className="flex-none w-full min-w-0 overflow-auto"
-              style={{ height: `${divHeight}` }}
-            >
-              <div className="flex flex-col 2xl:w-[40%] xl:w-[50%] lg:w-[60%] md:w-[70%] sm:w-[90%] w-[96%] mx-auto h-full">
+            <div className="flex-none w-full min-w-0 overflow-auto h-full">
+              <div className="flex flex-col 2xl:w-[40%] xl:w-[50%] lg:w-[60%] md:w-[70%] sm:w-[90%] w-[96%] mx-auto">
                 <AddDetails
                   emblaApi={emblaApi}
                   setRefresh={setRefresh}

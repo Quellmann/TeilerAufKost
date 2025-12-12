@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import SkeletonTable from "../components/SkeletonTable";
 import { API_BASE_URL } from "../config";
 import { useNavigate } from "react-router-dom";
 import { TrashIcon } from "@heroicons/react/24/outline";
@@ -6,6 +7,7 @@ import DeleteModal from "../components/DeleteModal";
 
 const Admin = () => {
   const [data, setData] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
   const [openGroupId, setOpenGroupId] = useState(null);
   const [isOpen, setIsOpen] = useState(false);
   const navigate = useNavigate();
@@ -14,6 +16,7 @@ const Admin = () => {
     return;
   }, []);
   async function fetchData() {
+    setIsLoading(true);
     try {
       const groupResponse = await fetch(`${API_BASE_URL}/allGroups`);
 
@@ -34,6 +37,7 @@ const Admin = () => {
       }
 
       setData(data);
+      setIsLoading(false);
       return Promise.resolve();
     } catch (error) {
       console.error("Fetch data error:", error);
@@ -51,40 +55,44 @@ const Admin = () => {
   return (
     <div className="h-full overflow-auto">
       <div className="flex flex-col">
-        <div className="overflow-auto">
-          <table className="min-w-full">
-            <thead>
-              <tr className="text-left">
-                <th>Name</th>
-                <th>Mitglieder</th>
-                <th>Löschen</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-light-border dark:divide-dark-border">
-              {data?.map((elmt) => (
-                <tr
-                  key={elmt._id}
-                  onClick={() => navigate(`/?groupId=${elmt._id}`)}
-                  className="p-2 hover:bg-slate-200 dark:hover:bg-slate-700 cursor-pointer"
-                >
-                  <td>{elmt.groupName}</td>
-                  <td>{elmt.groupMember.length}</td>
-                  <td className="flex justify-end items-center p-1">
-                    <div
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setIsOpen(true);
-                        setOpenGroupId(elmt._id);
-                      }}
-                      className="hover:bg-red-500 hover:text-white rounded-full p-1"
-                    >
-                      <TrashIcon className="size-5"></TrashIcon>
-                    </div>
-                  </td>
+        <div className="overflow-auto p-4">
+          {isLoading ? (
+            <SkeletonTable rows={6} />
+          ) : (
+            <table className="min-w-full">
+              <thead>
+                <tr className="text-left">
+                  <th>Name</th>
+                  <th>Mitglieder</th>
+                  <th>Löschen</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody className="divide-y divide-light-border dark:divide-dark-border">
+                {data?.map((elmt) => (
+                  <tr
+                    key={elmt._id}
+                    onClick={() => navigate(`/?groupId=${elmt._id}`)}
+                    className="p-2 hover:bg-slate-200 dark:hover:bg-slate-700 cursor-pointer"
+                  >
+                    <td>{elmt.groupName}</td>
+                    <td>{elmt.groupMember.length}</td>
+                    <td className="flex justify-end items-center p-1">
+                      <div
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setIsOpen(true);
+                          setOpenGroupId(elmt._id);
+                        }}
+                        className="hover:bg-red-500 hover:text-white rounded-full p-1"
+                      >
+                        <TrashIcon className="size-5"></TrashIcon>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          )}
         </div>
       </div>
       <DeleteModal

@@ -31,7 +31,7 @@ const AddDetails = ({ emblaApi, setRefresh }) => {
     }
   };
   return (
-    <div className="mt-6 p-2 flex-col flex grow border border-light-border dark:border-dark-border rounded-lg">
+    <div className="my-6 p-2 flex-col flex grow border border-light-border dark:border-dark-border rounded-lg">
       <div>
         <button
           onClick={() => {

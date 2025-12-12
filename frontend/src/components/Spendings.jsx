@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useOutletContext, useSearchParams } from "react-router-dom";
 import { PencilSquareIcon, ChevronDownIcon } from "@heroicons/react/24/outline";
 
-const Spendings = ({ spendings }) => {
+const Spendings = ({ spendings, innerEmblaApi }) => {
   const [search] = useState("");
   const [focusedSpending, setFocusedSpending] = useState(undefined);
   const [searchParams, setSearchParams] = useSearchParams();
@@ -14,6 +14,15 @@ const Spendings = ({ spendings }) => {
     }
     return;
   }, [searchParams]);
+
+  // Trigger AutoHeight remeasure when accordion expands/collapses
+  useEffect(() => {
+    if (!innerEmblaApi) return;
+    const timer = setTimeout(() => {
+      innerEmblaApi.reInit();
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [focusedSpending, innerEmblaApi]);
 
   const handleOpenState = (index) => {
     if (focusedSpending === index) {

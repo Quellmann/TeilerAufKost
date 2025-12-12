@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from "react";
+import SkeletonForm from "../components/SkeletonForm";
 import { Input } from "@headlessui/react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import {
@@ -33,6 +34,7 @@ class Person {
 const NewPerson = ({ emblaApi, setRefresh }) => {
   const [memberInput, setMemberInput] = useState("");
   const [data, setData] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
   const [spendings, setSpendings] = useState([]);
   const [personData, setPersonData] = useState([]);
   const inputRef = useRef(null);
@@ -141,6 +143,7 @@ const NewPerson = ({ emblaApi, setRefresh }) => {
 
   useEffect(() => {
     async function fetchData() {
+      setIsLoading(true);
       const groupResponse = await fetch(`${API_BASE_URL}/${groupId}`);
       const spendingResponse = await fetch(
         `${API_BASE_URL}/${groupId}/spendings`
@@ -170,10 +173,19 @@ const NewPerson = ({ emblaApi, setRefresh }) => {
       setPersonData(
         data.groupMember.map((member) => new Person(member.name, spending_data))
       );
+      setIsLoading(false);
     }
     fetchData();
     return;
   }, []);
+
+  if (isLoading) {
+    return (
+      <div className="p-4">
+        <SkeletonForm />
+      </div>
+    );
+  }
 
   return (
     <form className="flex flex-col grow" autoComplete="off">

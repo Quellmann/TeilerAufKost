@@ -88,7 +88,7 @@ const Balancing = ({ personData }) => {
                     className="flex justify-center rounded-lg px-4 py-1 hover:bg-green-400 dark:hover:bg-dark-accent border border-light-border dark:border-dark-border"
                     onClick={() => emblaApi.scrollTo(2)}
                   >
-                    <BanknotesIcon className="w-6 text-gray-700 dark:text-dark-text"></BanknotesIcon>
+                    <BanknotesIcon className="w-6"></BanknotesIcon>
                   </Link>
                 </div>
               </td>

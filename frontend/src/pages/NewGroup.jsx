@@ -9,6 +9,7 @@ import {
 } from "@heroicons/react/24/outline";
 import { API_BASE_URL } from "../config";
 import toast from "react-hot-toast";
+import SkeletonOverview from "../components/SkeletonOverview";
 
 const NewGroup = () => {
   const [memberInput, setMemberInput] = useState("");
@@ -16,6 +17,7 @@ const NewGroup = () => {
   const inputRef = useRef(null);
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Function to handle adding a member
   const handleAddMember = () => {
@@ -89,7 +91,9 @@ const NewGroup = () => {
   };
 
   const submitForm = async () => {
-    if (formValidation()) {
+    if (!formValidation() || isSubmitting) return;
+    setIsSubmitting(true);
+    try {
       const response = await fetch(`${API_BASE_URL}/newGroup`, {
         method: "POST",
         headers: {
@@ -97,15 +101,34 @@ const NewGroup = () => {
         },
         body: JSON.stringify({ data: data }),
       });
+      if (!response.ok) {
+        const msg = await response.text();
+        throw new Error(msg || "Request failed");
+      }
       const group = await response.json();
       navigate(`/?groupId=${group._id}`, { replace: true });
+    } catch (err) {
+      toast.error("Fehler beim Erstellen der Gruppe");
+      console.error(err);
+      setIsSubmitting(false);
     }
   };
 
+  if (isSubmitting) {
+    return (
+      <div className="p-4">
+        <SkeletonOverview />
+      </div>
+    );
+  }
+
   return (
-    <form className="flex flex-col grow" autoComplete="off">
+    <form
+      className="my-6 p-2 flex flex-col grow rounded-lg border border-light-border dark:border-dark-border"
+      autoComplete="off"
+    >
       <div className="flex flex-col grow">
-        <div className="text-3xl mb-8 mt-10">Neue Gruppe hinzufügen</div>
+        <div className="text-3xl mb-8 mt-2">Neue Gruppe hinzufügen</div>
         <div className="text-lg mt-10 relative">
           <Input
             value={data.groupName}
@@ -113,7 +136,7 @@ const NewGroup = () => {
               setData((prev) => ({ ...prev, groupName: e.target.value }))
             }
             placeholder="Gruppenname"
-            className="border w-full rounded-lg p-2 h-10 text-center"
+            className="w-full rounded-lg p-2 h-10 text-center border border-light-border dark:border-dark-border bg-light-card dark:bg-dark-card"
             name="group_name"
             type="text"
           />
@@ -125,18 +148,18 @@ const NewGroup = () => {
             onChange={(e) => setMemberInput(e.target.value)}
             onKeyDown={handleKeyDown}
             placeholder="Personen"
-            className="border w-full rounded-lg p-2 h-10 text-center"
+            className="w-full rounded-lg p-2 h-10 text-center border border-light-border dark:border-dark-border bg-light-card dark:bg-dark-card"
             name="group_member"
             type="text"
           />
           <div
             onClick={handleAddMember}
-            className="absolute cursor-pointer border-l rounded-lg py-2 px-8 right-0 top-0 h-10 hover:bg-slate-200 hover:outline outline-2 -outline-offset-[3px] outline-black "
+            className="absolute cursor-pointer rounded-lg py-2 px-8 right-0 top-0 h-10 border border-light-border dark:border-dark-border bg-light-card dark:bg-dark-card"
           >
             <UserPlusIcon className="size-6" />
           </div>
         </div>
-        <div className="grid grid-cols-1 my-5 border rounded-lg divide-y">
+        <div className="grid grid-cols-1 my-5 rounded-lg divide-y divide-light-border dark:divide-dark-border border border-light-border dark:border-dark-border bg-light-card dark:bg-dark-card">
           {/* tablehead */}
           <div className="py-1 grid grid-cols-4 font-bold">
             <div className="pl-2">Nummer</div>
@@ -153,20 +176,20 @@ const NewGroup = () => {
               <div className="flex items-center select-none">
                 <div
                   onClick={() => handleHouseholdClick("decrease", member)}
-                  className="p-0.5 cursor-pointer hover:bg-slate-200 rounded-full"
+                  className="p-0.5 cursor-pointer"
                 >
                   <ChevronLeftIcon className="size-5"></ChevronLeftIcon>
                 </div>
                 <div className="px-1">{member.household}</div>
                 <div
                   onClick={() => handleHouseholdClick("increase", member)}
-                  className="p-0.5 cursor-pointer hover:bg-slate-200 rounded-full"
+                  className="p-0.5 cursor-pointer"
                 >
                   <ChevronRightIcon className="size-5"></ChevronRightIcon>
                 </div>
               </div>
               <div
-                className="justify-self-end mr-2 cursor-pointer hover:bg-slate-200 rounded-full"
+                className="justify-self-end mr-2 cursor-pointer"
                 onClick={() => handleDelete(index)}
               >
                 <XMarkIcon className={`size-6`}></XMarkIcon>
@@ -177,13 +200,16 @@ const NewGroup = () => {
       </div>
       <div className="flex justify-center mb-10">
         <button
+          disabled={isSubmitting}
           onClick={(e) => {
             e.preventDefault();
-            submitForm();
+            if (!isSubmitting) submitForm();
           }}
-          className="rounded-lg bg-slate-200 hover:bg-green-400 transition-colors py-2 px-20"
+          className={`rounded-lg transition-colors py-2 px-20 border border-light-border dark:border-dark-border bg-light-card dark:bg-dark-card ${
+            isSubmitting ? "opacity-60 cursor-not-allowed" : ""
+          }`}
         >
-          Speichern
+          {isSubmitting ? "Speichern..." : "Speichern"}
         </button>
       </div>
     </form>

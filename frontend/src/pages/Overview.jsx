@@ -10,6 +10,7 @@ import { API_BASE_URL } from "../config";
 import JoinGroup from "./JoinGroup";
 import Carousel from "../components/Carousel";
 import GridLoader from "react-spinners/GridLoader";
+import SkeletonOverview from "../components/SkeletonOverview";
 import LandingPage from "./LandingPage";
 
 class Person {
@@ -119,13 +120,8 @@ const Overview = () => {
       return <LandingPage></LandingPage>;
     } else if (isLoading) {
       return (
-        <div className="flex justify-center h-full items-center">
-          <GridLoader
-            loading={isLoading}
-            size={100}
-            speedMultiplier={0.5}
-            color="rgba(229 231 235)"
-          ></GridLoader>
+        <div className="p-4">
+          <SkeletonOverview />
         </div>
       );
     } else if (!joined) {
@@ -138,49 +134,44 @@ const Overview = () => {
       );
     } else {
       return (
-        <>
-          <div className="mt-6 rounded-lg border border-light-border dark:border-dark-border">
-            <div className="p-2 flex items-center justify-between bg-light-card dark:bg-dark-card rounded-t-lg border-b border-light-border dark:border-dark-border">
-              <div className="text-3xl truncate py-1">{data.groupName}</div>
-              <div className="flex">
-                <div
-                  onClick={() => setIsOpenQR(true)}
-                  className="p-1 rounded-lg cursor-pointer"
-                >
-                  <QrCodeIcon className="h-7 w-7"></QrCodeIcon>
-                </div>
+        <div className="my-6 rounded-lg border border-light-border dark:border-dark-border">
+          <div className="p-2 flex items-center justify-between bg-light-card dark:bg-dark-card rounded-t-lg border-b border-light-border dark:border-dark-border">
+            <div className="text-3xl truncate py-1">{data.groupName}</div>
+            <div className="flex">
+              <div
+                onClick={() => setIsOpenQR(true)}
+                className="p-1 rounded-lg cursor-pointer"
+              >
+                <QrCodeIcon className="h-7 w-7"></QrCodeIcon>
               </div>
             </div>
-            <div className="text-lg ml-4 mt-2">Saldo</div>
-            <div className="m-2 flex flex-col divide-y rounded-lg text-xl bg-light-card dark:bg-dark-card border divide-light-border dark:divide-dark-border border-light-border dark:border-dark-border">
-              {data.groupMember?.map((member, index) => (
-                <div key={index} className="flex justify-between p-2">
-                  <div className="">{member.name}</div>
-                  <div className="">
-                    <div>
-                      {personData
-                        .find((person) => person.name === member.name)
-                        .balance()
-                        .toFixed(2)}{" "}
-                      €
-                    </div>
+          </div>
+          <div className="text-lg ml-4 mt-2">Saldo</div>
+          <div className="m-2 flex flex-col divide-y rounded-lg text-xl bg-light-card dark:bg-dark-card border divide-light-border dark:divide-dark-border border-light-border dark:border-dark-border">
+            {data.groupMember?.map((member, index) => (
+              <div key={index} className="flex justify-between p-2">
+                <div className="">{member.name}</div>
+                <div className="">
+                  <div>
+                    {personData
+                      .find((person) => person.name === member.name)
+                      .balance()
+                      .toFixed(2)}{" "}
+                    €
                   </div>
                 </div>
-              ))}
-            </div>
-            <div className="mt-5 pt-2 border-t border-light-border dark:border-dark-border">
-              <Carousel
-                personData={personData}
-                spendings={spendings}
-              ></Carousel>
-            </div>
+              </div>
+            ))}
+          </div>
+          <div className="mt-5 pt-2 border-t border-light-border dark:border-dark-border">
+            <Carousel personData={personData} spendings={spendings}></Carousel>
           </div>
           <QRCodeModal
             isOpenQR={isOpenQR}
             setIsOpenQR={setIsOpenQR}
             qrCodeUrl={window.location.href}
           ></QRCodeModal>
-        </>
+        </div>
       );
     }
   };

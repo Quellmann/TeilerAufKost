@@ -11,8 +11,16 @@ await connectToDatabase()
 app.use(cors());
 app.use(express.json());
 
+if (process.env.NODE_ENV === "development") {
+  app.use(async (req, res, next) => {
+    await new Promise(resolve => setTimeout(resolve, 3000));
+    next();
+  });
+}
+
 app.use(groupRoutes);
 app.use(spendingRoutes);
+
 
 app.listen(3000, () => {
     console.log(`Server listening on port 3000`);

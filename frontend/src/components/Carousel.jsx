@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import useEmblaCarousel from "embla-carousel-react";
+import AutoHeight from "embla-carousel-auto-height";
 import Statistics from "./Statistics";
 import Balancing from "./Balancing";
 import Summary from "./Summary";
@@ -8,7 +9,7 @@ import { ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/24/outline";
 import Options from "./Options";
 
 const Carousel = ({ personData, spendings }) => {
-  const [emblaRef, emblaApi] = useEmblaCarousel();
+  const [emblaRef, emblaApi] = useEmblaCarousel({}, [AutoHeight()]);
   const [selectedIndex, setSelectedIndex] = useState(0);
 
   const scrollPrev = useCallback(() => {
@@ -36,8 +37,8 @@ const Carousel = ({ personData, spendings }) => {
   }, [emblaApi]);
 
   return (
-    <div className="overflow-hidden py-5 relative" ref={emblaRef}>
-      <div className="flex gap-5 p-2">
+    <div className="overflow-hidden pt-6 pb-2 relative" ref={emblaRef}>
+      <div className="flex gap-5 px-2 items-start transition-[height] duration-300">
         <div className="flex-none w-full min-w-0">
           <div className="flex justify-center text-xl mb-5">
             Ausgleichszahlungen
@@ -54,7 +55,7 @@ const Carousel = ({ personData, spendings }) => {
           <div className="flex justify-center text-xl mb-5">
             Ausgaben-Historie
           </div>
-          <Spendings spendings={spendings}></Spendings>
+          <Spendings spendings={spendings} innerEmblaApi={emblaApi}></Spendings>
         </div>
         <div className="flex-none w-full min-w-0">
           <div className="flex justify-center text-xl mb-5">Statistik</div>

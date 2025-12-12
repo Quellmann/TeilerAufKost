@@ -28,11 +28,20 @@ const Statistics = ({ personData, spendings }) => {
   });
 
   useEffect(() => {
+    // Initialize from current document class (handles default dark mode)
+    if (typeof document !== "undefined") {
+      setDarkMode(document.documentElement.classList.contains("dark"));
+    }
+
+    // Observe changes to the `class` attribute to update theme dynamically
     const observer = new MutationObserver(() => {
       setDarkMode(document.documentElement.classList.contains("dark"));
     });
 
-    observer.observe(document.documentElement, { attributes: true });
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ["class"],
+    });
 
     return () => observer.disconnect();
   }, []);

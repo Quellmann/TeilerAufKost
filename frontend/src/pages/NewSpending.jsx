@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import SkeletonForm from "../components/SkeletonForm";
 import { Input } from "@headlessui/react";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import { API_BASE_URL } from "../config";
@@ -26,6 +27,7 @@ const NewSpending = ({ emblaApi, setRefresh }) => {
   const [percentages, setPercentages] = useState({});
   const [userHasEdited, setUserHasEdited] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     if (searchParams.get("spending")) {
@@ -373,10 +375,19 @@ const NewSpending = ({ emblaApi, setRefresh }) => {
           setPercentages((prev) => ({ ...prev, [member.name]: 0 }))
         );
       }
+      setIsLoading(false);
     }
     groupId && fetchData();
     return;
   }, [groupId]);
+
+  if (isLoading) {
+    return (
+      <div className="p-4">
+        <SkeletonForm />
+      </div>
+    );
+  }
 
   return (
     <form className="flex flex-col justify-between grow" autoComplete="off">
