@@ -38,6 +38,18 @@ body {
 /* Dark mode colors for skeleton */
 :root.dark .skeleton,
 .dark .skeleton {
-    --skeleton-base: #0f172a; /* slate-900 */
-    --skeleton-highlight: #0b1220; /* slightly lighter */
+    --skeleton-base: #1c1f27;
+    --skeleton-highlight: #15181d;
+}
+
+:root.dark .skeleton::after, .dark .skeleton::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 100%;
+    background: linear-gradient(90deg, transparent, rgba(37, 37, 37, 0.6), transparent);
+    transform: translateX(-100%);
+    animation: shimmer 1.2s linear infinite;
 }

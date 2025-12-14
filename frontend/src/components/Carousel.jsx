@@ -71,13 +71,13 @@ const Carousel = ({ personData, spendings }) => {
       </div>
       <button
         onClick={scrollPrev}
-        className="absolute top-5 left-0 hover:bg-slate-200 rounded-full p-1"
+        className="absolute top-5 left-0 rounded-full p-1"
       >
         <ChevronLeftIcon className="w-6 -translate-x-0.5"></ChevronLeftIcon>
       </button>
       <button
         onClick={scrollNext}
-        className="absolute top-5 right-0 hover:bg-slate-200 rounded-full p-1"
+        className="absolute top-5 right-0 rounded-full p-1"
       >
         <ChevronRightIcon className="w-6 translate-x-0.5"></ChevronRightIcon>
       </button>

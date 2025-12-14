@@ -48,7 +48,7 @@ const JoinGroup = ({ groupName, groupId, setJoined }) => {
           Beitreten
         </button>
       </div>
-      <div className="flex justify-center mb-10">
+      <div className="flex justify-center mt-10">
         <Link
           to={"/"}
           className="rounded-lg transition-colors py-2 px-20 border border-light-border dark:border-dark-border bg-light-card dark:bg-dark-card hover:bg-accent hover:text-white"

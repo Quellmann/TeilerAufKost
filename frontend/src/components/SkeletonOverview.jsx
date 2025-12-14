@@ -3,9 +3,9 @@ import React from "react";
 const MemberRow = () => (
   <div className="flex justify-between items-center p-2">
     <div className="flex items-center gap-3">
-      <div className="skeleton h-8 w-44 rounded"></div>
+      <div className="skeleton h-8 w-44 rounded-lg"></div>
     </div>
-    <div className="skeleton h-8 w-14 rounded"></div>
+    <div className="skeleton h-8 w-14 rounded-lg"></div>
   </div>
 );
 
