@@ -588,7 +588,7 @@ const NewSpending = ({ emblaApi, setRefresh }) => {
               e.preventDefault();
               setIsOpen(true);
             }}
-            className="rounded-lg bg-red-500 transition-colors py-2 px-10 border border-light-border dark:border-dark-border"
+            className="rounded-lg transition-colors py-2 px-10 border border-light-border dark:border-dark-border bg-light-card dark:bg-dark-card"
           >
             Löschen
           </button>

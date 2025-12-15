@@ -144,23 +144,58 @@ const Overview = () => {
           </div>
           <div className="text-lg ml-4 mt-2">Saldo</div>
           <div className="m-2 flex flex-col divide-y rounded-lg text-xl bg-light-card dark:bg-dark-card border divide-light-border dark:divide-dark-border border-light-border dark:border-dark-border">
-            {data.groupMember?.map((member, index) => (
-              <div key={index} className="flex justify-between p-2">
-                <div className="">{member.name}</div>
-                <div className="">
-                  <div>
-                    {personData
-                      .find((person) => person.name === member.name)
-                      .balance()
-                      .toFixed(2)}{" "}
-                    €
+            {(() => {
+              const saldoHousehold = JSON.parse(
+                localStorage.getItem("saldoHousehold") || "false"
+              );
+              if (!saldoHousehold) {
+                return data.groupMember?.map((member, index) => (
+                  <div key={index} className="flex justify-between p-2">
+                    <div className="">{member.name}</div>
+                    <div className="">
+                      <div>
+                        {(
+                          personData
+                            .find((person) => person.name === member.name)
+                            ?.balance() || 0
+                        ).toFixed(2)}{" "}
+                        €
+                      </div>
+                    </div>
                   </div>
-                </div>
-              </div>
-            ))}
+                ));
+              }
+
+              // household mode: aggregate members by household index
+              const households = {};
+              data.groupMember?.forEach((m) => {
+                const h = m.household ?? 0;
+                households[h] = households[h] || [];
+                households[h].push(m.name);
+              });
+
+              return Object.entries(households).map(([hid, names]) => {
+                const bal = names.reduce((sum, name) => {
+                  const p = personData.find((pp) => pp.name === name);
+                  return sum + (p ? p.balance() : 0);
+                }, 0);
+                return (
+                  <div key={hid} className="flex justify-between p-2">
+                    <div className="">{`Haushalt ${hid}: ${names.join(
+                      ", "
+                    )}`}</div>
+                    <div className="text-nowrap">{bal.toFixed(2)} €</div>
+                  </div>
+                );
+              });
+            })()}
           </div>
           <div className="mt-5 pt-2 border-t border-light-border dark:border-dark-border">
-            <Carousel personData={personData} spendings={spendings}></Carousel>
+            <Carousel
+              personData={personData}
+              spendings={spendings}
+              groupMembers={data.groupMember}
+            ></Carousel>
           </div>
           <QRCodeModal
             isOpenQR={isOpenQR}

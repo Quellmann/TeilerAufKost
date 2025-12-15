@@ -1,6 +1,10 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useOutletContext, useSearchParams } from "react-router-dom";
-import { PencilSquareIcon, ChevronDownIcon } from "@heroicons/react/24/outline";
+import {
+  PencilSquareIcon,
+  ChevronDownIcon,
+  PencilIcon,
+} from "@heroicons/react/24/outline";
 
 const Spendings = ({ spendings, innerEmblaApi }) => {
   const [search] = useState("");
@@ -15,13 +19,29 @@ const Spendings = ({ spendings, innerEmblaApi }) => {
     return;
   }, [searchParams]);
 
-  // Trigger AutoHeight remeasure when accordion expands/collapses
+  // Re-measure immediately and while the accordion transitions.
+  const rootRef = useRef(null);
   useEffect(() => {
     if (!innerEmblaApi) return;
-    const timer = setTimeout(() => {
-      innerEmblaApi.reInit();
-    }, 300);
-    return () => clearTimeout(timer);
+
+    // immediate remeasure so embla adjusts without delay
+    if (typeof innerEmblaApi.reInit === "function") innerEmblaApi.reInit();
+
+    let rafId = null;
+    const ro = new ResizeObserver(() => {
+      if (rafId) cancelAnimationFrame(rafId);
+      rafId = requestAnimationFrame(() => {
+        if (innerEmblaApi && typeof innerEmblaApi.reInit === "function") {
+          innerEmblaApi.reInit();
+        }
+      });
+    });
+
+    if (rootRef.current) ro.observe(rootRef.current);
+    return () => {
+      ro.disconnect();
+      if (rafId) cancelAnimationFrame(rafId);
+    };
   }, [focusedSpending, innerEmblaApi]);
 
   const handleOpenState = (index) => {
@@ -55,7 +75,10 @@ const Spendings = ({ spendings, innerEmblaApi }) => {
   };
 
   return (
-    <div className="flex flex-col mt-5 rounded-lg divide-y divide-light-border dark:divide-dark-border bg-light-card dark:bg-dark-card border border-light-border dark:border-dark-border">
+    <div
+      ref={rootRef}
+      className="flex flex-col mt-5 rounded-lg divide-y divide-light-border dark:divide-dark-border bg-light-card dark:bg-dark-card border border-light-border dark:border-dark-border"
+    >
       {spendings.length === 0 ? (
         <div className="p-3">Es wurden noch keine Ausgaben verbucht.</div>
       ) : (
@@ -144,12 +167,12 @@ const Spendings = ({ spendings, innerEmblaApi }) => {
                       <div>€</div>
                     </div>
                   </div>
-                  <div className="flex justify-start mt-5 ">
+                  <div className="flex justify-start mt-5 gap-5">
                     <button
                       onClick={() => handleEditSpending(spending)}
                       className="flex items-center"
                     >
-                      <PencilSquareIcon className="size-6"></PencilSquareIcon>
+                      <PencilSquareIcon className="size-4 mr-1"></PencilSquareIcon>
                       <div className="text-sm">Bearbeiten</div>
                     </button>
                   </div>

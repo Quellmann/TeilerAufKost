@@ -8,7 +8,7 @@ import Spendings from "./Spendings";
 import { ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/24/outline";
 import Options from "./Options";
 
-const Carousel = ({ personData, spendings }) => {
+const Carousel = ({ personData, spendings, groupMembers }) => {
   const [emblaRef, emblaApi] = useEmblaCarousel({}, [AutoHeight()]);
   const [selectedIndex, setSelectedIndex] = useState(0);
 
@@ -43,7 +43,10 @@ const Carousel = ({ personData, spendings }) => {
           <div className="flex justify-center text-xl mb-5">
             Ausgleichszahlungen
           </div>
-          <Balancing personData={personData}></Balancing>
+          <Balancing
+            personData={personData}
+            groupMembers={groupMembers}
+          ></Balancing>
         </div>
         <div className="flex-none w-full min-w-0">
           <div className="flex justify-center text-xl mb-5">
@@ -64,7 +67,7 @@ const Carousel = ({ personData, spendings }) => {
             spendings={spendings}
           ></Statistics>
         </div>
-        <div className="flex-none w-full min-w-0">
+        <div className="flex-none w-full min-w-0 mr-2">
           <div className="flex justify-center text-xl mb-5">Optionen</div>
           <Options></Options>
         </div>

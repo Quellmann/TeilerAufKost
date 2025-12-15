@@ -13,7 +13,7 @@ app.use(express.json());
 
 if (process.env.NODE_ENV === "development") {
   app.use(async (req, res, next) => {
-    await new Promise(resolve => setTimeout(resolve, 3000));
+    await new Promise(resolve => setTimeout(resolve, 500));
     next();
   });
 }
