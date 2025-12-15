@@ -119,11 +119,7 @@ const Overview = () => {
     if (!groupId) {
       return <LandingPage></LandingPage>;
     } else if (isLoading) {
-      return (
-        <div className="p-4">
-          <SkeletonOverview />
-        </div>
-      );
+      return <SkeletonOverview />;
     } else if (!joined) {
       return (
         <JoinGroup
@@ -134,7 +130,7 @@ const Overview = () => {
       );
     } else {
       return (
-        <div className="my-6 rounded-lg border border-light-border dark:border-dark-border">
+        <div className="rounded-lg border border-light-border dark:border-dark-border">
           <div className="p-2 flex items-center justify-between bg-light-card dark:bg-dark-card rounded-t-lg border-b border-light-border dark:border-dark-border">
             <div className="text-3xl truncate py-1">{data.groupName}</div>
             <div className="flex">

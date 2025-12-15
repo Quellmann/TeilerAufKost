@@ -143,7 +143,7 @@ const MainPage = () => {
               className="flex-none w-full min-w-0 overflow-auto h-full"
               onClick={closeSidebar}
             >
-              <div className="flex flex-col 2xl:w-[40%] xl:w-[50%] lg:w-[60%] md:w-[70%] sm:w-[90%] w-[96%] mx-auto">
+              <div className="my-6 flex flex-col 2xl:w-[40%] xl:w-[50%] lg:w-[60%] md:w-[70%] sm:w-[90%] w-[96%] mx-auto">
                 <Outlet
                   context={[setSidebarGroups, refresh, emblaApi, setRefresh]}
                 ></Outlet>

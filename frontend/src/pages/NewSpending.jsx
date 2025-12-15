@@ -382,11 +382,7 @@ const NewSpending = ({ emblaApi, setRefresh }) => {
   }, [groupId]);
 
   if (isLoading) {
-    return (
-      <div className="p-4">
-        <SkeletonForm />
-      </div>
-    );
+    return <SkeletonForm />;
   }
 
   return (
@@ -414,7 +410,7 @@ const NewSpending = ({ emblaApi, setRefresh }) => {
           />
         </div>
         <div className="text-lg mt-5 flex justify-center gap-3">
-          <div className="relative">
+          <div className="relative w-2/5">
             <Input
               onChange={(e) => handleAmountInput(e.target.value, "amount")}
               onFocus={(e) => handleFocus(e)}
@@ -429,13 +425,13 @@ const NewSpending = ({ emblaApi, setRefresh }) => {
         </div>
 
         <div className="text-lg mt-3 flex justify-center gap-3">
-          <div className="relative">
+          <div className="relative w-2/5">
             <Input
               onChange={(e) => handleAmountInput(e.target.value, "tip")}
               onFocus={(e) => handleFocus(e)}
               value={form.tip}
               placeholder="Trinkgeld"
-              className="rounded-lg py-2 px-4 text-center text-sky-400 border border-light-border dark:border-dark-border bg-light-card dark:bg-dark-card"
+              className="w-full rounded-lg py-2 px-4 text-center text-sky-400 border border-light-border dark:border-dark-border bg-light-card dark:bg-dark-card"
               name="tip_amount"
             />
             <div className="absolute right-2 top-2.5">€</div>
@@ -585,7 +581,7 @@ const NewSpending = ({ emblaApi, setRefresh }) => {
           </div>
         </div>
       </div>
-      <div className="flex justify-around my-10">
+      <div className="flex justify-around mt-5">
         {editMode && (
           <button
             onClick={(e) => {
