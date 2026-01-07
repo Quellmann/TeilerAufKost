@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { createTheme, useTheme, ThemeProvider } from "@mui/material/styles";
+import { createTheme, ThemeProvider } from "@mui/material/styles";
 import { LineChart } from "@mui/x-charts/LineChart";
 import { PieChart } from "@mui/x-charts/PieChart";
 import { BarChart } from "@mui/x-charts/BarChart";
@@ -53,10 +53,10 @@ const Statistics = ({ personData, spendings }) => {
       }
       return acc;
     }, []);
-    spendings = spendings.filter(
+    const filteredSpendings = spendings.filter(
       (spending, index) => !skipEntryIndices.includes(index)
     );
-    personData = personData.map((person) => ({
+    const filteredPersonData = personData.map((person) => ({
       ...person,
       liabilities: person.liabilities.filter(
         (item, index) => !skipEntryIndices.includes(index)
@@ -64,7 +64,7 @@ const Statistics = ({ personData, spendings }) => {
     }));
     setDataXAxis([
       {
-        data: spendings,
+        data: filteredSpendings,
         valueFormatter: (spending) =>
           new Date(spending.createdAt).toLocaleDateString("de-DE", {
             timeZone: "Europe/Berlin",
@@ -76,13 +76,13 @@ const Statistics = ({ personData, spendings }) => {
     ]);
 
     setLineSeries(
-      personData.map((person) => ({
+      filteredPersonData.map((person) => ({
         label: person.name,
         data: person.liabilities.reduce((acc, curr, index) => {
           if (index === 0) {
-            acc.push(Math.abs(curr)); // Add liabilities + expenditures for the first element
+            acc.push(Math.abs(curr));
           } else {
-            acc.push(acc[index - 1] + Math.abs(curr)); // Accumulate liabilities + expenditures
+            acc.push(acc[index - 1] + Math.abs(curr));
           }
           return acc;
         }, []),
@@ -90,25 +90,23 @@ const Statistics = ({ personData, spendings }) => {
     );
 
     setPieSeries(
-      personData.map((person) => {
-        const total_liablities = Math.abs(
+      filteredPersonData.map((person) => {
+        const total_liabilities = Math.abs(
           person.liabilities.reduce((a, b) => a + b, 0)
         );
-        // const total_expenditures = Math.abs(
-        //   person.expenditures.reduce((a, b) => a + b, 0)
-        // );
 
         return {
-          value: total_liablities,
+          value: total_liabilities,
           percent:
-            total_liablities / spendings.reduce((a, b) => a + +b.amount, 0),
+            total_liabilities /
+            filteredSpendings.reduce((a, b) => a + +b.amount, 0),
           label: person.name,
         };
       })
     );
 
     setBarSeries(
-      personData.map((person) => ({
+      filteredPersonData.map((person) => ({
         label: person.name,
         data: person.liabilities.map((elmt) => Math.abs(elmt)),
         stack: "total",
@@ -127,6 +125,36 @@ const Statistics = ({ personData, spendings }) => {
     }
   }, [addTotal]);
 
+  const generateTooltipContent = ({
+    tooltipData,
+    color = false,
+    percent = false,
+  }) => (
+    <div className="border border-light-border dark:border-dark-border rounded-lg text-light-text dark:text-dark-text bg-light-card dark:bg-dark-card">
+      <div className="flex gap-2 p-3 items-center">
+        {color && (
+          <div
+            style={{ backgroundColor: tooltipData.color }}
+            className="w-3 h-3 rounded-full"
+          />
+        )}
+        <div className="w-20 truncate">{tooltipData.label}</div>
+        <div>
+          <div className="text-right flex justify-end">
+            {tooltipData.formattedValue}
+            <div className="px-1.5">€</div>
+          </div>
+          {percent && (
+            <div className="text-right flex justify-end">
+              {(tooltipData.value.percent * 100).toFixed(2)}
+              <div className="px-1">%</div>
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+
   const generateGetBoundingClientRect = (x = 0, y = 0) => {
     return () => ({
       width: 0,
@@ -141,21 +169,17 @@ const Statistics = ({ personData, spendings }) => {
   const ItemTooltipFixedY = () => {
     const tooltipData = useItemTooltip();
     const mousePosition = useMouseTracker();
-    const svgRef = useSvgRef(); // Get the ref of the <svg/> component.
-    const drawingArea = useDrawingArea(); // Get the dimensions of the chart inside the <svg/>.
+    const svgRef = useSvgRef();
+    const drawingArea = useDrawingArea();
 
     if (!tooltipData || !mousePosition) {
-      // No data to display
       return null;
     }
 
     const tooltipPosition = {
       ...mousePosition,
-      // Add the y-coordinate of the <svg/> to the to margin between the <svg/> and the drawing area
       y: svgRef.current.getBoundingClientRect().top + drawingArea.top - 40,
     };
-
-    // console.log(mousePosition);
 
     const virtualElement = (tooltipPosition) => {
       return {
@@ -177,25 +201,7 @@ const Statistics = ({ personData, spendings }) => {
           placement="top"
           anchorEl={virtualElement(tooltipPosition)}
         >
-          <div className="border border-light-border dark:border-dark-border rounded-lg text-light-text dark:text-dark-text bg-light-card dark:bg-dark-card">
-            <div className="flex gap-2 p-3 items-center">
-              <div
-                style={{ backgroundColor: tooltipData.color }}
-                className={`w-3 h-3 rounded-full`}
-              ></div>
-              <div className="w-20 truncate">{tooltipData.label}</div>
-              <div>
-                <div className="text-right flex justify-end">
-                  {tooltipData.formattedValue}
-                  <div className="px-1.5">€</div>
-                </div>
-                <div className="text-right flex justify-end">
-                  {(tooltipData.value.percent * 100).toFixed(2)}
-                  <div className="px-1">%</div>
-                </div>
-              </div>
-            </div>
-          </div>
+          {generateTooltipContent({ tooltipData, color: true, percent: true })}
         </Popper>
       </NoSsr>
     );
@@ -204,21 +210,17 @@ const Statistics = ({ personData, spendings }) => {
   const AxisTooltipFixedY = () => {
     const tooltipData = useAxisTooltip();
     const mousePosition = useMouseTracker();
-    const svgRef = useSvgRef(); // Get the ref of the <svg/> component.
-    const drawingArea = useDrawingArea(); // Get the dimensions of the chart inside the <svg/>.
+    const svgRef = useSvgRef();
+    const drawingArea = useDrawingArea();
 
     if (!tooltipData || !mousePosition) {
-      // No data to display
       return null;
     }
 
     const tooltipPosition = {
       ...mousePosition,
-      // Add the y-coordinate of the <svg/> to the to margin between the <svg/> and the drawing area
       y: svgRef.current.getBoundingClientRect().top + drawingArea.top,
     };
-
-    // console.log(mousePosition);
 
     const virtualElement = (tooltipPosition) => {
       return {
@@ -242,7 +244,7 @@ const Statistics = ({ personData, spendings }) => {
         >
           <div className="border border-light-border dark:border-dark-border rounded-lg text-light-text dark:text-dark-text bg-light-card dark:bg-dark-card">
             <div className="py-1">
-              <div className="text-lg px-3 ">{tooltipData.axisValue.title}</div>
+              <div className="text-lg px-3">{tooltipData.axisValue.title}</div>
               <div className="text-md px-3 font-light">
                 {new Date(tooltipData.axisValue.createdAt).toLocaleString(
                   "de-DE",
@@ -257,8 +259,8 @@ const Statistics = ({ personData, spendings }) => {
                 <div key={index} className="flex gap-2 px-3 items-center">
                   <div
                     style={{ backgroundColor: elmt.color }}
-                    className={`w-3 h-3 rounded-full`}
-                  ></div>
+                    className="w-3 h-3 rounded-full"
+                  />
                   <div className="w-20 truncate">{elmt.formattedLabel}</div>
                   <div className="flex justify-self-end">
                     {elmt.formattedValue} €

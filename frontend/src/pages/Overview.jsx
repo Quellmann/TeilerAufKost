@@ -9,7 +9,6 @@ import QRCodeModal from "../components/QRCodeModal";
 import { API_BASE_URL } from "../config";
 import JoinGroup from "./JoinGroup";
 import Carousel from "../components/Carousel";
-import GridLoader from "react-spinners/GridLoader";
 import SkeletonOverview from "../components/SkeletonOverview";
 import LandingPage from "./LandingPage";
 
@@ -33,10 +32,39 @@ class Person {
   }
 }
 
+class Household {
+  constructor(householdIndex, memberNames, spendings) {
+    this.name = `Haushalt ${householdIndex}: ${memberNames.join(", ")}`;
+    this.memberNames = memberNames;
+    this.spendings = spendings;
+    this.balance = () => {
+      let liabilities = 0;
+      let expenditures = 0;
+
+      spendings.forEach((item) => {
+        // Calculate liabilities (amounts owed by this household)
+        item.to.forEach((recipient) => {
+          if (memberNames.includes(recipient.name)) {
+            liabilities -= recipient.amount;
+          }
+        });
+
+        // Calculate expenditures (amounts paid by this household)
+        if (memberNames.includes(item.from)) {
+          expenditures += item.to.reduce((a, b) => a + b.amount, 0);
+        }
+      });
+
+      return +(liabilities + expenditures).toFixed(2);
+    };
+  }
+}
+
 const Overview = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [data, setData] = useState([]);
   const [personData, setPersonData] = useState([]);
+  const [householdData, setHouseholdData] = useState([]);
   const [spendings, setSpendings] = useState([]);
   const [isOpenQR, setIsOpenQR] = useState(false);
   const [joined, setJoined] = useState(false);
@@ -45,6 +73,22 @@ const Overview = () => {
 
   const [searchParams] = useSearchParams();
   const [setSidebarGroups, refresh] = useOutletContext();
+
+  const householdHelper = (members, spendings) => {
+    const householdMap = {};
+    members.forEach((member) => {
+      const h = member.household ?? 0;
+      if (!(h in householdMap)) {
+        householdMap[h] = [];
+      }
+      householdMap[h].push(member.name);
+    });
+
+    const households = Object.entries(householdMap).map(
+      ([hid, names]) => new Household(hid, names, spendings)
+    );
+    setHouseholdData(households);
+  };
 
   const checkJoined = () => {
     const subscribedGroups = JSON.parse(
@@ -107,6 +151,7 @@ const Overview = () => {
       setPersonData(
         data.groupMember.map((member) => new Person(member.name, spending_data))
       );
+      setHouseholdData(householdHelper(data.groupMember, spending_data));
       setIsLoading(false);
       return Promise.resolve();
     } catch (error) {
@@ -148,46 +193,15 @@ const Overview = () => {
               const saldoHousehold = JSON.parse(
                 localStorage.getItem("saldoHousehold") || "false"
               );
-              if (!saldoHousehold) {
-                return data.groupMember?.map((member, index) => (
-                  <div key={index} className="flex justify-between p-2">
-                    <div className="">{member.name}</div>
-                    <div className="">
-                      <div>
-                        {(
-                          personData
-                            .find((person) => person.name === member.name)
-                            ?.balance() || 0
-                        ).toFixed(2)}{" "}
-                        €
-                      </div>
-                    </div>
+              const data = saldoHousehold ? householdData : personData;
+              return data.map((item, index) => (
+                <div key={index} className="flex justify-between p-2">
+                  <div className="">{item.name}</div>
+                  <div className="">
+                    <div>{item.balance().toFixed(2)} €</div>
                   </div>
-                ));
-              }
-
-              // household mode: aggregate members by household index
-              const households = {};
-              data.groupMember?.forEach((m) => {
-                const h = m.household ?? 0;
-                households[h] = households[h] || [];
-                households[h].push(m.name);
-              });
-
-              return Object.entries(households).map(([hid, names]) => {
-                const bal = names.reduce((sum, name) => {
-                  const p = personData.find((pp) => pp.name === name);
-                  return sum + (p ? p.balance() : 0);
-                }, 0);
-                return (
-                  <div key={hid} className="flex justify-between p-2">
-                    <div className="">{`Haushalt ${hid}: ${names.join(
-                      ", "
-                    )}`}</div>
-                    <div className="text-nowrap">{bal.toFixed(2)} €</div>
-                  </div>
-                );
-              });
+                </div>
+              ));
             })()}
           </div>
           <div className="mt-5 pt-2 border-t border-light-border dark:border-dark-border">
