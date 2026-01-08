@@ -1,18 +1,9 @@
 import { useEffect, useState } from "react";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
-import { LineChart } from "@mui/x-charts/LineChart";
-import { PieChart } from "@mui/x-charts/PieChart";
-import { BarChart } from "@mui/x-charts/BarChart";
-import { mangoFusionPalette } from "@mui/x-charts/colorPalettes";
 
-import NoSsr from "@mui/material/NoSsr";
-import Popper from "@mui/material/Popper";
-import {
-  useAxisTooltip,
-  useItemTooltip,
-  useMouseTracker,
-} from "@mui/x-charts/ChartsTooltip";
-import { useDrawingArea, useSvgRef } from "@mui/x-charts/hooks";
+import CustomLineChart from "./MuiCharts/CustomLineChart";
+import CustomBarChart from "./MuiCharts/CustomBarChart";
+import CustomPieChart from "./MuiCharts/CustomPieChart";
 
 import { CheckIcon } from "@heroicons/react/24/outline";
 
@@ -47,19 +38,22 @@ const Statistics = ({ personData, spendings }) => {
   }, []);
 
   const convertLineData = () => {
-    const skipEntryIndices = spendings.reduce((acc, spending, index) => {
-      if (spending.isBalancingTransaction) {
-        acc.push(index);
-      }
-      return acc;
-    }, []);
+    const skipBalancingTransactions = spendings.reduce(
+      (acc, spending, index) => {
+        if (spending.isBalancingTransaction) {
+          acc.push(index);
+        }
+        return acc;
+      },
+      []
+    );
     const filteredSpendings = spendings.filter(
-      (spending, index) => !skipEntryIndices.includes(index)
+      (spending, index) => !skipBalancingTransactions.includes(index)
     );
     const filteredPersonData = personData.map((person) => ({
       ...person,
       liabilities: person.liabilities.filter(
-        (item, index) => !skipEntryIndices.includes(index)
+        (item, index) => !skipBalancingTransactions.includes(index)
       ),
     }));
     setDataXAxis([
@@ -77,6 +71,8 @@ const Statistics = ({ personData, spendings }) => {
 
     setLineSeries(
       filteredPersonData.map((person) => ({
+        type: "line",
+        labelMarkType: "circle",
         label: person.name,
         data: person.liabilities.reduce((acc, curr, index) => {
           if (index === 0) {
@@ -90,23 +86,27 @@ const Statistics = ({ personData, spendings }) => {
     );
 
     setPieSeries(
-      filteredPersonData.map((person) => {
-        const total_liabilities = Math.abs(
-          person.liabilities.reduce((a, b) => a + b, 0)
-        );
+      filteredPersonData
+        .map((person) => {
+          const total_liabilities = Math.abs(
+            person.liabilities.reduce((a, b) => a + b, 0)
+          );
 
-        return {
-          value: total_liabilities,
-          percent:
-            total_liabilities /
-            filteredSpendings.reduce((a, b) => a + +b.amount, 0),
-          label: person.name,
-        };
-      })
+          return {
+            value: parseFloat(total_liabilities).toFixed(2),
+            percent:
+              total_liabilities /
+              filteredSpendings.reduce((a, b) => a + +b.amount, 0),
+            label: person.name,
+          };
+        })
+        .filter((elmt) => elmt.value != 0)
     );
 
     setBarSeries(
       filteredPersonData.map((person) => ({
+        type: "bar",
+        labelMarkType: "circle",
         label: person.name,
         data: person.liabilities.map((elmt) => Math.abs(elmt)),
         stack: "total",
@@ -119,262 +119,19 @@ const Statistics = ({ personData, spendings }) => {
       const totalData = lineSeries.at(0)?.data.map((_, index) => {
         return lineSeries.reduce((sum, person) => sum + person.data[index], 0);
       });
-      setLineSeries((prev) => [...prev, { label: "Gesamt", data: totalData }]);
+      setLineSeries((prev) => [
+        ...prev,
+        {
+          label: "Gesamt",
+          data: totalData,
+          labelMarkType: "circle",
+          type: "line",
+        },
+      ]);
     } else {
       setLineSeries((prev) => prev.filter((elmt) => elmt.label != "Gesamt"));
     }
   }, [addTotal]);
-
-  const generateTooltipContent = ({
-    tooltipData,
-    color = false,
-    percent = false,
-  }) => (
-    <div className="border border-light-border dark:border-dark-border rounded-lg text-light-text dark:text-dark-text bg-light-card dark:bg-dark-card">
-      <div className="flex gap-2 p-3 items-center">
-        {color && (
-          <div
-            style={{ backgroundColor: tooltipData.color }}
-            className="w-3 h-3 rounded-full"
-          />
-        )}
-        <div className="w-20 truncate">{tooltipData.label}</div>
-        <div>
-          <div className="text-right flex justify-end">
-            {tooltipData.formattedValue}
-            <div className="px-1.5">€</div>
-          </div>
-          {percent && (
-            <div className="text-right flex justify-end">
-              {(tooltipData.value.percent * 100).toFixed(2)}
-              <div className="px-1">%</div>
-            </div>
-          )}
-        </div>
-      </div>
-    </div>
-  );
-
-  const generateGetBoundingClientRect = (x = 0, y = 0) => {
-    return () => ({
-      width: 0,
-      height: 0,
-      top: y,
-      right: x,
-      bottom: y,
-      left: x,
-    });
-  };
-
-  const ItemTooltipFixedY = () => {
-    const tooltipData = useItemTooltip();
-    const mousePosition = useMouseTracker();
-    const svgRef = useSvgRef();
-    const drawingArea = useDrawingArea();
-
-    if (!tooltipData || !mousePosition) {
-      return null;
-    }
-
-    const tooltipPosition = {
-      ...mousePosition,
-      y: svgRef.current.getBoundingClientRect().top + drawingArea.top - 40,
-    };
-
-    const virtualElement = (tooltipPosition) => {
-      return {
-        getBoundingClientRect: generateGetBoundingClientRect(
-          tooltipPosition.x,
-          tooltipPosition.y
-        ),
-      };
-    };
-
-    return (
-      <NoSsr>
-        <Popper
-          sx={{
-            pointerEvents: "none",
-            zIndex: (theme) => theme.zIndex.modal,
-          }}
-          open
-          placement="top"
-          anchorEl={virtualElement(tooltipPosition)}
-        >
-          {generateTooltipContent({ tooltipData, color: true, percent: true })}
-        </Popper>
-      </NoSsr>
-    );
-  };
-
-  const AxisTooltipFixedY = () => {
-    const tooltipData = useAxisTooltip();
-    const mousePosition = useMouseTracker();
-    const svgRef = useSvgRef();
-    const drawingArea = useDrawingArea();
-
-    if (!tooltipData || !mousePosition) {
-      return null;
-    }
-
-    const tooltipPosition = {
-      ...mousePosition,
-      y: svgRef.current.getBoundingClientRect().top + drawingArea.top,
-    };
-
-    const virtualElement = (tooltipPosition) => {
-      return {
-        getBoundingClientRect: generateGetBoundingClientRect(
-          tooltipPosition.x,
-          tooltipPosition.y
-        ),
-      };
-    };
-
-    return (
-      <NoSsr>
-        <Popper
-          sx={{
-            pointerEvents: "none",
-            zIndex: (theme) => theme.zIndex.modal,
-          }}
-          open
-          placement="top"
-          anchorEl={virtualElement(tooltipPosition)}
-        >
-          <div className="border border-light-border dark:border-dark-border rounded-lg text-light-text dark:text-dark-text bg-light-card dark:bg-dark-card">
-            <div className="py-1">
-              <div className="text-lg px-3">{tooltipData.axisValue.title}</div>
-              <div className="text-md px-3 font-light">
-                {new Date(tooltipData.axisValue.createdAt).toLocaleString(
-                  "de-DE",
-                  {
-                    timeZone: "Europe/Berlin",
-                  }
-                )}
-              </div>
-            </div>
-            <div className="flex flex-col py-1">
-              {tooltipData.seriesItems?.map((elmt, index) => (
-                <div key={index} className="flex gap-2 px-3 items-center">
-                  <div
-                    style={{ backgroundColor: elmt.color }}
-                    className="w-3 h-3 rounded-full"
-                  />
-                  <div className="w-20 truncate">{elmt.formattedLabel}</div>
-                  <div className="flex justify-self-end">
-                    {elmt.formattedValue} €
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </Popper>
-      </NoSsr>
-    );
-  };
-
-  const pieChart = () => {
-    return (
-      pieSeries && (
-        <ThemeProvider theme={newTheme}>
-          <PieChart
-            series={[
-              {
-                data: pieSeries,
-                innerRadius: 50,
-                outerRadius: 100,
-                paddingAngle: 2,
-                cornerRadius: 5,
-                startAngle: -45,
-                endAngle: 315,
-              },
-            ]}
-            slotProps={{
-              legend: {
-                direction: "column",
-                position: {
-                  vertical: "middle",
-                  horizontal: "right",
-                },
-                itemMarkWidth: 18,
-                itemMarkHeight: 3,
-                markGap: 5,
-                itemGap: 10,
-              },
-            }}
-            colors={mangoFusionPalette}
-            tooltip={{
-              trigger: "item",
-            }}
-            slots={{ popper: ItemTooltipFixedY }}
-          />
-        </ThemeProvider>
-      )
-    );
-  };
-
-  const barChart = () => {
-    return (
-      barSeries && (
-        <ThemeProvider theme={newTheme}>
-          <BarChart
-            xAxis={dataXAxis}
-            series={barSeries}
-            borderRadius={8}
-            margin={{
-              top: 66,
-              bottom: 36,
-              left: 36,
-              right: 36,
-            }}
-            slotProps={{
-              legend: {
-                direction: "row",
-                itemMarkWidth: 18,
-                itemMarkHeight: 3,
-                markGap: 5,
-                itemGap: 10,
-              },
-            }}
-            colors={mangoFusionPalette}
-            slots={{ popper: AxisTooltipFixedY }}
-          />
-        </ThemeProvider>
-      )
-    );
-  };
-
-  const lineChart = () => {
-    return (
-      lineSeries && (
-        <ThemeProvider theme={newTheme}>
-          <LineChart
-            xAxis={dataXAxis}
-            series={lineSeries}
-            margin={{
-              top: 66,
-              bottom: 36,
-              left: 36,
-              right: 36,
-            }}
-            slotProps={{
-              legend: {
-                direction: "row",
-                itemMarkWidth: 18,
-                itemMarkHeight: 3,
-                markGap: 5,
-                itemGap: 10,
-              },
-            }}
-            grid={{ vertical: false, horizontal: true }}
-            colors={mangoFusionPalette}
-            slots={{ popper: AxisTooltipFixedY }}
-          />
-        </ThemeProvider>
-      )
-    );
-  };
 
   useEffect(() => {
     convertLineData();
@@ -382,32 +139,46 @@ const Statistics = ({ personData, spendings }) => {
 
   return (
     <div className="flex flex-col gap-5">
-      <div className="flex flex-col rounded-lg bg-light-card dark:bg-dark-card border border-light-border dark:border-dark-border">
-        <div className="flex text-xl justify-center">
-          Aufsummierter Verbrauch
-        </div>
-        <div className="flex h-64">{pieChart()}</div>
-      </div>
-      <div className="flex flex-col rounded-lg bg-light-card dark:bg-dark-card border border-light-border dark:border-dark-border">
-        <div className="flex text-xl justify-center">Anteilige Ausgaben</div>
-        <div className="flex w-full h-96">{barChart()}</div>
-      </div>
-      <div className="flex flex-col rounded-lg bg-light-card dark:bg-dark-card border border-light-border dark:border-dark-border relative">
-        <div className="flex text-xl justify-center -translate-x-5 sm:translate-x-5">
-          Kummulierte Ausgaben
-        </div>
-        <div className="absolute top-1 right-1 flex items-center">
-          <div className="text-xs">Gesamt</div>
-          <div
-            onClick={() => setAddTotal((prev) => !prev)}
-            className={`ml-1 cursor-pointer w-6 h-6 rounded-md border border-light-border dark:border-dark-border`}
-          >
-            {" "}
-            {addTotal && <CheckIcon></CheckIcon>}
+      <ThemeProvider theme={newTheme}>
+        <div className="flex flex-col rounded-lg bg-light-card dark:bg-dark-card border border-light-border dark:border-dark-border">
+          <div className="flex text-xl justify-center">
+            Aufsummierter Verbrauch
+          </div>
+          <div className="flex flex-col w-full h-[300px]">
+            <CustomPieChart series={pieSeries}></CustomPieChart>
           </div>
         </div>
-        <div className="flex w-full h-96">{lineChart()}</div>
-      </div>
+        <div className="flex flex-col rounded-lg bg-light-card dark:bg-dark-card border border-light-border dark:border-dark-border">
+          <div className="flex text-xl justify-center">Anteilige Ausgaben</div>
+          <div className="flex flex-col w-full h-96">
+            <CustomBarChart
+              xAxis={dataXAxis}
+              series={barSeries}
+            ></CustomBarChart>
+          </div>
+        </div>
+        <div className="flex flex-col rounded-lg bg-light-card dark:bg-dark-card border border-light-border dark:border-dark-border relative">
+          <div className="flex text-xl justify-center -translate-x-5 sm:translate-x-5">
+            Kummulierte Ausgaben
+          </div>
+          <div className="absolute top-1 right-1 flex items-center">
+            <div className="text-xs">Gesamt</div>
+            <div
+              onClick={() => setAddTotal((prev) => !prev)}
+              className={`ml-1 cursor-pointer w-6 h-6 rounded-md border border-light-border dark:border-dark-border`}
+            >
+              {" "}
+              {addTotal && <CheckIcon></CheckIcon>}
+            </div>
+          </div>
+          <div className="flex flex-col w-full h-96">
+            <CustomLineChart
+              xAxis={dataXAxis}
+              series={lineSeries}
+            ></CustomLineChart>
+          </div>
+        </div>
+      </ThemeProvider>
     </div>
   );
 };

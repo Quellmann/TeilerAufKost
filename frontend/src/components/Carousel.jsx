@@ -9,7 +9,9 @@ import { ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/24/outline";
 import Options from "./Options";
 
 const Carousel = ({ personData, spendings, groupMembers }) => {
-  const [emblaRef, emblaApi] = useEmblaCarousel({}, [AutoHeight()]);
+  const [emblaRef, emblaApi] = useEmblaCarousel({ watchDrag: false }, [
+    AutoHeight(),
+  ]);
   const [selectedIndex, setSelectedIndex] = useState(0);
 
   const scrollPrev = useCallback(() => {
@@ -76,13 +78,13 @@ const Carousel = ({ personData, spendings, groupMembers }) => {
         onClick={scrollPrev}
         className="absolute top-5 left-0 rounded-full p-1"
       >
-        <ChevronLeftIcon className="w-6 -translate-x-0.5"></ChevronLeftIcon>
+        <ChevronLeftIcon className="w-6 translate-x-3"></ChevronLeftIcon>
       </button>
       <button
         onClick={scrollNext}
         className="absolute top-5 right-0 rounded-full p-1"
       >
-        <ChevronRightIcon className="w-6 translate-x-0.5"></ChevronRightIcon>
+        <ChevronRightIcon className="w-6 -translate-x-3"></ChevronRightIcon>
       </button>
       <div className="absolute top-2 flex space-x-2 w-full justify-center">
         {[0, 1, 2, 3, 4].map((index) => (
