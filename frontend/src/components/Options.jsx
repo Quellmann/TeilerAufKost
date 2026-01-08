@@ -68,13 +68,14 @@ const Options = () => {
                 : "bg-light-bg dark:bg-dark-card"
             }`}
           ></div>
-          <div className="">Saldo pro Mitglied</div>
+          <div className="select-none">Saldo pro Mitglied</div>
         </div>
         <div
           onClick={() => {
             setSaldoHousehold(true);
-            localStorage.setItem("saldoHousehold", JSON.stringify(true));
-            setRefresh(new Date());
+            // localStorage.setItem("saldoHousehold", JSON.stringify(true));
+            // setRefresh(new Date());
+            console.log("not supported yet");
           }}
           className="flex p-3 grow justify-around items-center rounded-lg cursor-pointer text-xl bg-light-card dark:bg-dark-card border border-light-border dark:border-dark-border"
         >
@@ -85,7 +86,7 @@ const Options = () => {
                 : "bg-light-bg dark:bg-dark-card"
             }`}
           ></div>
-          <div>Saldo pro Haushalt</div>
+          <div className="select-none">Saldo pro Haushalt</div>
         </div>
       </div>
       <div
