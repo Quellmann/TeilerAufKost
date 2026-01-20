@@ -1,5 +1,3 @@
-import React from "react";
-
 const MemberRow = () => (
   <div className="flex justify-between items-center p-2">
     <div className="flex items-center gap-3">

@@ -1,7 +1,7 @@
 import React from "react";
 import { useLocation, useSearchParams } from "react-router-dom";
 
-const Summary = ({ personData, emblaApi }) => {
+const Summary = ({ saldoData, emblaApi }) => {
   const [searchParams, setSearchParams] = useSearchParams();
 
   const handleFocus = (index) => {
@@ -20,13 +20,13 @@ const Summary = ({ personData, emblaApi }) => {
           </tr>
         </thead>
         <tbody className="">
-          {personData.map((person, personIndex) => (
-            <React.Fragment key={personIndex}>
+          {saldoData.map((saldo, saldoIndex) => (
+            <React.Fragment key={saldoIndex}>
               <tr className="border-t border-light-border dark:border-dark-border">
-                <td className="p-2">{person.name}</td>
+                <td className="p-2">{saldo.name}</td>
                 <td className="p-2">
                   <div>
-                    {person.expenditures.map((expenditure, index) => (
+                    {saldo.expenditures.map((expenditure, index) => (
                       <div key={index}>
                         <div
                           onClick={() => handleFocus(index)}
@@ -40,7 +40,7 @@ const Summary = ({ personData, emblaApi }) => {
                 </td>
                 <td className="p-2">
                   <div>
-                    {person.liabilities.map((liability, index) => (
+                    {saldo.liabilities.map((liability, index) => (
                       <div key={index}>
                         <div
                           onClick={() => handleFocus(index)}
@@ -57,17 +57,15 @@ const Summary = ({ personData, emblaApi }) => {
                 <td className="px-2 text-sm">Summe:</td>
                 <td className="px-2">
                   <div className="text-sm text-green-500">
-                    {person.expenditures.reduce((a, b) => a + b, 0)
-                      ? person.expenditures
-                          .reduce((a, b) => a + b, 0)
-                          .toFixed(2)
+                    {saldo.expenditures.reduce((a, b) => a + b, 0)
+                      ? saldo.expenditures.reduce((a, b) => a + b, 0).toFixed(2)
                       : ""}
                   </div>
                 </td>
                 <td className="px-2">
                   <div className="text-sm text-red-500">
-                    {person.liabilities.reduce((a, b) => a + b, 0)
-                      ? person.liabilities.reduce((a, b) => a + b, 0).toFixed(2)
+                    {saldo.liabilities.reduce((a, b) => a + b, 0)
+                      ? saldo.liabilities.reduce((a, b) => a + b, 0).toFixed(2)
                       : ""}
                   </div>
                 </td>

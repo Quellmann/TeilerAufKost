@@ -1,5 +1,3 @@
-import React from "react";
-
 const SkeletonForm = () => (
   <div className="">
     <div className="skeleton h-[57px] w-full rounded-lg mt-[85px]"></div>

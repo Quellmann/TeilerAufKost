@@ -1,17 +1,17 @@
 import { BanknotesIcon } from "@heroicons/react/24/outline";
 import { Link, useOutletContext, useSearchParams } from "react-router-dom";
 
-const Balancing = ({ personData }) => {
+const Balancing = ({ saldoData }) => {
   const [searchParams] = useSearchParams();
   const groupId = searchParams.get("groupId");
   const [setSidebarGroups, refresh, emblaApi] = useOutletContext();
 
   const balancingCalculation = () => {
-    let senders = personData
+    let senders = saldoData
       .filter((person) => person.balance() < 0)
       .sort((a, b) => b.balance() - a.balance())
       .map((entry) => ({ ...entry, balance: entry.balance() }));
-    let receivers = personData
+    let receivers = saldoData
       .filter((person) => person.balance() > 0)
       .sort((a, b) => a.balance() - b.balance())
       .map((entry) => ({ ...entry, balance: entry.balance() }));
@@ -72,7 +72,7 @@ const Balancing = ({ personData }) => {
             <tr key={personIndex}>
               <td className="p-2">{balancing.from}</td>
               <td className="p-2">{balancing.to}</td>
-              <td onClick={() => console.log(balancing.amount)} className="p-2">
+              <td className="p-2 text-nowrap">
                 {balancing.amount.toFixed(2)} €
               </td>
               <td className="p-1">

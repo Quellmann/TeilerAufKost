@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import SkeletonForm from "../components/SkeletonForm";
+import SkeletonForm from "../components/Skeletons/SkeletonForm";
 import { Input } from "@headlessui/react";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import { API_BASE_URL } from "../config";
@@ -9,7 +9,7 @@ import { Switch } from "@headlessui/react";
 import DeleteModal from "../components/DeleteModal";
 
 const NewSpending = ({ emblaApi, setRefresh }) => {
-  const [data, setData] = useState([]);
+  const [data, setData] = useState({});
   const [editMode, setEditMode] = useState(false);
   const [searchParams, setSearchParams] = useSearchParams();
   const groupId = searchParams.get("groupId");
@@ -39,7 +39,7 @@ const NewSpending = ({ emblaApi, setRefresh }) => {
         from: JSON.parse(searchParams.get("from")),
         to: JSON.parse(searchParams.get("to")),
         individualValueHistory: JSON.parse(searchParams.get("to")).map(
-          (elmt) => elmt.name
+          (elmt) => elmt.name,
         ),
         isBalancingTransaction:
           searchParams.get("type") === "transaction" ? true : false,
@@ -65,26 +65,83 @@ const NewSpending = ({ emblaApi, setRefresh }) => {
               ? 0
               : +((member.amount / sumOfAmounts) * 100).toFixed(2);
           return acc;
-        }, {})
+        }, {}),
       );
-    } else if (searchParams.get("type") === "transaction") {
-      setForm((prev) => ({
-        ...prev,
-        title: "Ausgleichszahlung",
-        amount: searchParams.get("amount"),
-        from: searchParams.get("from"),
-        to: [
+    }
+    return;
+  }, [searchParams]);
+
+  useEffect(() => {
+    if (data && data.groupMember) {
+      if (
+        searchParams.get("type") === "transaction" &&
+        !searchParams.get("mode") === "edit"
+      ) {
+        let transactionFrom = searchParams.get("from");
+        let transactionTo = [
           {
             name: searchParams.get("to"),
             amount: searchParams.get("amount"),
           },
-        ],
-        isBalancingTransaction: true,
-      }));
-      setPercentages((prev) => ({ ...prev, [searchParams.get("to")]: 100 }));
+        ];
+
+        if (
+          !data.groupMember
+            .map((elmt) => elmt.name)
+            .includes(transactionFrom) ||
+          !data.groupMember
+            .map((elmt) => elmt.name)
+            .includes(searchParams.get("to"))
+        ) {
+          transactionFrom = "";
+          transactionTo = [];
+        }
+
+        setForm((prev) => ({
+          ...prev,
+          title: "Ausgleichszahlung",
+          amount: searchParams.get("amount"),
+          from: transactionFrom,
+          to: transactionTo,
+          isBalancingTransaction: true,
+        }));
+        setPercentages((prev) => ({ ...prev, [searchParams.get("to")]: 100 }));
+      }
     }
+  }, [data]);
+
+  useEffect(() => {
+    async function fetchData() {
+      const response = await fetch(`${API_BASE_URL}/${groupId}`);
+      if (!response.ok) {
+        const message = `An error has occurred: ${response.statusText}`;
+        console.error(message);
+        return;
+      }
+      const data = await response.json();
+      if (!data) {
+        console.warn(`Data not found`);
+        navigate("/");
+      }
+      setData(data);
+
+      if (!(searchParams.get("mode") === "edit")) {
+        setForm((prev) => ({
+          ...prev,
+          to: data.groupMember.map((member) => ({
+            name: member.name,
+            amount: 0,
+          })),
+        }));
+        data.groupMember.map((member) =>
+          setPercentages((prev) => ({ ...prev, [member.name]: 0 })),
+        );
+      }
+      setIsLoading(false);
+    }
+    groupId && fetchData();
     return;
-  }, [searchParams]);
+  }, [groupId]);
 
   const formValidation = () => {
     !form.title && toast.error("Gib einen gültigen Titel an");
@@ -101,7 +158,7 @@ const NewSpending = ({ emblaApi, setRefresh }) => {
       setForm((prev) => ({
         ...prev,
         individualValueHistory: prev.individualValueHistory.filter(
-          (elmt) => elmt != member
+          (elmt) => elmt != member,
         ),
         to: form.to.filter((elmt) => elmt.name != member),
       }));
@@ -131,10 +188,10 @@ const NewSpending = ({ emblaApi, setRefresh }) => {
               ? {
                   ...elmt,
                   amount: ((percentages[member] / 100) * form.amount).toFixed(
-                    2
+                    2,
                   ),
                 }
-              : elmt
+              : elmt,
           ),
         }));
         // set edit history
@@ -180,7 +237,7 @@ const NewSpending = ({ emblaApi, setRefresh }) => {
       setForm((prev) => ({
         ...prev,
         to: prev.to.map((elmt) =>
-          elmt.name === person ? { ...elmt, amount: value } : elmt
+          elmt.name === person ? { ...elmt, amount: value } : elmt,
         ),
       }));
     }
@@ -197,7 +254,7 @@ const NewSpending = ({ emblaApi, setRefresh }) => {
       if (remainingAmount < 0) {
         toast.dismiss();
         toast(
-          "Individueller Betrag größer als der Gesamtbetrag. Beträge werden zurück-\ngesetzt, bis Teilung möglich ist."
+          "Individueller Betrag größer als der Gesamtbetrag. Beträge werden zurück-\ngesetzt, bis Teilung möglich ist.",
         );
         // this state change triggers a recall of this function by the useEffect down below
 
@@ -223,7 +280,7 @@ const NewSpending = ({ emblaApi, setRefresh }) => {
               return {
                 ...member,
                 amount: (+member.amount + parseFloat(remainingAmount)).toFixed(
-                  2
+                  2,
                 ),
               };
             } else {
@@ -233,7 +290,9 @@ const NewSpending = ({ emblaApi, setRefresh }) => {
         }));
       } else {
         let newSplit = parseFloat(
-          (Math.floor((remainingAmount / uneditedCount) * 100) / 100).toFixed(2)
+          (Math.floor((remainingAmount / uneditedCount) * 100) / 100).toFixed(
+            2,
+          ),
         );
         const notSplittable =
           form.amount - editedTotal - newSplit * uneditedCount;
@@ -242,15 +301,15 @@ const NewSpending = ({ emblaApi, setRefresh }) => {
           toast.dismiss();
           toast(
             `Restbetrag ${notSplittable.toFixed(
-              2
-            )}€ nicht gleichmäßig teilbar. Beträge werden einheitlich aufgerundet.`
+              2,
+            )}€ nicht gleichmäßig teilbar. Beträge werden einheitlich aufgerundet.`,
           );
           newSplit += 0.01;
         }
         const newAmounts = form.to.map((member) =>
           form.individualValueHistory.includes(member.name)
             ? member
-            : { ...member, amount: +newSplit.toFixed(2) }
+            : { ...member, amount: +newSplit.toFixed(2) },
         );
 
         const sumOfAmounts = newAmounts.reduce((a, b) => a + +b.amount, 0);
@@ -332,54 +391,20 @@ const NewSpending = ({ emblaApi, setRefresh }) => {
               "Content-Type": "application/json",
             },
             body: JSON.stringify(formAndTip),
-          }
+          },
         );
       } else if (type === "delete") {
         const response = await fetch(
           `${API_BASE_URL}/${searchParams.get("spending")}/deleteSpending`,
           {
             method: "DELETE",
-          }
+          },
         );
       }
-      console.log(formAndTip);
       setRefresh(new Date());
       setSearchParams({ groupId: searchParams.get("groupId") });
     }
   };
-
-  useEffect(() => {
-    async function fetchData() {
-      const response = await fetch(`${API_BASE_URL}/${groupId}`);
-      if (!response.ok) {
-        const message = `An error has occurred: ${response.statusText}`;
-        console.error(message);
-        return;
-      }
-      const data = await response.json();
-      if (!data) {
-        console.warn(`Data not found`);
-        navigate("/");
-      }
-      setData(data);
-
-      if (!(searchParams.get("mode") === "edit")) {
-        setForm((prev) => ({
-          ...prev,
-          to: data.groupMember.map((member) => ({
-            name: member.name,
-            amount: 0,
-          })),
-        }));
-        data.groupMember.map((member) =>
-          setPercentages((prev) => ({ ...prev, [member.name]: 0 }))
-        );
-      }
-      setIsLoading(false);
-    }
-    groupId && fetchData();
-    return;
-  }, [groupId]);
 
   if (isLoading) {
     return <SkeletonForm />;
@@ -394,8 +419,8 @@ const NewSpending = ({ emblaApi, setRefresh }) => {
               ? "Transaktion bearbeiten"
               : "Ausgabe bearbeiten"
             : form.isBalancingTransaction
-            ? "Neue Transaktion hinzufügen"
-            : "Neue Ausgabe hinzufügen"}
+              ? "Neue Transaktion hinzufügen"
+              : "Neue Ausgabe hinzufügen"}
         </div>
         <div className="text-lg">
           <Input
@@ -439,7 +464,7 @@ const NewSpending = ({ emblaApi, setRefresh }) => {
               onClick={() => {
                 toast.dismiss();
                 toast(
-                  "Trinkgeld wird unter allen Zahlenden zu gleichen Anteilen aufgeteilt."
+                  "Trinkgeld wird unter allen Zahlenden zu gleichen Anteilen aufgeteilt.",
                 );
               }}
               className="absolute top-3 right-0 translate-x-8 size-6"
@@ -463,7 +488,7 @@ const NewSpending = ({ emblaApi, setRefresh }) => {
               onClick={() => {
                 toast.dismiss();
                 toast(
-                  "Transaktionen sind Geldbewegungen, die nicht als Verbrauch gewertet werden. Beispielsweise wenn du einer Person 10€ gibst, um gemeinsam eine Rechnung zu begleichen."
+                  "Transaktionen sind Geldbewegungen, die nicht als Verbrauch gewertet werden. Beispielsweise wenn du einer Person 10€ gibst, um gemeinsam eine Rechnung zu begleichen.",
                 );
               }}
               className="absolute top-1 right-1 translate-x-11 size-6"
@@ -535,7 +560,7 @@ const NewSpending = ({ emblaApi, setRefresh }) => {
                             individualValueHandler(
                               "percent",
                               e.target.value,
-                              member.name
+                              member.name,
                             )
                           }
                           value={percentages[member.name]}
@@ -555,7 +580,7 @@ const NewSpending = ({ emblaApi, setRefresh }) => {
                             individualValueHandler(
                               "amount",
                               e.target.value,
-                              member.name
+                              member.name,
                             )
                           }
                           value={

@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import SkeletonForm from "../components/SkeletonForm";
+import SkeletonForm from "../components/Skeletons/SkeletonForm";
 import { Input } from "@headlessui/react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import {

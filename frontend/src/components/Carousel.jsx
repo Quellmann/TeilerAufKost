@@ -1,14 +1,16 @@
 import { useCallback, useEffect, useState } from "react";
 import useEmblaCarousel from "embla-carousel-react";
 import AutoHeight from "embla-carousel-auto-height";
-import Statistics from "./Statistics";
-import Balancing from "./Balancing";
-import Summary from "./Summary";
-import Spendings from "./Spendings";
-import { ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/24/outline";
-import Options from "./Options";
 
-const Carousel = ({ personData, spendings, groupMembers }) => {
+import Statistics from "./InnerCarousel/Statistics";
+import Balancing from "./InnerCarousel/Balancing";
+import Summary from "./InnerCarousel/Summary";
+import Spendings from "./InnerCarousel/Spendings";
+import Options from "./InnerCarousel/Options";
+
+import { ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/24/outline";
+
+const Carousel = ({ saldoData, spendings, groupMembers }) => {
   const [emblaRef, emblaApi] = useEmblaCarousel({ watchDrag: false }, [
     AutoHeight(),
   ]);
@@ -38,6 +40,12 @@ const Carousel = ({ personData, spendings, groupMembers }) => {
     }
   }, [emblaApi]);
 
+  useEffect(() => {
+    if (emblaApi) {
+      emblaApi.reInit();
+    }
+  }, [saldoData]);
+
   return (
     <div className="overflow-hidden pt-6 pb-2 relative" ref={emblaRef}>
       <div className="flex gap-5 px-2 items-start transition-[height] duration-300">
@@ -46,7 +54,7 @@ const Carousel = ({ personData, spendings, groupMembers }) => {
             Ausgleichszahlungen
           </div>
           <Balancing
-            personData={personData}
+            saldoData={saldoData}
             groupMembers={groupMembers}
           ></Balancing>
         </div>
@@ -54,7 +62,7 @@ const Carousel = ({ personData, spendings, groupMembers }) => {
           <div className="flex justify-center text-xl mb-5">
             Zusammenfassung
           </div>
-          <Summary personData={personData} emblaApi={emblaApi}></Summary>
+          <Summary saldoData={saldoData} emblaApi={emblaApi}></Summary>
         </div>
         <div className="flex-none w-full min-w-0">
           <div className="flex justify-center text-xl mb-5">
@@ -64,14 +72,11 @@ const Carousel = ({ personData, spendings, groupMembers }) => {
         </div>
         <div className="flex-none w-full min-w-0">
           <div className="flex justify-center text-xl mb-5">Statistik</div>
-          <Statistics
-            personData={personData}
-            spendings={spendings}
-          ></Statistics>
+          <Statistics saldoData={saldoData} spendings={spendings}></Statistics>
         </div>
         <div className="flex-none w-full min-w-0 mr-2">
           <div className="flex justify-center text-xl mb-5">Optionen</div>
-          <Options></Options>
+          <Options innerEmblaApi={emblaApi}></Options>
         </div>
       </div>
       <button

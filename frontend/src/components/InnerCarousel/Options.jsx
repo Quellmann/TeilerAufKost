@@ -4,14 +4,14 @@ import {
   UserPlusIcon,
 } from "@heroicons/react/24/outline";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   useNavigate,
   useOutletContext,
   useSearchParams,
 } from "react-router-dom";
-import { API_BASE_URL } from "../config";
-import DeleteModal from "./DeleteModal";
+import { API_BASE_URL } from "../../config";
+import DeleteModal from "../DeleteModal";
 
 const Options = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -51,8 +51,8 @@ const Options = () => {
   };
 
   return (
-    <div className="flex flex-col gap-5">
-      <div className="flex justify-between gap-2">
+    <div className="flex flex-col gap-3">
+      <div className="flex justify-between gap-3">
         <div
           onClick={() => {
             setSaldoHousehold(false);
@@ -73,9 +73,8 @@ const Options = () => {
         <div
           onClick={() => {
             setSaldoHousehold(true);
-            // localStorage.setItem("saldoHousehold", JSON.stringify(true));
-            // setRefresh(new Date());
-            console.log("not supported yet");
+            localStorage.setItem("saldoHousehold", JSON.stringify(true));
+            setRefresh(new Date());
           }}
           className="flex p-3 grow justify-around items-center rounded-lg cursor-pointer text-xl bg-light-card dark:bg-dark-card border border-light-border dark:border-dark-border"
         >

@@ -9,7 +9,7 @@ import QRCodeModal from "../components/QRCodeModal";
 import { API_BASE_URL } from "../config";
 import JoinGroup from "./JoinGroup";
 import Carousel from "../components/Carousel";
-import SkeletonOverview from "../components/SkeletonOverview";
+import SkeletonOverview from "../components/Skeletons/SkeletonOverview";
 import LandingPage from "./LandingPage";
 
 class Person {
@@ -20,7 +20,6 @@ class Person {
       return person ? -person.amount : 0;
     });
     this.expenditures = spendings.map((item) => {
-      // calculate exact expanditure with rounding to 2 decimal cent values
       return item.from === name ? item.to.reduce((a, b) => a + b.amount, 0) : 0;
     });
     this.balance = () => {
@@ -37,6 +36,17 @@ class Household {
     this.name = `Haushalt ${householdIndex}: ${memberNames.join(", ")}`;
     this.memberNames = memberNames;
     this.spendings = spendings;
+    this.liabilities = spendings.map((item) => {
+      return item.to.reduce(
+        (a, b) => (memberNames.includes(b.name) ? a + b.amount : a),
+        0
+      );
+    });
+    this.expenditures = spendings.map((item) => {
+      return memberNames.includes(item.from)
+        ? item.to.reduce((a, b) => a + b.amount, 0)
+        : 0;
+    });
     this.balance = () => {
       let liabilities = 0;
       let expenditures = 0;
@@ -68,6 +78,7 @@ const Overview = () => {
   const [spendings, setSpendings] = useState([]);
   const [isOpenQR, setIsOpenQR] = useState(false);
   const [joined, setJoined] = useState(false);
+  const [saldoHousehold, setSaldoHousehold] = useState(false);
   const [groupId, setGroupId] = useState("");
   const navigate = useNavigate();
 
@@ -87,7 +98,7 @@ const Overview = () => {
     const households = Object.entries(householdMap).map(
       ([hid, names]) => new Household(hid, names, spendings)
     );
-    setHouseholdData(households);
+    return households;
   };
 
   const checkJoined = () => {
@@ -117,6 +128,9 @@ const Overview = () => {
   useEffect(() => {
     groupId && fetchData();
     checkJoined();
+    setSaldoHousehold(
+      JSON.parse(localStorage.getItem("saldoHousehold") || "false")
+    );
     return;
   }, [groupId, refresh]);
 
@@ -190,14 +204,14 @@ const Overview = () => {
           <div className="text-lg ml-4 mt-2">Saldo</div>
           <div className="m-2 flex flex-col divide-y rounded-lg text-xl bg-light-card dark:bg-dark-card border divide-light-border dark:divide-dark-border border-light-border dark:border-dark-border">
             {(() => {
-              const saldoHousehold = JSON.parse(
-                localStorage.getItem("saldoHousehold") || "false"
-              );
-              const data = saldoHousehold ? householdData : personData;
-              return data.map((item, index) => (
-                <div key={index} className="flex justify-between p-2">
+              const saldoData = saldoHousehold ? householdData : personData;
+              return saldoData.map((item, index) => (
+                <div
+                  key={index}
+                  className="flex justify-between p-2 gap-5 items-center"
+                >
                   <div className="">{item.name}</div>
-                  <div className="">
+                  <div className="text-nowrap">
                     <div>{item.balance().toFixed(2)} €</div>
                   </div>
                 </div>
@@ -206,7 +220,7 @@ const Overview = () => {
           </div>
           <div className="mt-5 pt-2 border-t border-light-border dark:border-dark-border">
             <Carousel
-              personData={personData}
+              saldoData={saldoHousehold ? householdData : personData}
               spendings={spendings}
               groupMembers={data.groupMember}
             ></Carousel>

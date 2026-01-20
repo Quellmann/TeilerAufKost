@@ -9,7 +9,7 @@ import {
 } from "@heroicons/react/24/outline";
 import { API_BASE_URL } from "../config";
 import toast from "react-hot-toast";
-import SkeletonOverview from "../components/SkeletonOverview";
+import SkeletonOverview from "../components/Skeletons/SkeletonOverview";
 
 const NewGroup = () => {
   const [memberInput, setMemberInput] = useState("");

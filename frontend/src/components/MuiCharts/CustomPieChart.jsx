@@ -55,6 +55,7 @@ const CustomPieChart = ({ series }) => {
                 flexWrap: "nowrap",
                 userSelect: "none",
                 margin: "0",
+                textWrap: "nowrap",
               },
             },
           }}

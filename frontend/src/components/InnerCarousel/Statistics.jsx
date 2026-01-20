@@ -1,13 +1,13 @@
 import { useEffect, useState } from "react";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 
-import CustomLineChart from "./MuiCharts/CustomLineChart";
-import CustomBarChart from "./MuiCharts/CustomBarChart";
-import CustomPieChart from "./MuiCharts/CustomPieChart";
+import CustomLineChart from "../MuiCharts/CustomLineChart";
+import CustomBarChart from "../MuiCharts/CustomBarChart";
+import CustomPieChart from "../MuiCharts/CustomPieChart";
 
 import { CheckIcon } from "@heroicons/react/24/outline";
 
-const Statistics = ({ personData, spendings }) => {
+const Statistics = ({ saldoData, spendings }) => {
   const [dataXAxis, setDataXAxis] = useState([]);
   const [lineSeries, setLineSeries] = useState([]);
   const [pieSeries, setPieSeries] = useState([]);
@@ -50,9 +50,9 @@ const Statistics = ({ personData, spendings }) => {
     const filteredSpendings = spendings.filter(
       (spending, index) => !skipBalancingTransactions.includes(index)
     );
-    const filteredPersonData = personData.map((person) => ({
-      ...person,
-      liabilities: person.liabilities.filter(
+    const filteredSaldoData = saldoData.map((saldo) => ({
+      ...saldo,
+      liabilities: saldo.liabilities.filter(
         (item, index) => !skipBalancingTransactions.includes(index)
       ),
     }));
@@ -70,11 +70,11 @@ const Statistics = ({ personData, spendings }) => {
     ]);
 
     setLineSeries(
-      filteredPersonData.map((person) => ({
+      filteredSaldoData.map((saldo) => ({
         type: "line",
         labelMarkType: "circle",
-        label: person.name,
-        data: person.liabilities.reduce((acc, curr, index) => {
+        label: saldo.name,
+        data: saldo.liabilities.reduce((acc, curr, index) => {
           if (index === 0) {
             acc.push(Math.abs(curr));
           } else {
@@ -86,10 +86,10 @@ const Statistics = ({ personData, spendings }) => {
     );
 
     setPieSeries(
-      filteredPersonData
-        .map((person) => {
+      filteredSaldoData
+        .map((saldo) => {
           const total_liabilities = Math.abs(
-            person.liabilities.reduce((a, b) => a + b, 0)
+            saldo.liabilities.reduce((a, b) => a + b, 0)
           );
 
           return {
@@ -97,18 +97,18 @@ const Statistics = ({ personData, spendings }) => {
             percent:
               total_liabilities /
               filteredSpendings.reduce((a, b) => a + +b.amount, 0),
-            label: person.name,
+            label: saldo.name,
           };
         })
         .filter((elmt) => elmt.value != 0)
     );
 
     setBarSeries(
-      filteredPersonData.map((person) => ({
+      filteredSaldoData.map((saldo) => ({
         type: "bar",
         labelMarkType: "circle",
-        label: person.name,
-        data: person.liabilities.map((elmt) => Math.abs(elmt)),
+        label: saldo.name,
+        data: saldo.liabilities.map((elmt) => Math.abs(elmt)),
         stack: "total",
       }))
     );
@@ -135,7 +135,7 @@ const Statistics = ({ personData, spendings }) => {
 
   useEffect(() => {
     convertLineData();
-  }, [personData, spendings]);
+  }, [saldoData, spendings]);
 
   return (
     <div className="flex flex-col gap-5">
