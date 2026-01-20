@@ -18,24 +18,24 @@ const Options = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
   const [saldoHousehold, setSaldoHousehold] = useState(() =>
-    JSON.parse(localStorage.getItem("saldoHousehold") || "false")
+    JSON.parse(localStorage.getItem("saldoHousehold") || "false"),
   );
   const [setSidebarGroups, refresh, emblaApi, setRefresh] = useOutletContext();
 
   const deleteGroupSubscription = () => {
     const subscribedGroups = JSON.parse(
-      localStorage.getItem("groupSubscription")
+      localStorage.getItem("groupSubscription"),
     );
     localStorage.setItem(
       "groupSubscription",
       JSON.stringify(
         subscribedGroups.filter(
-          (group) => group.id != searchParams.get("groupId")
-        )
-      )
+          (group) => group.id != searchParams.get("groupId"),
+        ),
+      ),
     );
     setSidebarGroups((prev) =>
-      prev.filter((group) => group.id != searchParams.get("groupId"))
+      prev.filter((group) => group.id != searchParams.get("groupId")),
     );
     navigate("/");
   };
@@ -45,7 +45,7 @@ const Options = () => {
       `${API_BASE_URL}/${searchParams.get("groupId")}/deleteGroupSpendings`,
       {
         method: "DELETE",
-      }
+      },
     );
     setRefresh(new Date());
   };
@@ -59,7 +59,7 @@ const Options = () => {
             localStorage.setItem("saldoHousehold", JSON.stringify(false));
             setRefresh(new Date());
           }}
-          className="flex p-3 grow justify-around items-center rounded-lg cursor-pointer text-xl bg-light-card dark:bg-dark-card border border-light-border dark:border-dark-border"
+          className="flex p-3 grow justify-around items-center rounded-lg cursor-pointer text-xl bg-light-card dark:bg-dark-card border border-light-border dark:border-dark-border min-h-14"
         >
           <div
             className={`w-4 h-4 mr-2 min-w-4 ring-2 ring-inset ring-light-text dark:ring-dark-text rounded-full transition-all duration-300 ${
@@ -68,7 +68,9 @@ const Options = () => {
                 : "bg-light-bg dark:bg-dark-card"
             }`}
           ></div>
-          <div className="select-none">Saldo pro Mitglied</div>
+          <div className="select-none align-middle text-sm sm:text-base md:text-lg">
+            Saldo pro Mitglied
+          </div>
         </div>
         <div
           onClick={() => {
@@ -76,7 +78,7 @@ const Options = () => {
             localStorage.setItem("saldoHousehold", JSON.stringify(true));
             setRefresh(new Date());
           }}
-          className="flex p-3 grow justify-around items-center rounded-lg cursor-pointer text-xl bg-light-card dark:bg-dark-card border border-light-border dark:border-dark-border"
+          className="flex p-3 grow justify-around items-center rounded-lg cursor-pointer text-xl bg-light-card dark:bg-dark-card border border-light-border dark:border-dark-border min-h-14"
         >
           <div
             className={`w-4 h-4 mr-2 min-w-4 ring-2 ring-inset ring-light-text dark:ring-dark-text rounded-full transition-all duration-300 ${
@@ -85,7 +87,9 @@ const Options = () => {
                 : "bg-light-bg dark:bg-dark-card"
             }`}
           ></div>
-          <div className="select-none">Saldo pro Haushalt</div>
+          <div className="select-none text-sm sm:text-base md:text-lg">
+            Saldo pro Haushalt
+          </div>
         </div>
       </div>
       <div
@@ -96,21 +100,21 @@ const Options = () => {
             type: "person",
           });
         }}
-        className="flex p-3 justify-center items-center rounded-lg cursor-pointer text-xl bg-light-card dark:bg-dark-card border border-light-border dark:border-dark-border"
+        className="flex p-3 min-h-14 justify-center items-center rounded-lg cursor-pointer text-xl bg-light-card dark:bg-dark-card border border-light-border dark:border-dark-border"
       >
         <UserPlusIcon className="size-6 mr-3"></UserPlusIcon>
         Mitglieder verwalten
       </div>
       <div
         onClick={() => setIsOpen(true)}
-        className="flex p-3 justify-center items-center rounded-lg cursor-pointer text-xl bg-light-card dark:bg-dark-card border border-light-border dark:border-dark-border"
+        className="flex p-3 min-h-14 justify-center items-center rounded-lg cursor-pointer text-xl bg-light-card dark:bg-dark-card border border-light-border dark:border-dark-border"
       >
         <ArrowPathIcon className="size-6 mr-3"></ArrowPathIcon>
         Ausgaben zurücksetzen
       </div>
       <div
         onClick={() => deleteGroupSubscription()}
-        className="flex p-3 justify-center items-center rounded-lg cursor-pointer text-xl bg-light-card dark:bg-dark-card border border-light-border dark:border-dark-border"
+        className="flex p-3 min-h-14 justify-center items-center rounded-lg cursor-pointer text-xl bg-light-card dark:bg-dark-card border border-light-border dark:border-dark-border"
       >
         <ArrowLeftStartOnRectangleIcon className="size-6 mr-3"></ArrowLeftStartOnRectangleIcon>
         Gruppe verlassen
