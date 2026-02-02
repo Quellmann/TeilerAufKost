@@ -7,6 +7,7 @@ import Overview from "./pages/Overview.jsx";
 import NewGroup from "./pages/NewGroup.jsx";
 import NotFoundPage from "./pages/NotFoundPage.jsx";
 import Admin from "./pages/Admin.jsx";
+import Impressum from "./pages/Impressum.jsx";
 
 const router = createBrowserRouter([
   {
@@ -26,6 +27,10 @@ const router = createBrowserRouter([
         element: <Admin></Admin>,
       },
       {
+        path: "/imprint",
+        element: <Impressum></Impressum>,
+      },
+      {
         path: "*",
         element: <NotFoundPage></NotFoundPage>,
       },
@@ -36,5 +41,5 @@ const router = createBrowserRouter([
 createRoot(document.getElementById("root")).render(
   <StrictMode>
     <RouterProvider router={router} />
-  </StrictMode>
+  </StrictMode>,
 );

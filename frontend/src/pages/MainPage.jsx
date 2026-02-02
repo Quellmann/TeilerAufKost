@@ -45,12 +45,12 @@ const MainPage = () => {
     const response = await fetch(
       `${API_BASE_URL}/groups?groupIds=${JSON.stringify(
         JSON.parse(localStorage.getItem("groupSubscription")).map(
-          (group) => group.id
-        )
+          (group) => group.id,
+        ),
       )}`,
       {
         method: "GET",
-      }
+      },
     );
     const data = await response.json();
     const idsInDatabase = data.map((elmt) => ({
@@ -63,7 +63,7 @@ const MainPage = () => {
 
   useEffect(() => {
     const subscribedGroups = JSON.parse(
-      localStorage.getItem("groupSubscription")
+      localStorage.getItem("groupSubscription"),
     );
     if (subscribedGroups) {
       setSidebarGroups(subscribedGroups);
@@ -81,7 +81,7 @@ const MainPage = () => {
         </div>
         <div
           onClick={() => {
-            navigate("/"), emblaApi.scrollTo(1);
+            (navigate("/"), emblaApi.scrollTo(1));
           }}
           className="flex items-center gap-2 cursor-pointer"
         >
@@ -101,16 +101,16 @@ const MainPage = () => {
       <div className="flex-1 flex flex-col min-h-0 bg-light-bg dark:bg-dark-bg">
         {/* Outer Carousel */}
         <div className="flex-1 overflow-hidden relative" ref={emblaRef}>
-          <div className="flex gap-5 h-full">
+          <div className="flex gap-5 h-full min-h-0">
             {/* Sidebar */}
-            <div className="flex-none w-64 min-w-0 border-r border-light-border dark:border-dark-border overflow-hidden">
-              <div className="w-64 h-full flex flex-col justify-between">
-                <div className="p-2 space-y-2">
-                  <div className="flex justify-between">
+            <div className="flex-none w-64 min-w-0 border-r border-light-border dark:border-dark-border min-h-0">
+              <div className="w-64 h-full flex flex-col min-h-0">
+                <div className="flex-1 flex flex-col min-h-0">
+                  <div className="p-2 flex justify-between items-center border-b border-light-border dark:border-dark-border">
                     <div className="text-xl">Gruppen</div>
                     <DarkmodeToggle></DarkmodeToggle>
                   </div>
-                  <div className="flex flex-col gap-2">
+                  <div className="p-2 flex-1 overflow-y-auto flex flex-col gap-2">
                     {sidebarGroups.map((group) => (
                       <div
                         key={group.id}
@@ -118,14 +118,14 @@ const MainPage = () => {
                           navigate("/?groupId=" + group.id);
                           emblaApi.scrollTo(1);
                         }}
-                        className="p-1 rounded-lg cursor-pointer truncate bg-light-card dark:bg-dark-card border border-light-border dark:border-dark-border"
+                        className="p-1 rounded-lg min-h-10 flex items-center cursor-pointer truncate bg-light-card dark:bg-dark-card border border-light-border dark:border-dark-border"
                       >
-                        {group.name}
+                        <p>{group.name}</p>
                       </div>
                     ))}
                   </div>
                 </div>
-                <div className="px-2 pb-10">
+                <div className="p-2 mt-auto border-t border-light-border dark:border-dark-border">
                   <div
                     onClick={() => {
                       navigate("/newGroup");

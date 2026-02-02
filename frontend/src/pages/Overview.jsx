@@ -39,7 +39,7 @@ class Household {
     this.liabilities = spendings.map((item) => {
       return item.to.reduce(
         (a, b) => (memberNames.includes(b.name) ? a + b.amount : a),
-        0
+        0,
       );
     });
     this.expenditures = spendings.map((item) => {
@@ -96,18 +96,18 @@ const Overview = () => {
     });
 
     const households = Object.entries(householdMap).map(
-      ([hid, names]) => new Household(hid, names, spendings)
+      ([hid, names]) => new Household(hid, names, spendings),
     );
     return households;
   };
 
   const checkJoined = () => {
     const subscribedGroups = JSON.parse(
-      localStorage.getItem("groupSubscription")
+      localStorage.getItem("groupSubscription"),
     );
     if (subscribedGroups) {
       const isAlreadySubscribed = subscribedGroups.some(
-        (group) => group.id === groupId
+        (group) => group.id === groupId,
       );
       if (subscribedGroups && isAlreadySubscribed) {
         setJoined(true);
@@ -129,7 +129,7 @@ const Overview = () => {
     groupId && fetchData();
     checkJoined();
     setSaldoHousehold(
-      JSON.parse(localStorage.getItem("saldoHousehold") || "false")
+      JSON.parse(localStorage.getItem("saldoHousehold") || "false"),
     );
     return;
   }, [groupId, refresh]);
@@ -138,7 +138,7 @@ const Overview = () => {
     try {
       const groupResponse = await fetch(`${API_BASE_URL}/${groupId}`);
       const spendingResponse = await fetch(
-        `${API_BASE_URL}/${groupId}/spendings`
+        `${API_BASE_URL}/${groupId}/spendings`,
       );
 
       if (!groupResponse.ok || !spendingResponse.ok) {
@@ -163,7 +163,9 @@ const Overview = () => {
       setData(data);
       setSpendings(spending_data);
       setPersonData(
-        data.groupMember.map((member) => new Person(member.name, spending_data))
+        data.groupMember.map(
+          (member) => new Person(member.name, spending_data),
+        ),
       );
       setHouseholdData(householdHelper(data.groupMember, spending_data));
       setIsLoading(false);
