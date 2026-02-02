@@ -23,7 +23,7 @@ const LandingPageJoinGroup = () => {
         <ul className="gap-5 pr-5 flex flex-col">
           <li
             className={
-              "py-1 px-2 cursor-pointer border border-light-border dark:border-dark-border rounded-full " +
+              "py-1 px-2 cursor-pointer bg-light-bg dark:bg-dark-bg z-10 border border-light-border dark:border-dark-border rounded-full " +
               (joinOptionSelector === 0
                 ? "ring ring-gray-500 dark:ring-blue-500"
                 : "")
@@ -34,7 +34,7 @@ const LandingPageJoinGroup = () => {
           </li>
           <li
             className={
-              "py-1 px-2 cursor-pointer border border-light-border dark:border-dark-border rounded-full " +
+              "py-1 px-2 cursor-pointer bg-light-bg dark:bg-dark-bg z-10 border border-light-border dark:border-dark-border rounded-full " +
               (joinOptionSelector === 1
                 ? "ring ring-gray-500 dark:ring-blue-500"
                 : "")
@@ -45,7 +45,7 @@ const LandingPageJoinGroup = () => {
           </li>
           <li
             className={
-              "py-1 px-2 cursor-pointer border border-light-border dark:border-dark-border rounded-full " +
+              "py-1 px-2 cursor-pointer bg-light-bg dark:bg-dark-bg z-10 border border-light-border dark:border-dark-border rounded-full " +
               (joinOptionSelector === 2
                 ? "ring ring-gray-500 dark:ring-blue-500"
                 : "")
