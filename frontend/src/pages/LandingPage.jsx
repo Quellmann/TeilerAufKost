@@ -33,7 +33,7 @@ const LandingPage = () => {
       <div className="mt-5 flex flex-col items-center">
         <div
           onClick={scrollToHow}
-          className="cursor-pointer w-4/5 p-1 mx-auto border border-light-border dark:border-dark-border rounded-full bg-light-card dark:bg-dark-card"
+          className="cursor-pointer w-4/5 py-1 px-4 mx-auto border border-light-border dark:border-dark-border rounded-full bg-light-card dark:bg-dark-card"
         >
           Erfahre wie es funktioniert und starte jetzt, komplett kostenlos!
         </div>

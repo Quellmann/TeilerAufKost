@@ -24,7 +24,7 @@ const LandingPageAddExpanse = ({ joinOption }) => {
           <div
             className={`
             transition-all duration-300 ease-in-out
-            ${animating ? "opacity-0 -rotate-3 scale-95" : "opacity-100 rotate-0 scale-100"}
+            ${animating ? "opacity-0 rotate-3 scale-95" : "opacity-100 rotate-0 scale-100"}
           `}
           >
             <img

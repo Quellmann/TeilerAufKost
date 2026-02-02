@@ -1,11 +1,10 @@
-import React from "react";
 import { Link } from "react-router-dom";
 
 const Impressum = () => {
   const year = new Date().getFullYear();
 
   return (
-    <div className="max-w-4xl mx-auto my-12 p-6 bg-light-card dark:bg-dark-card rounded-xl border border-light-border dark:border-dark-border">
+    <div className="max-w-4xl mx-auto my-3 p-6 bg-light-card dark:bg-dark-card rounded-xl border border-light-border dark:border-dark-border">
       <div className="text-2xl font-bold mb-4">Impressum</div>
 
       <p className="mb-4">
@@ -15,13 +14,16 @@ const Impressum = () => {
       </p>
 
       <section className="mb-4">
-        <div className="font-semibold">Angaben gemäß § 5 DDG</div>
-        <div className="mt-2 text-sm">
+        <div className="mt-2 font-semibold">
           TeilerAufKost
           <br />
-          Betreiber: Sebastian Gleixner
+          Betreiber: <span className="font-normal">Sebastian Gleixner</span>
           <br />
-          Anschrift: Anni-Eisler-Lehmann-Str. 8a, Ap. 245, 55122 Mainz
+          Anschrift:
+          <span className="font-normal">
+            {" "}
+            Anni-Eisler-Lehmann-Str. 8a, Ap. 245, 55122 Mainz
+          </span>
         </div>
       </section>
 
@@ -37,32 +39,19 @@ const Impressum = () => {
 
       <section className="mb-4">
         <div className="font-semibold">Hinweis zur Nutzung</div>
-        <ul className="list-disc list-inside mt-2 text-sm">
+        <ul className="list-disc list-outside mt-2 text-sm pl-3">
           <li>Die App ist ein nicht-kommerzielles, privates Projekt.</li>
           <li>
-            Es besteht keine Pflicht zur Registrierung; personenbezogene Daten
-            werden nur verarbeitet, wenn du sie uns freiwillig (z. B. per
-            E‑Mail) mitteilst.
+            Alle eingepflegten Informationen werden unverschlüsselt auf der
+            Datenbank gespeichert und können durch den Betreiber eingesehen
+            werden. Bei Benutzung der App sollten daher keine sensible Daten
+            verwendet werden.
+          </li>
+          <li>
+            Durch die Verwendung der App stimmst du der Verarbeitung und
+            Speicherung deiner eingepflegten Informationen zu.
           </li>
         </ul>
-      </section>
-
-      <section className="mb-4">
-        <div className="font-semibold">Streitbeilegung</div>
-        <div className="mt-2 text-sm">
-          Die EU‑Plattform zur Online‑Streitbeilegung ist unter{" "}
-          <a
-            className="underline"
-            href="https://ec.europa.eu/consumers/odr/"
-            target="_blank"
-            rel="noreferrer"
-          >
-            https://ec.europa.eu/consumers/odr/
-          </a>{" "}
-          erreichbar. Wir sind nicht verpflichtet und nicht bereit, an
-          Streitbeilegungsverfahren vor einer Verbraucherschlichtungsstelle
-          teilzunehmen.
-        </div>
       </section>
 
       <div className="text-sm text-muted">
