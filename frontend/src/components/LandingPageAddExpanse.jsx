@@ -1,23 +1,10 @@
-import { useState } from "react";
+import { useState, useContext } from "react";
+import { ThemeContext } from "../context/ThemeContext";
 
 const LandingPageAddExpanse = ({ joinOption }) => {
   const [joinOptionSelector, setJoinOptionSelector] = useState(0);
   const [animating, setAnimating] = useState(false);
-
-  const addExpanseImages = [
-    {
-      dark: "/heropage/hero-addexpanse-dark.png",
-      light: "/heropage/hero-addexpanse-light.png",
-    },
-    {
-      dark: "/heropage/hero-addexpanse1-dark.png",
-      light: "/heropage/hero-addexpanse1-light.png",
-    },
-    {
-      dark: "/heropage/hero-addexpanse2-dark.png",
-      light: "/heropage/hero-addexpanse2-light.png",
-    },
-  ];
+  const { theme } = useContext(ThemeContext);
 
   const changeOption = (newIndex) => {
     if (newIndex === joinOptionSelector) return;
@@ -40,22 +27,20 @@ const LandingPageAddExpanse = ({ joinOption }) => {
             ${animating ? "opacity-0 -rotate-3 scale-95" : "opacity-100 rotate-0 scale-100"}
           `}
           >
-            {/* Dark */}
             <img
-              src={addExpanseImages[joinOptionSelector].dark}
-              loading="eager"
-              decoding="async"
+              src={`/heropage/Step3/hero-addexpanse0-${theme}.png`}
               alt=""
-              className="object-fill rounded-lg hidden dark:block shadow-2xl shadow-blue-500/90 mx-auto"
+              className={`object-fill rounded-lg shadow-2xl shadow-gray-500 dark:shadow-blue-500/90 mx-auto ${joinOptionSelector === 0 ? "block" : "hidden"}`}
             />
-
-            {/* Light */}
             <img
-              src={addExpanseImages[joinOptionSelector].light}
-              loading="eager"
-              decoding="async"
+              src={`/heropage/Step3/hero-addexpanse1-${theme}.png`}
               alt=""
-              className="object-cover rounded-lg dark:hidden shadow-2xl shadow-gray-500 mx-auto"
+              className={`object-fill rounded-lg shadow-2xl shadow-gray-500 dark:shadow-blue-500/90 mx-auto ${joinOptionSelector === 1 ? "block" : "hidden"}`}
+            />
+            <img
+              src={`/heropage/Step3/hero-addexpanse2-${theme}.png`}
+              alt=""
+              className={`object-fill rounded-lg shadow-2xl shadow-gray-500 dark:shadow-blue-500/90 mx-auto ${joinOptionSelector === 2 ? "block" : "hidden"}`}
             />
           </div>
         </div>
@@ -145,22 +130,20 @@ const LandingPageAddExpanse = ({ joinOption }) => {
             ${animating ? "opacity-0 -rotate-3 scale-95" : "opacity-100 rotate-0 scale-100"}
           `}
           >
-            {/* Dark */}
             <img
-              src={addExpanseImages[joinOptionSelector].dark}
-              loading="eager"
-              decoding="async"
+              src={`/heropage/Step3/hero-addexpanse0-${theme}.png`}
               alt=""
-              className="object-fill rounded-lg hidden dark:block shadow-2xl shadow-blue-500/90 mx-auto"
+              className={`object-fill rounded-lg shadow-2xl shadow-gray-500 dark:shadow-blue-500/90 mx-auto ${joinOptionSelector === 0 ? "block" : "hidden"}`}
             />
-
-            {/* Light */}
             <img
-              src={addExpanseImages[joinOptionSelector].light}
-              loading="eager"
-              decoding="async"
+              src={`/heropage/Step3/hero-addexpanse1-${theme}.png`}
               alt=""
-              className="object-cover rounded-lg dark:hidden shadow-2xl shadow-gray-500 mx-auto"
+              className={`object-fill rounded-lg shadow-2xl shadow-gray-500 dark:shadow-blue-500/90 mx-auto ${joinOptionSelector === 1 ? "block" : "hidden"}`}
+            />
+            <img
+              src={`/heropage/Step3/hero-addexpanse2-${theme}.png`}
+              alt=""
+              className={`object-fill rounded-lg shadow-2xl shadow-gray-500 dark:shadow-blue-500/90 mx-auto ${joinOptionSelector === 2 ? "block" : "hidden"}`}
             />
           </div>
         </div>

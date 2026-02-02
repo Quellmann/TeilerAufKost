@@ -5,15 +5,13 @@ import {
   CheckIcon,
   PlusIcon,
   PresentationChartLineIcon,
-  DocumentMagnifyingGlassIcon,
-  EnvelopeIcon,
-  DocumentTextIcon,
 } from "@heroicons/react/24/outline";
 import { useState } from "react";
 
 import LandingPageJoinGroup from "../components/LandingPageJoinGroup";
 import LandingPageAddExpanse from "../components/LandingPageAddExpanse";
 import LandingPageOverview from "../components/LandingPageOverview";
+import LandingPageNewGroup from "../components/LandingPageNewGroup";
 
 const LandingPage = () => {
   const scrollToHow = () => {
@@ -160,7 +158,11 @@ const LandingPage = () => {
               </div>
             </div>
           </div>
-          <LandingPageJoinGroup joinOption={joinOption}></LandingPageJoinGroup>
+          {joinOption === 0 ? (
+            <LandingPageNewGroup></LandingPageNewGroup>
+          ) : (
+            <LandingPageJoinGroup></LandingPageJoinGroup>
+          )}
           {/* Schritt 3 */}
           <div className="mt-28">
             <div

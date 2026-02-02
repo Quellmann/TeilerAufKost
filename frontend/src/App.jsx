@@ -1,7 +1,12 @@
 import MainPage from "./pages/MainPage";
+import ThemeProvider from "./context/ThemeContext";
 
 function App() {
-  return <MainPage></MainPage>;
+  return (
+    <ThemeProvider>
+      <MainPage />
+    </ThemeProvider>
+  );
 }
 
 export default App;

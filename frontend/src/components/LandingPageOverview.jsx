@@ -1,31 +1,10 @@
-import { useState } from "react";
+import { useState, useContext } from "react";
+import { ThemeContext } from "../context/ThemeContext";
 
 const LandingPageOverview = ({ joinOption }) => {
   const [joinOptionSelector, setJoinOptionSelector] = useState(0);
   const [animating, setAnimating] = useState(false);
-
-  const overviewImages = [
-    {
-      dark: "/heropage/hero-overview-dark.png",
-      light: "/heropage/hero-overview-light.png",
-    },
-    {
-      dark: "/heropage/hero-overview1-dark.png",
-      light: "/heropage/hero-overview1-light.png",
-    },
-    {
-      dark: "/heropage/hero-overview2-dark.png",
-      light: "/heropage/hero-overview2-light.png",
-    },
-    {
-      dark: "/heropage/hero-overview3-dark.png",
-      light: "/heropage/hero-overview3-light.png",
-    },
-    {
-      dark: "/heropage/hero-overview4-dark.png",
-      light: "/heropage/hero-overview4-light.png",
-    },
-  ];
+  const { theme } = useContext(ThemeContext);
 
   const changeOption = (newIndex) => {
     if (newIndex === joinOptionSelector) return;
@@ -48,22 +27,30 @@ const LandingPageOverview = ({ joinOption }) => {
             ${animating ? "opacity-0 -rotate-3 scale-95" : "opacity-100 rotate-0 scale-100"}
           `}
           >
-            {/* Dark */}
             <img
-              src={overviewImages[joinOptionSelector].dark}
-              loading="eager"
-              decoding="async"
+              src={`/heropage/Step4/hero-overview0-${theme}.png`}
               alt=""
-              className="object-fill rounded-lg hidden dark:block shadow-2xl shadow-blue-500/90 mx-auto"
+              className={`object-fill rounded-lg shadow-2xl shadow-gray-500 dark:shadow-blue-500/90 mx-auto ${joinOptionSelector === 0 ? "block" : "hidden"}`}
             />
-
-            {/* Light */}
             <img
-              src={overviewImages[joinOptionSelector].light}
-              loading="eager"
-              decoding="async"
+              src={`/heropage/Step4/hero-overview1-${theme}.png`}
               alt=""
-              className="object-cover rounded-lg dark:hidden shadow-2xl shadow-gray-500 mx-auto"
+              className={`object-fill rounded-lg shadow-2xl shadow-gray-500 dark:shadow-blue-500/90 mx-auto ${joinOptionSelector === 1 ? "block" : "hidden"}`}
+            />
+            <img
+              src={`/heropage/Step4/hero-overview2-${theme}.png`}
+              alt=""
+              className={`object-fill rounded-lg shadow-2xl shadow-gray-500 dark:shadow-blue-500/90 mx-auto ${joinOptionSelector === 2 ? "block" : "hidden"}`}
+            />
+            <img
+              src={`/heropage/Step4/hero-overview3-${theme}.png`}
+              alt=""
+              className={`object-fill rounded-lg shadow-2xl shadow-gray-500 dark:shadow-blue-500/90 mx-auto ${joinOptionSelector === 3 ? "block" : "hidden"}`}
+            />
+            <img
+              src={`/heropage/Step4/hero-overview4-${theme}.png`}
+              alt=""
+              className={`object-fill rounded-lg shadow-2xl shadow-gray-500 dark:shadow-blue-500/90 mx-auto ${joinOptionSelector === 4 ? "block" : "hidden"}`}
             />
           </div>
         </div>
@@ -197,22 +184,30 @@ const LandingPageOverview = ({ joinOption }) => {
             ${animating ? "opacity-0 -rotate-3 scale-95" : "opacity-100 rotate-0 scale-100"}
           `}
           >
-            {/* Dark */}
             <img
-              src={overviewImages[joinOptionSelector].dark}
-              loading="eager"
-              decoding="async"
+              src={`/heropage/Step4/hero-overview0-${theme}.png`}
               alt=""
-              className="object-fill rounded-lg hidden dark:block shadow-2xl shadow-blue-500/90 mx-auto"
+              className={`object-fill rounded-lg shadow-2xl shadow-gray-500 dark:shadow-blue-500/90 mx-auto ${joinOptionSelector === 0 ? "block" : "hidden"}`}
             />
-
-            {/* Light */}
             <img
-              src={overviewImages[joinOptionSelector].light}
-              loading="eager"
-              decoding="async"
+              src={`/heropage/Step4/hero-overview1-${theme}.png`}
               alt=""
-              className="object-cover rounded-lg dark:hidden shadow-2xl shadow-gray-500 mx-auto"
+              className={`object-fill rounded-lg shadow-2xl shadow-gray-500 dark:shadow-blue-500/90 mx-auto ${joinOptionSelector === 1 ? "block" : "hidden"}`}
+            />
+            <img
+              src={`/heropage/Step4/hero-overview2-${theme}.png`}
+              alt=""
+              className={`object-fill rounded-lg shadow-2xl shadow-gray-500 dark:shadow-blue-500/90 mx-auto ${joinOptionSelector === 2 ? "block" : "hidden"}`}
+            />
+            <img
+              src={`/heropage/Step4/hero-overview3-${theme}.png`}
+              alt=""
+              className={`object-fill rounded-lg shadow-2xl shadow-gray-500 dark:shadow-blue-500/90 mx-auto ${joinOptionSelector === 3 ? "block" : "hidden"}`}
+            />
+            <img
+              src={`/heropage/Step4/hero-overview4-${theme}.png`}
+              alt=""
+              className={`object-fill rounded-lg shadow-2xl shadow-gray-500 dark:shadow-blue-500/90 mx-auto ${joinOptionSelector === 4 ? "block" : "hidden"}`}
             />
           </div>
         </div>
