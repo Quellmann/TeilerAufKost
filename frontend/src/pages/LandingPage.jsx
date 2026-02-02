@@ -213,12 +213,12 @@ const LandingPage = () => {
 
       {/* CTA - Call to action */}
       <div className="mt-28 p-6 rounded-2xl bg-light-card dark:bg-dark-card border border-light-border dark:border-dark-border">
-        <div className="max-w-4xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
+        <div className="max-w-4xl mx-auto flex flex-col items-center justify-between gap-4">
           <div className="text-left">
-            <div className="text-2xl font-bold">
+            <div className="text-2xl font-bold text-center">
               Bereit, gemeinsame Ausgaben zu vereinfachen?
             </div>
-            <div className="mt-2 text-sm text-muted">
+            <div className="mt-2 text-sm text-center">
               Starte jetzt direkt, erstelle eine Gruppe und lade Freunde per
               QR‑Code oder Link ein.
             </div>
@@ -226,7 +226,7 @@ const LandingPage = () => {
           <div className="flex gap-3">
             <a
               href="/newGroup"
-              className="px-6 py-3 bg-blue-600 text-white rounded-xl shadow hover:bg-blue-700"
+              className="px-6 py-3 rounded-xl border border-light-border dark:border-dark-border ring ring-gray-500 dark:ring-blue-500"
             >
               Jetzt Gruppe erstellen
             </a>
