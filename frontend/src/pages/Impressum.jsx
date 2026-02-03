@@ -14,38 +14,29 @@ const Impressum = () => {
       </p>
 
       <section className="mb-4">
-        <div className="mt-2 font-semibold">
-          TeilerAufKost
-          <br />
-          Betreiber: <span className="font-normal">Sebastian Gleixner</span>
-          <br />
-          Anschrift:
-          <span className="font-normal">
-            {" "}
-            Anni-Eisler-Lehmann-Str. 8a, Ap. 245, 55122 Mainz
-          </span>
+        <div className="mt-2">
+          <div className="text-lg font-semibold">TeilerAufKost</div>
+          <div className="mt-2">
+            Betreiber: <span>Sebastian Gleixner</span>
+          </div>
+          <div className="">
+            Kontakt: <span>sebastian.gleixner.stud@gmail.com</span>
+          </div>
         </div>
       </section>
 
       <section className="mb-4">
-        <div className="font-semibold">Kontakt</div>
-        <div className="mt-2 text-sm">
-          E-Mail:{" "}
-          <a className="underline" href="sebastian.gleixner.stud@gmail.com">
-            sebastian.gleixner.stud@gmail.com
-          </a>
-        </div>
-      </section>
-
-      <section className="mb-4">
-        <div className="font-semibold">Hinweis zur Nutzung</div>
+        <div className="text-lg font-semibold">Hinweis zur Nutzung</div>
         <ul className="list-disc list-outside mt-2 text-sm pl-3">
           <li>Die App ist ein nicht-kommerzielles, privates Projekt.</li>
           <li>
             Alle eingepflegten Informationen werden unverschlüsselt auf der
             Datenbank gespeichert und können durch den Betreiber eingesehen
-            werden. Bei Benutzung der App sollten daher keine sensible Daten
-            verwendet werden.
+            werden.
+          </li>
+          <li>
+            Bei Benutzung der App sollten keine sensiblen Daten verwendet und
+            innerhalb einer Gruppe abgespeichert werden.
           </li>
           <li>
             Durch die Verwendung der App stimmst du der Verarbeitung und
