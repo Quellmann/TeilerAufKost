@@ -239,7 +239,7 @@ const LandingPage = () => {
       </div>
 
       {/* Footer */}
-      <footer className="mt-12 pt-6 border-t border-light-border dark:border-dark-border">
+      <footer className="mt-[300px] pt-6 border-t border-light-border dark:border-dark-border">
         <div className="max-w-6xl mx-auto px-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 text-sm">
           <div className="flex flex-col">
             <span className="text-muted">© {year} TeilerAufKost</span>
