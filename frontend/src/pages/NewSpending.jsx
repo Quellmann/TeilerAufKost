@@ -106,9 +106,32 @@ const NewSpending = ({ emblaApi, setRefresh }) => {
           isBalancingTransaction: true,
         }));
         setPercentages((prev) => ({ ...prev, [searchParams.get("to")]: 100 }));
+      } else {
+        setForm((prev) => ({
+          ...prev,
+          title: "Ausgleichszahlung",
+          amount: searchParams.get("amount"),
+          from: fromUrlHelper(),
+          to: toUrlHelper(),
+          isBalancingTransaction: true,
+        }));
+        setPercentages((prev) => ({ ...prev, [searchParams.get("to")]: 100 }));
       }
     }
   }, [data]);
+
+  const fromUrlHelper = () => {
+    const decoded = decodeURIComponent(searchParams.get("from"));
+    const obj = JSON.parse(decoded);
+    console.log(obj);
+    return obj;
+  };
+
+  const toUrlHelper = () => {
+    const decoded = decodeURIComponent(searchParams.get("to"));
+    const obj = JSON.parse(decoded);
+    return obj;
+  };
 
   useEffect(() => {
     async function fetchData() {

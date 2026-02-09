@@ -82,8 +82,13 @@ const Balancing = ({ saldoData }) => {
                       type: "transaction",
                       mode: "edit",
                       amount: balancing.amount.toFixed(2),
-                      from: balancing.from,
-                      to: balancing.to,
+                      from: JSON.stringify(balancing.from),
+                      to: JSON.stringify([
+                        {
+                          name: balancing.to,
+                          amount: balancing.amount.toFixed(2),
+                        },
+                      ]),
                     })}`}
                     className="flex justify-center rounded-lg px-4 py-1 hover:bg-green-400 dark:hover:bg-dark-accent border border-light-border dark:border-dark-border"
                     onClick={() => emblaApi.scrollTo(2)}
