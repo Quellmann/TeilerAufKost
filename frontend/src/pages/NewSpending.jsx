@@ -106,7 +106,10 @@ const NewSpending = ({ emblaApi, setRefresh }) => {
           isBalancingTransaction: true,
         }));
         setPercentages((prev) => ({ ...prev, [searchParams.get("to")]: 100 }));
-      } else {
+      } else if (
+        searchParams.get("type") === "transaction" &&
+        searchParams.get("mode") === "edit"
+      ) {
         setForm((prev) => ({
           ...prev,
           title: "Ausgleichszahlung",
@@ -123,7 +126,6 @@ const NewSpending = ({ emblaApi, setRefresh }) => {
   const fromUrlHelper = () => {
     const decoded = decodeURIComponent(searchParams.get("from"));
     const obj = JSON.parse(decoded);
-    console.log(obj);
     return obj;
   };
 
