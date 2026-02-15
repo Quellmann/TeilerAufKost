@@ -11,9 +11,10 @@ import Options from "./InnerCarousel/Options";
 import { ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/24/outline";
 
 const Carousel = ({ saldoData, spendings, groupMembers }) => {
-  const [emblaRef, emblaApi] = useEmblaCarousel({ watchDrag: false }, [
-    AutoHeight(),
-  ]);
+  const [emblaRef, emblaApi] = useEmblaCarousel(
+    { watchDrag: false, loop: true },
+    [AutoHeight()],
+  );
   const [selectedIndex, setSelectedIndex] = useState(0);
 
   const scrollPrev = useCallback(() => {
