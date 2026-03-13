@@ -38,7 +38,10 @@ const LandingPage = () => {
           Erfahre wie es funktioniert und starte jetzt, komplett kostenlos!
         </div>
         <div>
-          <ChevronDoubleDownIcon className="cursor-pointer w-6 h-6 mt-2 mx-auto" />
+          <ChevronDoubleDownIcon
+            onClick={scrollToHow}
+            className="cursor-pointer w-6 h-6 mt-2 mx-auto"
+          />
         </div>
       </div>
 
